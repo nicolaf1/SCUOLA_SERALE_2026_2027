@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCD e mcm - Esercizi e Quiz</title>
+<style>
+  :root {
+    --primario: #1a5fa8;
+    --primario-scuro: #0d3f75;
+    --primario-chiaro: #e8f1fb;
+    --arancio: #e67e22;
+    --arancio-scuro: #c8660f;
+    --grigio-bg: #f2f2f2;
+    --grigio-bordo: #b0b0b0;
+    --verde: #2e8b57;
+    --rosso: #c0392b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #fafafa;
+    color: #222;
+    margin: 0;
+    padding: 0 0 60px 0;
+    line-height: 1.5;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primario), var(--primario-scuro));
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  header h1 { margin: 0 0 8px 0; font-size: 1.8em; }
+  header p { margin: 0; opacity: 0.9; }
+
+  main {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  section {
+    margin-top: 35px;
+  }
+
+  h2 {
+    color: var(--primario-scuro);
+    border-bottom: 3px solid var(--arancio);
+    padding-bottom: 6px;
+    font-size: 1.4em;
+  }
+
+  .teoria {
+    background: var(--grigio-bg);
+    border: 1px solid var(--grigio-bordo);
+    border-left: 6px solid var(--primario);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+
+  .teoria h3 {
+    margin-top: 0;
+    color: var(--primario-scuro);
+  }
+
+  .formula {
+    background: white;
+    border: 1px dashed var(--primario);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 1.1em;
+    text-align: center;
+    font-weight: bold;
+    color: var(--primario-scuro);
+  }
+
+  .esercizio {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .esercizio .numeri {
+    font-size: 1.15em;
+    font-weight: bold;
+    color: var(--primario-scuro);
+    margin-bottom: 10px;
+  }
+
+  .esercizio label {
+    display: inline-block;
+    width: 60px;
+    font-weight: bold;
+  }
+
+  .esercizio input[type="number"] {
+    width: 90px;
+    padding: 6px 8px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-right: 14px;
+  }
+
+  .esercizio input[type="number"].corretto {
+    border-color: var(--verde);
+    background: #eafaf0;
+  }
+
+  .esercizio input[type="number"].sbagliato {
+    border-color: var(--rosso);
+    background: #fdecea;
+  }
+
+  button {
+    background: var(--arancio);
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+
+  button:hover { background: var(--arancio-scuro); }
+
+  button.secondario {
+    background: var(--primario);
+  }
+
+  button.secondario:hover { background: var(--primario-scuro); }
+
+  .feedback {
+    margin-top: 10px;
+    font-weight: bold;
+    min-height: 22px;
+  }
+
+  .feedback.ok { color: var(--verde); }
+  .feedback.no { color: var(--rosso); }
+
+  .soluzione {
+    margin-top: 10px;
+    background: var(--primario-chiaro);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: none;
+    font-size: 0.95em;
+  }
+
+  .soluzione.visibile { display: block; }
+
+  .toggle-sol {
+    background: none;
+    color: var(--primario);
+    text-decoration: underline;
+    padding: 0;
+    font-weight: normal;
+    font-size: 0.9em;
+    margin-left: 6px;
+  }
+  .toggle-sol:hover { background: none; color: var(--primario-scuro); }
+
+  /* Quiz */
+  .quiz-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .quiz-box .domanda {
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: var(--primario-scuro);
+  }
+
+  .opzione {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--grigio-bg);
+    border: 1px solid #ccc;
+    color: #222;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+  }
+
+  .opzione:hover { background: #e6e6e6; }
+
+  .opzione.corretta {
+    background: #d4f4dd;
+    border-color: var(--verde);
+    color: #1e5e37;
+  }
+
+  .opzione.sbagliata {
+    background: #fbdcd8;
+    border-color: var(--rosso);
+    color: var(--rosso);
+  }
+
+  .opzione:disabled { cursor: default; }
+
+  .spiegazione {
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #444;
+    display: none;
+  }
+  .spiegazione.visibile { display: block; }
+
+  #risultato-quiz {
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 14px;
+    display: none;
+  }
+
+  .barra-progresso {
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 10px;
+    margin-bottom: 16px;
+  }
+  .barra-progresso-interna {
+    background: var(--arancio);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .random-box {
+    background: white;
+    border: 2px solid var(--primario);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .random-numeri {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--primario-scuro);
+    margin: 15px 0;
+    letter-spacing: 2px;
+  }
+
+  .azioni {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+    font-size: 0.85em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MCD e mcm</h1>
+  <p>Esercizi guidati, esercizi rapidi e quiz di autoverifica</p>
+</header>
+
+<main>
+
+  <section id="teoria">
+    <h2>Richiami teorici</h2>
+    <div class="teoria">
+      <h3>Massimo Comun Divisore (MCD)</h3>
+      <p>Il <strong>MCD</strong> di due o più numeri è il più grande numero che divide esattamente tutti i numeri dati. Si calcola scomponendo i numeri in fattori primi e prendendo i <strong>fattori comuni con l'esponente più piccolo</strong>.</p>
+      <h3>Minimo Comune Multiplo (mcm)</h3>
+      <p>Il <strong>mcm</strong> di due o più numeri è il più piccolo numero (diverso da zero) che è multiplo di tutti i numeri dati. Si calcola prendendo <strong>tutti i fattori primi, comuni e non comuni, con l'esponente più grande</strong>.</p>
+      <div class="formula">MCD(a, b) &times; mcm(a, b) = a &times; b</div>
+      <p style="margin-bottom:0;">Questa relazione vale solo per <strong>due</strong> numeri e permette di trovare l'uno conoscendo l'altro.</p>
+    </div>
+  </section>
+
+  <section id="esercizi-guidati">
+    <h2>Esercizi guidati</h2>
+    <p>Calcola MCD e mcm di ciascuna coppia, poi controlla il risultato. Puoi mostrare la scomposizione in fattori primi come aiuto.</p>
+    <div id="contenitore-esercizi"></div>
+  </section>
+
+  <section id="random">
+    <h2>Allenamento rapido</h2>
+    <div class="random-box">
+      <p>Genera due numeri casuali e calcola mentalmente (o su carta) il loro MCD e mcm.</p>
+      <div class="random-numeri" id="numeri-random">— , —</div>
+      <button class="secondario" onclick="generaNumeriRandom()">Genera nuova coppia</button>
+      <button onclick="mostraRisultatoRandom()">Mostra soluzione</button>
+      <div class="soluzione" id="soluzione-random"></div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <h2>Quiz a risposta multipla</h2>
+    <div class="barra-progresso"><div class="barra-progresso-interna" id="barra-interna"></div></div>
+    <div id="contenitore-quiz"></div>
+    <div id="risultato-quiz"></div>
+    <div class="azioni">
+      <button class="secondario" onclick="riavviaQuiz()">Riavvia quiz</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>Materiale didattico &mdash; MCD e mcm</footer>
+
+<script>
+"use strict";
+
+/* ---------- utilità matematiche ---------- */
+
+function scomponiInFattori(n) {
+  const fattori = {};
+  let d = 2;
+  let resto = n;
+  while (d * d <= resto) {
+    while (resto % d === 0) {
+      fattori[d] = (fattori[d] || 0) + 1;
+      resto = resto / d;
+    }
+    d++;
+  }
+  if (resto > 1) {
+    fattori[resto] = (fattori[resto] || 0) + 1;
+  }
+  return fattori;
+}
+
+function scomposizioneTesto(n) {
+  const f = scomponiInFattori(n);
+  const parti = Object.keys(f).map(function (base) {
+    const esp = f[base];
+    return esp === 1 ? base : base + "^" + esp;
+  });
+  return n + " = " + parti.join(" x ");
+}
+
+function mcd(a, b) {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  while (b !== 0) {
+    const t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
+function mcm(a, b) {
+  return Math.abs(a * b) / mcd(a, b);
+}
+
+function numeroCasuale(minimo, massimo) {
+  return Math.floor(Math.random() * (massimo - minimo + 1)) + minimo;
+}
+
+/* ---------- esercizi guidati ---------- */
+
+const coppieEsercizi = [
+  [12, 18],
+  [24, 36],
+  [15, 40],
+  [28, 42],
+  [45, 60],
+  [32, 48]
+];
+
+function costruisciEsercizi() {
+  const contenitore = document.getElementById("contenitore-esercizi");
+  coppieEsercizi.forEach(function (coppia, indice) {
+    const a = coppia[0];
+    const b = coppia[1];
+    const div = document.createElement("div");
+    div.className = "esercizio";
+    div.innerHTML =
+      '<div class="numeri">Esercizio ' + (indice + 1) + ': calcola MCD e mcm di ' + a + ' e ' + b + '</div>' +
+      '<div>' +
+      '<label>MCD =</label><input type="number" id="mcd-' + indice + '">' +
+      '<label>mcm =</label><input type="number" id="mcm-' + indice + '">' +
+      '<button onclick="verificaEsercizio(' + indice + ', ' + a + ', ' + b + ')">Verifica</button>' +
+      '<button class="toggle-sol" onclick="mostraNascondiSoluzione(' + indice + ')">mostra svolgimento</button>' +
+      '</div>' +
+      '<div class="feedback" id="feedback-' + indice + '"></div>' +
+      '<div class="soluzione" id="sol-' + indice + '">' +
+      '<p>' + scomposizioneTesto(a) + '</p>' +
+      '<p>' + scomposizioneTesto(b) + '</p>' +
+      '<p><strong>MCD</strong> = fattori comuni con esponente minimo = ' + mcd(a, b) + '</p>' +
+      '<p><strong>mcm</strong> = tutti i fattori con esponente massimo = ' + mcm(a, b) + '</p>' +
+      '</div>';
+    contenitore.appendChild(div);
+  });
+}
+
+function verificaEsercizio(indice, a, b) {
+  const inputMcd = document.getElementById("mcd-" + indice);
+  const inputMcm = document.getElementById("mcm-" + indice);
+  const feedback = document.getElementById("feedback-" + indice);
+
+  const valoreMcd = parseInt(inputMcd.value, 10);
+  const valoreMcm = parseInt(inputMcm.value, 10);
+
+  const mcdCorretto = mcd(a, b);
+  const mcmCorretto = mcm(a, b);
+
+  const mcdOk = valoreMcd === mcdCorretto;
+  const mcmOk = valoreMcm === mcmCorretto;
+
+  inputMcd.className = mcdOk ? "corretto" : "sbagliato";
+  inputMcm.className = mcmOk ? "corretto" : "sbagliato";
+
+  if (mcdOk && mcmOk) {
+    feedback.textContent = "Esatto! Ottimo lavoro.";
+    feedback.className = "feedback ok";
+  } else {
+    feedback.textContent = "Non ancora corretto. Riprova o mostra lo svolgimento.";
+    feedback.className = "feedback no";
+  }
+}
+
+function mostraNascondiSoluzione(indice) {
+  const sol = document.getElementById("sol-" + indice);
+  sol.classList.toggle("visibile");
+}
+
+/* ---------- allenamento rapido ---------- */
+
+let numeroA = 0;
+let numeroB = 0;
+
+function generaNumeriRandom() {
+  numeroA = numeroCasuale(6, 60);
+  numeroB = numeroCasuale(6, 60);
+  document.getElementById("numeri-random").textContent = numeroA + " , " + numeroB;
+  const sol = document.getElementById("soluzione-random");
+  sol.classList.remove("visibile");
+  sol.innerHTML = "";
+}
+
+function mostraRisultatoRandom() {
+  if (numeroA === 0 || numeroB === 0) {
+    generaNumeriRandom();
+    return;
+  }
+  const sol = document.getElementById("soluzione-random");
+  sol.innerHTML =
+    '<p>' + scomposizioneTesto(numeroA) + '</p>' +
+    '<p>' + scomposizioneTesto(numeroB) + '</p>' +
+    '<p><strong>MCD</strong> = ' + mcd(numeroA, numeroB) + '</p>' +
+    '<p><strong>mcm</strong> = ' + mcm(numeroA, numeroB) + '</p>';
+  sol.classList.add("visibile");
+}
+
+/* ---------- quiz ---------- */
+
+const domandeQuiz = [
+  {
+    testo: "Qual è il MCD tra 18 e 24?",
+    opzioni: ["6", "3", "9", "12"],
+    corretta: 0,
+    spiegazione: "18 = 2 x 3^2, 24 = 2^3 x 3. I fattori comuni con esponente minimo sono 2 e 3, quindi MCD = 2 x 3 = 6."
+  },
+  {
+    testo: "Qual è il mcm tra 4 e 6?",
+    opzioni: ["24", "10", "2", "12"],
+    corretta: 3,
+    spiegazione: "4 = 2^2, 6 = 2 x 3. Il mcm prende tutti i fattori con esponente massimo: 2^2 x 3 = 12."
+  },
+  {
+    testo: "Se MCD(a, b) = 1, come si chiamano a e b?",
+    opzioni: ["Numeri pari", "Numeri primi tra loro", "Numeri multipli", "Numeri quadrati"],
+    corretta: 1,
+    spiegazione: "Due numeri con MCD = 1 non hanno fattori primi in comune e si dicono primi tra loro (o coprimi)."
+  },
+  {
+    testo: "Sapendo che MCD(15, 20) = 5, quanto vale mcm(15, 20)?",
+    opzioni: ["60", "300", "15", "100"],
+    corretta: 0,
+    spiegazione: "Usando MCD x mcm = a x b: mcm = (15 x 20) / 5 = 300 / 5 = 60."
+  },
+  {
+    testo: "Qual è il mcm tra due numeri primi tra loro, per esempio 8 e 9?",
+    opzioni: ["1", "17", "72", "8"],
+    corretta: 2,
+    spiegazione: "Se MCD = 1, il mcm coincide con il prodotto dei due numeri: 8 x 9 = 72."
+  },
+  {
+    testo: "Qual è il MCD tra 0 e un numero n diverso da zero?",
+    opzioni: ["0", "1", "n", "Non esiste"],
+    corretta: 2,
+    spiegazione: "Ogni numero divide 0, quindi il divisore comune più grande tra 0 e n è n stesso."
+  },
+  {
+    testo: "In quale contesto si usa tipicamente il mcm?",
+    opzioni: [
+      "Semplificare una frazione",
+      "Sommare frazioni con denominatori diversi",
+      "Trovare il resto di una divisione",
+      "Calcolare una percentuale"
+    ],
+    corretta: 1,
+    spiegazione: "Per sommare o sottrarre frazioni con denominatori diversi si porta tutto al minimo comune denominatore, che è il mcm dei denominatori."
+  },
+  {
+    testo: "Qual è il MCD tra 100 e 75?",
+    opzioni: ["5", "25", "10", "50"],
+    corretta: 1,
+    spiegazione: "100 = 2^2 x 5^2, 75 = 3 x 5^2. Il fattore comune con esponente minimo è 5^2 = 25."
+  }
+];
+
+let indiceCorrente = 0;
+let punteggio = 0;
+let risposteDate = [];
+
+function iniziaQuiz() {
+  indiceCorrente = 0;
+  punteggio = 0;
+  risposteDate = [];
+  document.getElementById("risultato-quiz").style.display = "none";
+  mostraDomandaCorrente();
+}
+
+function aggiornaBarra() {
+  const percentuale = (indiceCorrente / domandeQuiz.length) * 100;
+  document.getElementById("barra-interna").style.width = percentuale + "%";
+}
+
+function mostraDomandaCorrente() {
+  aggiornaBarra();
+  const contenitore = document.getElementById("contenitore-quiz");
+
+  if (indiceCorrente >= domandeQuiz.length) {
+    contenitore.innerHTML = "";
+    mostraRisultatoFinale();
+    return;
+  }
+
+  const domanda = domandeQuiz[indiceCorrente];
+  const div = document.createElement("div");
+  div.className = "quiz-box";
+
+  let opzioniHtml = "";
+  domanda.opzioni.forEach(function (opzione, i) {
+    opzioniHtml += '<button class="opzione" onclick="rispondi(' + i + ')">' + opzione + '</button>';
+  });
+
+  div.innerHTML =
+    '<div class="domanda">Domanda ' + (indiceCorrente + 1) + ' di ' + domandeQuiz.length + ': ' + domanda.testo + '</div>' +
+    opzioniHtml +
+    '<div class="spiegazione" id="spiegazione-corrente">' + domanda.spiegazione + '</div>';
+
+  contenitore.innerHTML = "";
+  contenitore.appendChild(div);
+}
+
+function rispondi(indiceScelto) {
+  const domanda = domandeQuiz[indiceCorrente];
+  const bottoni = document.querySelectorAll("#contenitore-quiz .opzione");
+
+  bottoni.forEach(function (bottone, i) {
+    bottone.disabled = true;
+    if (i === domanda.corretta) {
+      bottone.classList.add("corretta");
+    } else if (i === indiceScelto) {
+      bottone.classList.add("sbagliata");
+    }
+  });
+
+  document.getElementById("spiegazione-corrente").classList.add("visibile");
+
+  const corretto = indiceScelto === domanda.corretta;
+  if (corretto) {
+    punteggio++;
+  }
+  risposteDate.push(corretto);
+
+  setTimeout(function () {
+    indiceCorrente++;
+    mostraDomandaCorrente();
+  }, 1800);
+}
+
+function mostraRisultatoFinale() {
+  aggiornaBarra();
+  const box = document.getElementById("risultato-quiz");
+  const percentuale = Math.round((punteggio / domandeQuiz.length) * 100);
+
+  let messaggio;
+  let colore;
+  if (percentuale === 100) {
+    messaggio = "Perfetto! Hai risposto correttamente a tutte le domande.";
+    colore = "#d4f4dd";
+  } else if (percentuale >= 60) {
+    messaggio = "Buon lavoro, ma ripassa i punti che ti sono sfuggiti.";
+    colore = "#fff3cd";
+  } else {
+    messaggio = "Ti conviene ripassare MCD e mcm prima di riprovare.";
+    colore = "#fbdcd8";
+  }
+
+  box.style.display = "block";
+  box.style.background = colore;
+  box.textContent = "Punteggio: " + punteggio + " / " + domandeQuiz.length + " (" + percentuale + "%) - " + messaggio;
+}
+
+function riavviaQuiz() {
+  iniziaQuiz();
+}
+
+/* ---------- inizializzazione ---------- */
+
+document.addEventListener("DOMContentLoaded", function () {
+  costruisciEsercizi();
+  generaNumeriRandom();
+  iniziaQuiz();
+});
+</script>
+
+</body>
+</html>

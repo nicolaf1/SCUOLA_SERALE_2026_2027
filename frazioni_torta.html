@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frazioni - Esercizi Interattivi</title>
+<style>
+  :root{
+    --primary:#4F86C6;
+    --primary-dark:#2c5f8a;
+    --secondary:#f2994a;
+    --success:#27ae60;
+    --danger:#e74c3c;
+    --bg:#eef3fa;
+    --card:#ffffff;
+    --empty-fill:#e3eaf3;
+    --text:#233044;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,#dfe9f7 0%,#f5f8fd 100%);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  header{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:white;
+    padding:22px 16px 18px;
+    text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  }
+  header h1{margin:0 0 4px;font-size:1.6rem;}
+  header p{margin:0;opacity:0.9;font-size:0.95rem;}
+
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin:18px auto 0;
+    max-width:900px;
+    padding:0 12px;
+  }
+  .tab-btn{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:0.95rem;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .tab-btn:hover{background:#eaf1fb;}
+  .tab-btn.active{
+    background:var(--primary);
+    color:white;
+    box-shadow:0 3px 8px rgba(79,134,198,0.4);
+  }
+
+  main{
+    max-width:900px;
+    margin:22px auto;
+    padding:0 14px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 6px 20px rgba(30,60,100,0.10);
+    padding:24px;
+    margin-bottom:20px;
+    display:none;
+  }
+  .card.active{display:block;}
+  .card h2{margin-top:0;color:var(--primary-dark);font-size:1.3rem;}
+  .card .istruzioni{
+    background:#fff6e9;
+    border-left:4px solid var(--secondary);
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:0.92rem;
+    margin-bottom:18px;
+  }
+
+  .pies-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    justify-content:center;
+    align-items:flex-start;
+    margin:18px 0;
+  }
+  .pie-wrap{text-align:center;}
+  .pie-wrap .label{
+    margin-top:8px;
+    font-weight:600;
+    color:var(--primary-dark);
+  }
+  svg.pie-svg{
+    cursor:default;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+  }
+  svg.pie-svg.clickable path{cursor:pointer;}
+  svg.pie-svg path{transition:fill 0.15s;}
+
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    margin-top:16px;
+  }
+  .frazione-input{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-size:1.4rem;
+    font-weight:700;
+  }
+  .frazione-input input{
+    width:64px;
+    text-align:center;
+    font-size:1.2rem;
+    padding:6px;
+    border:2px solid var(--primary);
+    border-radius:8px;
+    margin:2px 0;
+  }
+  .frazione-line{
+    width:60px;
+    border-bottom:3px solid var(--primary-dark);
+    margin:2px 0;
+  }
+  .plus-sign, .equals-sign{
+    font-size:1.6rem;
+    font-weight:700;
+    color:var(--primary-dark);
+    align-self:center;
+    padding:0 4px;
+  }
+
+  button.action{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.2s, transform 0.1s;
+  }
+  button.action:hover{background:var(--primary-dark);}
+  button.action:active{transform:scale(0.97);}
+  button.secondary{background:var(--secondary);}
+  button.secondary:hover{background:#d97e2f;}
+  button.choice{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:12px 18px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  button.choice:hover{background:#eaf1fb;}
+
+  .feedback{
+    margin-top:16px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:600;
+    text-align:center;
+    display:none;
+  }
+  .feedback.ok{background:#e5f8ed;color:var(--success);display:block;}
+  .feedback.no{background:#fdeceb;color:var(--danger);display:block;}
+
+  .score{
+    text-align:center;
+    font-size:0.95rem;
+    color:var(--primary-dark);
+    font-weight:600;
+    margin-top:10px;
+  }
+
+  .reset-bar{
+    text-align:center;
+    margin-top:26px;
+  }
+  .reset-bar button{
+    background:#95a5a6;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .reset-bar button:hover{background:#7f8c8d;}
+
+  @media (max-width:480px){
+    header h1{font-size:1.3rem;}
+    .card{padding:16px;}
+    svg.pie-svg{width:150px;height:150px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍕 Frazioni con le Torte 🍕</h1>
+  <p>Esercizi interattivi con diagrammi a torta &mdash; riconoscere, rappresentare, confrontare e sommare frazioni</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="tab1">1. Riconosci</button>
+  <button class="tab-btn" data-tab="tab2">2. Rappresenta</button>
+  <button class="tab-btn" data-tab="tab3">3. Confronta</button>
+  <button class="tab-btn" data-tab="tab4">4. Somma</button>
+</div>
+
+<main>
+
+  <!-- ESERCIZIO 1: RICONOSCI LA FRAZIONE -->
+  <section class="card active" id="tab1">
+    <h2>Riconosci la frazione</h2>
+    <div class="istruzioni">Osserva la torta: la parte colorata rappresenta una frazione della torta intera. Scrivi numeratore e denominatore corretti.</div>
+
+    <div class="pies-row">
+      <div class="pie-wrap">
+        <div id="pie1-container"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="frazione-input">
+        <input type="number" id="ex1-num" min="0" placeholder="?">
+        <div class="frazione-line"></div>
+        <input type="number" id="ex1-den" min="1" placeholder="?">
+      </div>
+      <button class="action" id="ex1-verifica">Verifica</button>
+      <button class="action secondary" id="ex1-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="ex1-feedback"></div>
+    <div class="score" id="ex1-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- ESERCIZIO 2: RAPPRESENTA LA FRAZIONE -->
+  <section class="card" id="tab2">
+    <h2>Rappresenta la frazione</h2>
+    <div class="istruzioni">Clicca sugli spicchi della torta per colorarli, fino a rappresentare correttamente la frazione richiesta.</div>
+
+    <div style="text-align:center; font-size:1.6rem; font-weight:700; color:var(--primary-dark); margin-bottom:6px;" id="ex2-target"></div>
+
+    <div class="pies-row">
+      <div class="pie-wrap">
+        <div id="pie2-container"></div>
+        <div class="label" id="ex2-count"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="action" id="ex2-verifica">Verifica</button>
+      <button class="action secondary" id="ex2-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="ex2-feedback"></div>
+    <div class="score" id="ex2-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- ESERCIZIO 3: CONFRONTA FRAZIONI -->
+  <section class="card" id="tab3">
+    <h2>Confronta le frazioni</h2>
+    <div class="istruzioni">Osserva le due torte e indica quale frazione è maggiore (oppure se sono uguali).</div>
+
+    <div class="pies-row">
+      <div class="pie-wrap">
+        <div id="pie3a-container"></div>
+        <div class="label" id="ex3a-label">Frazione A</div>
+      </div>
+      <div class="pie-wrap">
+        <div id="pie3b-container"></div>
+        <div class="label" id="ex3b-label">Frazione B</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="choice" data-choice="A">A è maggiore</button>
+      <button class="choice" data-choice="U">Sono uguali</button>
+      <button class="choice" data-choice="B">B è maggiore</button>
+    </div>
+    <div class="controls">
+      <button class="action secondary" id="ex3-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="ex3-feedback"></div>
+    <div class="score" id="ex3-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- ESERCIZIO 4: SOMMA FRAZIONI -->
+  <section class="card" id="tab4">
+    <h2>Somma di frazioni (stesso denominatore)</h2>
+    <div class="istruzioni">Le due torte mostrano due frazioni con lo stesso denominatore. Calcola la somma e scrivi il risultato (non è richiesta la semplificazione).</div>
+
+    <div class="pies-row">
+      <div class="pie-wrap">
+        <div id="pie4a-container"></div>
+        <div class="label" id="ex4a-label"></div>
+      </div>
+      <div class="plus-sign">+</div>
+      <div class="pie-wrap">
+        <div id="pie4b-container"></div>
+        <div class="label" id="ex4b-label"></div>
+      </div>
+      <div class="equals-sign">=</div>
+      <div class="frazione-input">
+        <input type="number" id="ex4-num" min="0" placeholder="?">
+        <div class="frazione-line"></div>
+        <input type="number" id="ex4-den" min="1" placeholder="?">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="action" id="ex4-verifica">Verifica</button>
+      <button class="action secondary" id="ex4-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="ex4-feedback"></div>
+    <div class="score" id="ex4-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <div class="reset-bar">
+    <button id="reset-all">Azzera tutti i punteggi</button>
+  </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============ UTILITY ============ */
+
+function randInt(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function gcd(a, b){
+  a = Math.abs(a); b = Math.abs(b);
+  while (b){ const t = b; b = a % b; a = t; }
+  return a === 0 ? 1 : a;
+}
+
+/* Crea un diagramma a torta SVG con n spicchi uguali.
+   coloredIndices: Set di indici (0..n-1) colorati.
+   options: {size, clickable, onSliceClick} */
+function createPieSVG(n, coloredIndices, options){
+  options = options || {};
+  const size = options.size || 190;
+  const clickable = !!options.clickable;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 8;
+  const anglePer = 360 / n;
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("class", "pie-svg" + (clickable ? " clickable" : ""));
+
+  function polarPoint(angleDeg, radius){
+    const rad = (Math.PI / 180) * angleDeg;
+    return {
+      x: cx + radius * Math.cos(rad),
+      y: cy + radius * Math.sin(rad)
+    };
+  }
+
+  for (let i = 0; i < n; i++){
+    const startAngle = -90 + i * anglePer;
+    const endAngle = startAngle + anglePer;
+    const p1 = polarPoint(startAngle, r);
+    const p2 = polarPoint(endAngle, r);
+    const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+
+    let d;
+    if (n === 1){
+      d = "M " + cx + " " + cy + " m " + (-r) + " 0 a " + r + " " + r + " 0 1 0 " + (2*r) + " 0 a " + r + " " + r + " 0 1 0 " + (-2*r) + " 0";
+    } else {
+      d = "M " + cx + "," + cy +
+          " L " + p1.x + "," + p1.y +
+          " A " + r + "," + r + " 0 " + largeArc + " 1 " + p2.x + "," + p2.y +
+          " Z";
+    }
+
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("data-index", String(i));
+    path.setAttribute("stroke", "#ffffff");
+    path.setAttribute("stroke-width", "2");
+    const isColored = coloredIndices.has(i);
+    path.setAttribute("fill", isColored ? "var(--primary)" : "var(--empty-fill)");
+
+    if (clickable && options.onSliceClick){
+      path.addEventListener("click", function(){
+        options.onSliceClick(i, path);
+      });
+    }
+
+    svg.appendChild(path);
+  }
+
+  return svg;
+}
+
+function setSliceColor(path, colored){
+  path.setAttribute("fill", colored ? "var(--primary)" : "var(--empty-fill)");
+}
+
+/* Genera un insieme di indici contigui colorati, a partire da una posizione casuale */
+function contiguousColoredSet(n, count, startAt){
+  const start = (startAt === undefined) ? randInt(0, n - 1) : startAt;
+  const s = new Set();
+  for (let k = 0; k < count; k++){
+    s.add((start + k) % n);
+  }
+  return s;
+}
+
+/* ============ GESTIONE TAB ============ */
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const cards = document.querySelectorAll(".card");
+
+tabButtons.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabButtons.forEach(function(b){ b.classList.remove("active"); });
+    cards.forEach(function(c){ c.classList.remove("active"); });
+    btn.classList.add("active");
+    document.getElementById(btn.getAttribute("data-tab")).classList.add("active");
+  });
+});
+
+/* ============ SCORE HELPER ============ */
+
+function makeScoreTracker(elementId){
+  let correct = 0;
+  let total = 0;
+  const el = document.getElementById(elementId);
+  function update(){
+    el.textContent = "Punteggio: " + correct + " / " + total;
+  }
+  update();
+  return {
+    registra: function(isCorrect){
+      total++;
+      if (isCorrect) correct++;
+      update();
+    },
+    reset: function(){
+      correct = 0; total = 0; update();
+    }
+  };
+}
+
+/* ============ ESERCIZIO 1: RICONOSCI ============ */
+
+const ex1Score = makeScoreTracker("ex1-score");
+let ex1Current = { n: 0, num: 0 };
+
+function nuovoEx1(){
+  const n = randInt(2, 10);
+  const num = randInt(1, n - 1);
+  ex1Current = { n: n, num: num };
+
+  const container = document.getElementById("pie1-container");
+  container.innerHTML = "";
+  const colored = contiguousColoredSet(n, num);
+  const svg = createPieSVG(n, colored, { size: 200, clickable: false });
+  container.appendChild(svg);
+
+  document.getElementById("ex1-num").value = "";
+  document.getElementById("ex1-den").value = "";
+  const fb = document.getElementById("ex1-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("ex1-verifica").addEventListener("click", function(){
+  const numVal = parseInt(document.getElementById("ex1-num").value, 10);
+  const denVal = parseInt(document.getElementById("ex1-den").value, 10);
+  const fb = document.getElementById("ex1-feedback");
+
+  if (isNaN(numVal) || isNaN(denVal)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci sia il numeratore sia il denominatore.";
+    return;
+  }
+
+  const isCorrect = (numVal === ex1Current.num && denVal === ex1Current.n);
+  ex1Score.registra(isCorrect);
+
+  if (isCorrect){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! La frazione è " + ex1Current.num + "/" + ex1Current.n + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. La frazione corretta era " + ex1Current.num + "/" + ex1Current.n + ".";
+  }
+});
+
+document.getElementById("ex1-nuovo").addEventListener("click", nuovoEx1);
+
+/* ============ ESERCIZIO 2: RAPPRESENTA ============ */
+
+const ex2Score = makeScoreTracker("ex2-score");
+let ex2Current = { n: 0, num: 0, coloredSet: new Set() };
+
+function aggiornaConteggioEx2(){
+  document.getElementById("ex2-count").textContent =
+    "Spicchi colorati: " + ex2Current.coloredSet.size + " / " + ex2Current.n;
+}
+
+function nuovoEx2(){
+  const n = randInt(2, 10);
+  const num = randInt(1, n - 1);
+  ex2Current = { n: n, num: num, coloredSet: new Set() };
+
+  document.getElementById("ex2-target").textContent =
+    "Rappresenta la frazione: " + num + " / " + n;
+
+  const container = document.getElementById("pie2-container");
+  container.innerHTML = "";
+  const svg = createPieSVG(n, new Set(), {
+    size: 200,
+    clickable: true,
+    onSliceClick: function(index, path){
+      if (ex2Current.coloredSet.has(index)){
+        ex2Current.coloredSet.delete(index);
+        setSliceColor(path, false);
+      } else {
+        ex2Current.coloredSet.add(index);
+        setSliceColor(path, true);
+      }
+      aggiornaConteggioEx2();
+    }
+  });
+  container.appendChild(svg);
+  aggiornaConteggioEx2();
+
+  const fb = document.getElementById("ex2-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("ex2-verifica").addEventListener("click", function(){
+  const fb = document.getElementById("ex2-feedback");
+  const isCorrect = (ex2Current.coloredSet.size === ex2Current.num);
+  ex2Score.registra(isCorrect);
+
+  if (isCorrect){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! Hai colorato correttamente " + ex2Current.num + " spicchi su " + ex2Current.n + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. Dovevi colorare " + ex2Current.num + " spicchi su " + ex2Current.n +
+      " (ne hai colorati " + ex2Current.coloredSet.size + ").";
+  }
+});
+
+document.getElementById("ex2-nuovo").addEventListener("click", nuovoEx2);
+
+/* ============ ESERCIZIO 3: CONFRONTA ============ */
+
+const ex3Score = makeScoreTracker("ex3-score");
+let ex3Current = { na: 0, numA: 0, nb: 0, numB: 0, esito: "A" };
+
+function nuovoEx3(){
+  const na = randInt(2, 8);
+  const numA = randInt(1, na - 1);
+  const nb = randInt(2, 8);
+  const numB = randInt(1, nb - 1);
+
+  const left = numA * nb;
+  const right = numB * na;
+  let esito;
+  if (left > right) esito = "A";
+  else if (left < right) esito = "B";
+  else esito = "U";
+
+  ex3Current = { na: na, numA: numA, nb: nb, numB: numB, esito: esito };
+
+  document.getElementById("ex3a-label").textContent = "Frazione A: " + numA + "/" + na;
+  document.getElementById("ex3b-label").textContent = "Frazione B: " + numB + "/" + nb;
+
+  const containerA = document.getElementById("pie3a-container");
+  containerA.innerHTML = "";
+  containerA.appendChild(createPieSVG(na, contiguousColoredSet(na, numA, 0), { size: 180, clickable: false }));
+
+  const containerB = document.getElementById("pie3b-container");
+  containerB.innerHTML = "";
+  containerB.appendChild(createPieSVG(nb, contiguousColoredSet(nb, numB, 0), { size: 180, clickable: false }));
+
+  const fb = document.getElementById("ex3-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.querySelectorAll("#tab3 .choice").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    const scelta = btn.getAttribute("data-choice");
+    const fb = document.getElementById("ex3-feedback");
+    const isCorrect = (scelta === ex3Current.esito);
+    ex3Score.registra(isCorrect);
+
+    const testoEsito = ex3Current.esito === "A" ? "A è maggiore" :
+                        ex3Current.esito === "B" ? "B è maggiore" : "sono uguali";
+
+    if (isCorrect){
+      fb.className = "feedback ok";
+      fb.textContent = "Esatto! " + testoEsito + " (" + ex3Current.numA + "/" + ex3Current.na +
+        " vs " + ex3Current.numB + "/" + ex3Current.nb + ").";
+    } else {
+      fb.className = "feedback no";
+      fb.textContent = "Non corretto. In realtà " + testoEsito + " (" + ex3Current.numA + "/" + ex3Current.na +
+        " vs " + ex3Current.numB + "/" + ex3Current.nb + ").";
+    }
+  });
+});
+
+document.getElementById("ex3-nuovo").addEventListener("click", nuovoEx3);
+
+/* ============ ESERCIZIO 4: SOMMA ============ */
+
+const ex4Score = makeScoreTracker("ex4-score");
+let ex4Current = { n: 0, a: 0, b: 0 };
+
+function nuovoEx4(){
+  const n = randInt(3, 10);
+  const a = randInt(1, n - 2);
+  const b = randInt(1, n - a - 1 >= 1 ? n - a - 1 : 1);
+  ex4Current = { n: n, a: a, b: b };
+
+  document.getElementById("ex4a-label").textContent = a + "/" + n;
+  document.getElementById("ex4b-label").textContent = b + "/" + n;
+
+  const containerA = document.getElementById("pie4a-container");
+  containerA.innerHTML = "";
+  containerA.appendChild(createPieSVG(n, contiguousColoredSet(n, a, 0), { size: 160, clickable: false }));
+
+  const containerB = document.getElementById("pie4b-container");
+  containerB.innerHTML = "";
+  containerB.appendChild(createPieSVG(n, contiguousColoredSet(n, b, 0), { size: 160, clickable: false }));
+
+  document.getElementById("ex4-num").value = "";
+  document.getElementById("ex4-den").value = "";
+
+  const fb = document.getElementById("ex4-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("ex4-verifica").addEventListener("click", function(){
+  const numVal = parseInt(document.getElementById("ex4-num").value, 10);
+  const denVal = parseInt(document.getElementById("ex4-den").value, 10);
+  const fb = document.getElementById("ex4-feedback");
+
+  if (isNaN(numVal) || isNaN(denVal)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci sia il numeratore sia il denominatore del risultato.";
+    return;
+  }
+
+  const attesoNum = ex4Current.a + ex4Current.b;
+  const attesoDen = ex4Current.n;
+  const isCorrect = (numVal === attesoNum && denVal === attesoDen);
+  ex4Score.registra(isCorrect);
+
+  if (isCorrect){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! " + ex4Current.a + "/" + ex4Current.n + " + " + ex4Current.b + "/" + ex4Current.n +
+      " = " + attesoNum + "/" + attesoDen + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. Il risultato era " + attesoNum + "/" + attesoDen + ".";
+  }
+});
+
+document.getElementById("ex4-nuovo").addEventListener("click", nuovoEx4);
+
+/* ============ RESET GENERALE ============ */
+
+document.getElementById("reset-all").addEventListener("click", function(){
+  ex1Score.reset();
+  ex2Score.reset();
+  ex3Score.reset();
+  ex4Score.reset();
+});
+
+/* ============ INIZIALIZZAZIONE ============ */
+
+nuovoEx1();
+nuovoEx2();
+nuovoEx3();
+nuovoEx4();
+
+</script>
+</body>
+</html>

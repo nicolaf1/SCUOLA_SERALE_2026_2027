@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fattori Primi, M.C.D. e m.c.m. - Giochi Interattivi</title>
+<style>
+  :root{
+    --primary:#4F86C6;
+    --primary-dark:#2c5f8a;
+    --secondary:#f2994a;
+    --success:#27ae60;
+    --danger:#e74c3c;
+    --purple:#8e44ad;
+    --bg:#eef3fa;
+    --card:#ffffff;
+    --text:#233044;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,#dfe9f7 0%,#f5f8fd 100%);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  header{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:white;
+    padding:22px 16px 18px;
+    text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  }
+  header h1{margin:0 0 4px;font-size:1.5rem;}
+  header p{margin:0;opacity:0.9;font-size:0.92rem;}
+
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin:18px auto 0;
+    max-width:920px;
+    padding:0 12px;
+  }
+  .tab-btn{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:0.9rem;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .tab-btn:hover{background:#eaf1fb;}
+  .tab-btn.active{
+    background:var(--primary);
+    color:white;
+    box-shadow:0 3px 8px rgba(79,134,198,0.4);
+  }
+
+  main{max-width:920px;margin:22px auto;padding:0 14px;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 6px 20px rgba(30,60,100,0.10);
+    padding:24px;
+    margin-bottom:20px;
+    display:none;
+  }
+  .card.active{display:block;}
+  .card h2{margin-top:0;color:var(--primary-dark);font-size:1.25rem;}
+  .istruzioni{
+    background:#fff6e9;
+    border-left:4px solid var(--secondary);
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:0.9rem;
+    margin-bottom:18px;
+  }
+
+  /* --- Tab1: Albero dei fattori --- */
+  .numero-attuale{
+    text-align:center;
+    margin:10px 0 18px;
+  }
+  .numero-attuale .cerchio{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:white;
+    font-size:2rem;
+    font-weight:700;
+    box-shadow:0 6px 14px rgba(44,95,138,0.35);
+  }
+  .breadcrumb{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin:14px 0;
+    min-height:36px;
+  }
+  .tag-fattore{
+    background:var(--success);
+    color:white;
+    padding:6px 12px;
+    border-radius:8px;
+    font-weight:700;
+    font-size:0.95rem;
+  }
+  .prime-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-top:16px;
+  }
+  button.prime-btn{
+    background:white;
+    border:2px solid var(--purple);
+    color:var(--purple);
+    width:52px;
+    height:52px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:1.1rem;
+    cursor:pointer;
+    transition:all 0.15s;
+  }
+  button.prime-btn:hover{background:#f4ecf9;}
+  button.prime-btn:active{transform:scale(0.94);}
+
+  .risultato-finale{
+    text-align:center;
+    font-size:1.3rem;
+    font-weight:700;
+    color:var(--success);
+    margin-top:14px;
+    display:none;
+  }
+
+  /* --- Tab2: Euclide --- */
+  .euclide-header{
+    text-align:center;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--primary-dark);
+    margin-bottom:10px;
+  }
+  .euclide-step{
+    background:#f4f8fd;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    font-size:1.25rem;
+    font-weight:700;
+    color:var(--primary-dark);
+  }
+  .euclide-step input{
+    width:64px;
+    text-align:center;
+    font-size:1.1rem;
+    font-weight:700;
+    padding:6px;
+    border:2px solid var(--secondary);
+    border-radius:8px;
+    margin:0 4px;
+  }
+  .euclide-storico{
+    font-size:0.85rem;
+    color:#7f8c9a;
+    text-align:center;
+    margin-top:10px;
+    line-height:1.6;
+  }
+
+  /* --- generico --- */
+  .equazione{
+    text-align:center;
+    font-size:1.3rem;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:#f4f8fd;
+    border-radius:12px;
+    padding:18px 12px;
+    margin:14px 0;
+  }
+  .scelte{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-top:16px;
+  }
+  button.choice{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+    flex:1 1 150px;
+    max-width:220px;
+  }
+  button.choice:hover{background:#eaf1fb;}
+  button.choice:active{transform:scale(0.97);}
+  button.choice.corretta{background:var(--success);border-color:var(--success);color:white;}
+  button.choice.sbagliata{background:var(--danger);border-color:var(--danger);color:white;}
+
+  button.action{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.2s, transform 0.1s;
+  }
+  button.action:hover{background:var(--primary-dark);}
+  button.action:active{transform:scale(0.97);}
+  button.action.secondary{background:var(--secondary);}
+  button.action.secondary:hover{background:#d97e2f;}
+  button.action:disabled{background:#c3ccd6;cursor:not-allowed;}
+
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    margin-top:16px;
+  }
+  .controls input[type=number]{
+    width:90px;
+    text-align:center;
+    font-size:1.2rem;
+    font-weight:700;
+    padding:8px;
+    border:2px solid var(--primary);
+    border-radius:8px;
+  }
+
+  .feedback{
+    margin-top:16px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:600;
+    text-align:center;
+    display:none;
+  }
+  .feedback.ok{background:#e5f8ed;color:var(--success);display:block;}
+  .feedback.no{background:#fdeceb;color:var(--danger);display:block;}
+  .feedback.info{background:#eaf1fb;color:var(--primary-dark);display:block;}
+
+  .score{
+    text-align:center;
+    font-size:0.9rem;
+    color:var(--primary-dark);
+    font-weight:600;
+    margin-top:12px;
+  }
+
+  .reset-bar{text-align:center;margin-top:26px;}
+  .reset-bar button{
+    background:#95a5a6;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .reset-bar button:hover{background:#7f8c8d;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧩 Fattori Primi, M.C.D. e m.c.m. 🧩</h1>
+  <p>Giochi interattivi: scomposizione in fattori primi, algoritmo di Euclide e minimo comune multiplo</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="tab1">1. Albero dei fattori</button>
+  <button class="tab-btn" data-tab="tab2">2. M.C.D. (Euclide)</button>
+  <button class="tab-btn" data-tab="tab3">3. m.c.m.</button>
+  <button class="tab-btn" data-tab="tab4">4. Quiz misto</button>
+</div>
+
+<main>
+
+  <!-- TAB 1: ALBERO DEI FATTORI -->
+  <section class="card active" id="tab1">
+    <h2>Scomponi in fattori primi</h2>
+    <div class="istruzioni">Clicca un numero primo che divide esattamente il numero mostrato. Continua finché non arrivi a 1.</div>
+
+    <div class="numero-attuale"><div class="cerchio" id="t1-numero">--</div></div>
+
+    <div class="breadcrumb" id="t1-breadcrumb"></div>
+
+    <div class="prime-buttons" id="t1-bottoni"></div>
+
+    <div class="risultato-finale" id="t1-risultato"></div>
+
+    <div class="controls">
+      <button class="action secondary" id="t1-nuovo">Nuovo numero</button>
+    </div>
+
+    <div class="feedback" id="t1-feedback"></div>
+    <div class="score" id="t1-score">Numeri completati: 0 &nbsp;|&nbsp; Tentativi errati: 0</div>
+  </section>
+
+  <!-- TAB 2: M.C.D. CON EUCLIDE -->
+  <section class="card" id="tab2">
+    <h2>Calcola il M.C.D. con l'algoritmo di Euclide</h2>
+    <div class="istruzioni">Ad ogni passo dividi il primo numero per il secondo: trova quoziente e resto. Continua finché il resto non è zero: l'ultimo divisore non nullo è il M.C.D.</div>
+
+    <div class="euclide-header" id="t2-header"></div>
+
+    <div class="euclide-step" id="t2-step"></div>
+
+    <div class="controls" id="t2-controls-passo">
+      <button class="action" id="t2-verifica">Verifica passo</button>
+      <button class="action secondary" id="t2-avanti" disabled>Passo successivo</button>
+    </div>
+
+    <div class="controls" id="t2-controls-finale" style="display:none;">
+      <span style="font-weight:700;color:var(--primary-dark);">M.C.D. = </span>
+      <input type="number" id="t2-finale-input">
+      <button class="action" id="t2-finale-verifica">Verifica M.C.D.</button>
+    </div>
+
+    <div class="euclide-storico" id="t2-storico"></div>
+
+    <div class="controls">
+      <button class="action secondary" id="t2-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="t2-feedback"></div>
+    <div class="score" id="t2-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- TAB 3: MCM -->
+  <section class="card" id="tab3">
+    <h2>Calcola il minimo comune multiplo</h2>
+    <div class="istruzioni">Osserva le scomposizioni in fattori primi dei due numeri, poi calcola il loro m.c.m. (prendi tutti i fattori, comuni e non comuni, con l'esponente maggiore).</div>
+
+    <div class="equazione" id="t3-fattorizzazioni"></div>
+
+    <div class="controls">
+      <span style="font-weight:700;color:var(--primary-dark);">m.c.m. = </span>
+      <input type="number" id="t3-risposta">
+      <button class="action" id="t3-verifica">Verifica</button>
+      <button class="action secondary" id="t3-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="t3-feedback"></div>
+    <div class="score" id="t3-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- TAB 4: QUIZ MISTO -->
+  <section class="card" id="tab4">
+    <h2>Quiz misto di ripasso</h2>
+    <div class="istruzioni">Domande a scelta multipla su numeri primi, scomposizioni, M.C.D. e m.c.m.</div>
+
+    <div class="equazione" id="t4-domanda"></div>
+
+    <div class="scelte" id="t4-scelte"></div>
+
+    <div class="controls">
+      <button class="action secondary" id="t4-nuovo">Nuova domanda</button>
+    </div>
+
+    <div class="feedback" id="t4-feedback"></div>
+    <div class="score" id="t4-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <div class="reset-bar">
+    <button id="reset-all">Azzera tutti i punteggi</button>
+  </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============ UTILITY MATEMATICHE ============ */
+
+function randInt(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function isPrime(n){
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++){
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+
+function primeFactorization(n){
+  const factors = {};
+  let num = n;
+  for (let p = 2; p * p <= num; p++){
+    while (num % p === 0){
+      factors[p] = (factors[p] || 0) + 1;
+      num = num / p;
+    }
+  }
+  if (num > 1){
+    factors[num] = (factors[num] || 0) + 1;
+  }
+  return factors;
+}
+
+function factorizationHTML(factors){
+  const primi = Object.keys(factors).map(Number).sort(function(a,b){return a-b;});
+  return primi.map(function(p){
+    const e = factors[p];
+    return e > 1 ? (p + "<sup>" + e + "</sup>") : String(p);
+  }).join(" &times; ");
+}
+
+function gcdEuclid(a, b){
+  a = Math.abs(a); b = Math.abs(b);
+  while (b){ const t = b; b = a % b; a = t; }
+  return a;
+}
+
+function lcmCalc(a, b){
+  return (a * b) / gcdEuclid(a, b);
+}
+
+function numeroCompostoCasuale(min, max){
+  let n;
+  do {
+    n = randInt(min, max);
+  } while (isPrime(n) || n < 4);
+  return n;
+}
+
+/* ============ GESTIONE TAB ============ */
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const cards = document.querySelectorAll(".card");
+
+tabButtons.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabButtons.forEach(function(b){ b.classList.remove("active"); });
+    cards.forEach(function(c){ c.classList.remove("active"); });
+    btn.classList.add("active");
+    document.getElementById(btn.getAttribute("data-tab")).classList.add("active");
+  });
+});
+
+/* ============ SCORE HELPER ============ */
+
+function makeScoreTracker(elementId, prefix){
+  let correct = 0, total = 0;
+  const el = document.getElementById(elementId);
+  function update(){
+    el.textContent = (prefix || "Punteggio: ") + correct + " / " + total;
+  }
+  update();
+  return {
+    registra: function(isCorrect){ total++; if (isCorrect) correct++; update(); },
+    reset: function(){ correct = 0; total = 0; update(); }
+  };
+}
+
+/* ============ TAB 1: ALBERO DEI FATTORI ============ */
+
+const PRIMI_DISPONIBILI = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47];
+
+let t1Completati = 0;
+let t1Errori = 0;
+let t1Stato = null; // { numeroIniziale, numeroAttuale, fattoriTrovati: [] }
+
+function aggiornaScoreT1(){
+  document.getElementById("t1-score").textContent =
+    "Numeri completati: " + t1Completati + " | Tentativi errati: " + t1Errori;
+}
+
+function renderT1(){
+  document.getElementById("t1-numero").textContent = t1Stato.numeroAttuale;
+
+  const breadcrumb = document.getElementById("t1-breadcrumb");
+  breadcrumb.innerHTML = "";
+  t1Stato.fattoriTrovati.forEach(function(p){
+    const tag = document.createElement("span");
+    tag.className = "tag-fattore";
+    tag.textContent = "× " + p;
+    breadcrumb.appendChild(tag);
+  });
+
+  const bottoni = document.getElementById("t1-bottoni");
+  bottoni.innerHTML = "";
+  const risultato = document.getElementById("t1-risultato");
+
+  if (t1Stato.numeroAttuale === 1){
+    bottoni.style.display = "none";
+    const conteggio = {};
+    t1Stato.fattoriTrovati.forEach(function(p){ conteggio[p] = (conteggio[p] || 0) + 1; });
+    risultato.style.display = "block";
+    risultato.innerHTML = "🎉 Completato! " + t1Stato.numeroIniziale + " = " + factorizationHTML(conteggio);
+  } else {
+    bottoni.style.display = "flex";
+    risultato.style.display = "none";
+    PRIMI_DISPONIBILI.filter(function(p){ return p <= t1Stato.numeroAttuale; }).forEach(function(p){
+      const btn = document.createElement("button");
+      btn.className = "prime-btn";
+      btn.textContent = p;
+      btn.addEventListener("click", function(){ provaFattoreT1(p); });
+      bottoni.appendChild(btn);
+    });
+  }
+}
+
+function provaFattoreT1(p){
+  const fb = document.getElementById("t1-feedback");
+  if (t1Stato.numeroAttuale % p === 0){
+    t1Stato.numeroAttuale = t1Stato.numeroAttuale / p;
+    t1Stato.fattoriTrovati.push(p);
+    fb.className = "feedback";
+    fb.textContent = "";
+    renderT1();
+    if (t1Stato.numeroAttuale === 1){
+      t1Completati++;
+      aggiornaScoreT1();
+    }
+  } else {
+    t1Errori++;
+    aggiornaScoreT1();
+    fb.className = "feedback no";
+    fb.textContent = p + " non divide esattamente " + t1Stato.numeroAttuale + ". Riprova.";
+  }
+}
+
+function nuovoT1(){
+  const n = numeroCompostoCasuale(12, 360);
+  t1Stato = { numeroIniziale: n, numeroAttuale: n, fattoriTrovati: [] };
+  const fb = document.getElementById("t1-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+  renderT1();
+}
+
+document.getElementById("t1-nuovo").addEventListener("click", nuovoT1);
+
+/* ============ TAB 2: M.C.D. CON EUCLIDE ============ */
+
+const t2Score = makeScoreTracker("t2-score");
+let t2Stato = null; // { a0,b0, currentA, currentB, storico:[], fase:'passo'|'finale', ultimoQ, ultimoR }
+
+function renderT2(){
+  document.getElementById("t2-header").textContent =
+    "M.C.D. tra " + t2Stato.a0 + " e " + t2Stato.b0;
+
+  if (t2Stato.fase === "passo"){
+    document.getElementById("t2-controls-passo").style.display = "flex";
+    document.getElementById("t2-controls-finale").style.display = "none";
+    document.getElementById("t2-step").innerHTML =
+      t2Stato.currentA + " = <input type='number' id='t2-q'> × " + t2Stato.currentB +
+      " + <input type='number' id='t2-r'>";
+    document.getElementById("t2-avanti").disabled = true;
+  } else {
+    document.getElementById("t2-controls-passo").style.display = "none";
+    document.getElementById("t2-controls-finale").style.display = "flex";
+    document.getElementById("t2-step").innerHTML =
+      "Il resto è arrivato a 0. L'algoritmo termina qui.";
+    document.getElementById("t2-finale-input").value = "";
+  }
+
+  document.getElementById("t2-storico").innerHTML = t2Stato.storico.join("<br>");
+  const fb = document.getElementById("t2-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+function nuovoT2(){
+  let a = randInt(30, 300);
+  let b = randInt(15, 200);
+  if (b > a){ const t = a; a = b; b = t; }
+  if (a === b) a = a + randInt(1,10);
+
+  t2Stato = {
+    a0: a, b0: b,
+    currentA: a, currentB: b,
+    storico: [],
+    fase: "passo"
+  };
+  renderT2();
+}
+
+document.getElementById("t2-verifica").addEventListener("click", function(){
+  const qInput = document.getElementById("t2-q");
+  const rInput = document.getElementById("t2-r");
+  const qVal = parseInt(qInput.value, 10);
+  const rVal = parseInt(rInput.value, 10);
+  const fb = document.getElementById("t2-feedback");
+
+  const qCorretto = Math.floor(t2Stato.currentA / t2Stato.currentB);
+  const rCorretto = t2Stato.currentA - qCorretto * t2Stato.currentB;
+
+  if (isNaN(qVal) || isNaN(rVal)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci sia il quoziente sia il resto.";
+    return;
+  }
+
+  const corretto = (qVal === qCorretto && rVal === rCorretto);
+  t2Score.registra(corretto);
+
+  t2Stato.storico.push(t2Stato.currentA + " = " + qCorretto + " × " + t2Stato.currentB + " + " + rCorretto);
+  t2Stato.ultimoQ = qCorretto;
+  t2Stato.ultimoR = rCorretto;
+
+  if (corretto){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! " + t2Stato.currentA + " = " + qCorretto + " × " + t2Stato.currentB + " + " + rCorretto;
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non proprio. Il passo corretto era: " + t2Stato.currentA + " = " + qCorretto +
+      " × " + t2Stato.currentB + " + " + rCorretto;
+  }
+
+  document.getElementById("t2-avanti").disabled = false;
+  qInput.disabled = true;
+  rInput.disabled = true;
+});
+
+document.getElementById("t2-avanti").addEventListener("click", function(){
+  const nuovaA = t2Stato.currentB;
+  const nuovaB = t2Stato.ultimoR;
+
+  if (nuovaB === 0){
+    t2Stato.fase = "finale";
+    renderT2();
+    return;
+  }
+
+  t2Stato.currentA = nuovaA;
+  t2Stato.currentB = nuovaB;
+  renderT2();
+});
+
+document.getElementById("t2-finale-verifica").addEventListener("click", function(){
+  const val = parseInt(document.getElementById("t2-finale-input").value, 10);
+  const fb = document.getElementById("t2-feedback");
+  const mcdReale = gcdEuclid(t2Stato.a0, t2Stato.b0);
+
+  if (isNaN(val)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci un numero.";
+    return;
+  }
+
+  const corretto = (val === mcdReale);
+  t2Score.registra(corretto);
+
+  if (corretto){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! M.C.D.(" + t2Stato.a0 + ", " + t2Stato.b0 + ") = " + mcdReale + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. M.C.D.(" + t2Stato.a0 + ", " + t2Stato.b0 + ") = " + mcdReale + ".";
+  }
+});
+
+document.getElementById("t2-nuovo").addEventListener("click", nuovoT2);
+
+/* ============ TAB 3: MCM ============ */
+
+const t3Score = makeScoreTracker("t3-score");
+let t3Stato = null; // { a, b }
+
+function nuovoT3(){
+  const a = numeroCompostoCasuale(8, 90);
+  let b = numeroCompostoCasuale(8, 90);
+  if (b === a) b = numeroCompostoCasuale(8, 90);
+  t3Stato = { a: a, b: b };
+
+  const fattA = primeFactorization(a);
+  const fattB = primeFactorization(b);
+
+  document.getElementById("t3-fattorizzazioni").innerHTML =
+    a + " = " + factorizationHTML(fattA) + "<br><br>" +
+    b + " = " + factorizationHTML(fattB);
+
+  document.getElementById("t3-risposta").value = "";
+  const fb = document.getElementById("t3-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("t3-verifica").addEventListener("click", function(){
+  const val = parseInt(document.getElementById("t3-risposta").value, 10);
+  const fb = document.getElementById("t3-feedback");
+  if (isNaN(val)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci un numero.";
+    return;
+  }
+  const mcmReale = lcmCalc(t3Stato.a, t3Stato.b);
+  const corretto = (val === mcmReale);
+  t3Score.registra(corretto);
+
+  if (corretto){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! m.c.m.(" + t3Stato.a + ", " + t3Stato.b + ") = " + mcmReale + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. m.c.m.(" + t3Stato.a + ", " + t3Stato.b + ") = " + mcmReale + ".";
+  }
+});
+
+document.getElementById("t3-nuovo").addEventListener("click", nuovoT3);
+
+/* ============ TAB 4: QUIZ MISTO ============ */
+
+const t4Score = makeScoreTracker("t4-score");
+
+function generaDomandaPrimo(){
+  const numeri = [];
+  const includiPrimo = Math.random() < 0.5;
+  while (numeri.length < 4){
+    const n = randInt(10, 100);
+    if (numeri.indexOf(n) === -1) numeri.push(n);
+  }
+  const testo = includiPrimo ? "Quale tra questi numeri è primo?" : "Quale tra questi numeri NON è primo?";
+
+  let candidati = numeri.filter(function(n){ return isPrime(n) === includiPrimo; });
+  if (candidati.length === 0){
+    const sostituto = includiPrimo ?
+      [11,13,17,19,23,29,31,37][randInt(0,7)] :
+      [12,14,15,16,18,20,21,22][randInt(0,7)];
+    numeri[0] = sostituto;
+    candidati = [sostituto];
+  }
+  const corretto = candidati[randInt(0, candidati.length - 1)];
+
+  return {
+    testo: testo,
+    opzioni: shuffle(numeri).map(String),
+    corretta: String(corretto)
+  };
+}
+
+function generaDomandaFattorizzazione(){
+  const n = numeroCompostoCasuale(20, 150);
+  const fatt = primeFactorization(n);
+  const corretta = factorizationHTML(fatt);
+
+  const distrattori = [];
+  while (distrattori.length < 3){
+    const fattAlt = {};
+    Object.keys(fatt).forEach(function(p){
+      const variazione = randInt(-1, 1);
+      const nuovoExp = Math.max(1, fatt[p] + (Math.random() < 0.5 ? variazione : 0));
+      fattAlt[p] = nuovoExp;
+    });
+    const chiavi = Object.keys(fattAlt);
+    if (Math.random() < 0.4 && chiavi.length > 0){
+      delete fattAlt[chiavi[randInt(0, chiavi.length - 1)]];
+    }
+    if (Object.keys(fattAlt).length === 0) continue;
+    const html = factorizationHTML(fattAlt);
+    if (html !== corretta && distrattori.indexOf(html) === -1){
+      distrattori.push(html);
+    }
+  }
+
+  return {
+    testo: "Qual è la scomposizione in fattori primi di " + n + "?",
+    opzioni: shuffle([corretta].concat(distrattori)),
+    corretta: corretta
+  };
+}
+
+function generaDomandaMCD(){
+  const a = randInt(12, 100);
+  const b = randInt(12, 100);
+  const corretto = gcdEuclid(a, b);
+  const opzioni = new Set([corretto]);
+  opzioni.add(Math.max(1, corretto + randInt(1,4)));
+  opzioni.add(Math.max(1, corretto - randInt(1,3) === 0 ? corretto + 5 : corretto - randInt(1,3)));
+  opzioni.add(lcmCalc(a,b) > 999 ? corretto * 2 : lcmCalc(a,b));
+  while (opzioni.size < 4){
+    opzioni.add(randInt(1, Math.max(a,b)));
+  }
+  return {
+    testo: "Qual è il M.C.D. tra " + a + " e " + b + "?",
+    opzioni: shuffle(Array.from(opzioni)).map(String),
+    corretta: String(corretto)
+  };
+}
+
+function generaDomandaMCM(){
+  const a = randInt(4, 40);
+  const b = randInt(4, 40);
+  const corretto = lcmCalc(a, b);
+  const opzioni = new Set([corretto]);
+  opzioni.add(a * b);
+  opzioni.add(corretto + Math.max(a,b));
+  opzioni.add(gcdEuclid(a,b) === corretto ? corretto + a : gcdEuclid(a,b));
+  while (opzioni.size < 4){
+    opzioni.add(corretto + randInt(1,20));
+  }
+  return {
+    testo: "Qual è il m.c.m. tra " + a + " e " + b + "?",
+    opzioni: shuffle(Array.from(opzioni)).map(String),
+    corretta: String(corretto)
+  };
+}
+
+const GENERATORI_DOMANDE = [generaDomandaPrimo, generaDomandaFattorizzazione, generaDomandaMCD, generaDomandaMCM];
+
+function nuovoT4(){
+  const gen = GENERATORI_DOMANDE[randInt(0, GENERATORI_DOMANDE.length - 1)];
+  const domanda = gen();
+
+  document.getElementById("t4-domanda").innerHTML = domanda.testo;
+
+  const cont = document.getElementById("t4-scelte");
+  cont.innerHTML = "";
+  domanda.opzioni.forEach(function(opz){
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = opz;
+    btn.addEventListener("click", function(){
+      const corretto = (opz === domanda.corretta);
+      t4Score.registra(corretto);
+      Array.from(cont.children).forEach(function(b){ b.disabled = true; });
+      const fb = document.getElementById("t4-feedback");
+      if (corretto){
+        btn.classList.add("corretta");
+        fb.className = "feedback ok";
+        fb.textContent = "Esatto!";
+      } else {
+        btn.classList.add("sbagliata");
+        Array.from(cont.children).forEach(function(b){
+          if (b.innerHTML === domanda.corretta) b.classList.add("corretta");
+        });
+        fb.className = "feedback no";
+        fb.textContent = "Non corretto. La risposta giusta era evidenziata in verde.";
+      }
+    });
+    cont.appendChild(btn);
+  });
+
+  const fb = document.getElementById("t4-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("t4-nuovo").addEventListener("click", nuovoT4);
+
+/* ============ RESET GENERALE ============ */
+
+document.getElementById("reset-all").addEventListener("click", function(){
+  t1Completati = 0;
+  t1Errori = 0;
+  aggiornaScoreT1();
+  t2Score.reset();
+  t3Score.reset();
+  t4Score.reset();
+});
+
+/* ============ INIZIALIZZAZIONE ============ */
+
+nuovoT1();
+nuovoT2();
+nuovoT3();
+nuovoT4();
+aggiornaScoreT1();
+
+</script>
+</body>
+</html>

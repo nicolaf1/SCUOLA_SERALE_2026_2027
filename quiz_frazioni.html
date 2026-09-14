@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz sulle Frazioni</title>
+<style>
+    :root {
+        --primario: #1565C0;
+        --primario-scuro: #0D47A1;
+        --primario-chiaro: #E3F2FD;
+        --grigio: #F2F2F2;
+        --grigio-bordo: #D0D0D0;
+        --arancio: #F39C12;
+        --arancio-scuro: #D68910;
+        --verde: #2E7D32;
+        --rosso: #C62828;
+        --testo: #263238;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+        background: var(--grigio);
+        color: var(--testo);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 640px;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    header h1 {
+        color: var(--primario-scuro);
+        margin: 0 0 4px 0;
+        font-size: 1.7em;
+    }
+
+    header p {
+        margin: 0;
+        color: #555;
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid var(--grigio-bordo);
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    /* ---- Schermata di selezione ---- */
+    .modes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .mode-btn {
+        background: var(--primario-chiaro);
+        border: 2px solid var(--primario);
+        color: var(--primario-scuro);
+        border-radius: 8px;
+        padding: 14px 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+    }
+
+    .mode-btn:hover {
+        background: var(--primario);
+        color: #fff;
+    }
+
+    .mode-btn:active {
+        transform: scale(0.97);
+    }
+
+    .mode-btn.full {
+        grid-column: 1 / -1;
+        background: var(--arancio);
+        border-color: var(--arancio-scuro);
+        color: #fff;
+    }
+
+    .mode-btn.full:hover {
+        background: var(--arancio-scuro);
+    }
+
+    /* ---- Schermata di gioco ---- */
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        font-weight: 600;
+        color: var(--primario-scuro);
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: var(--grigio-bordo);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--primario);
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    .timer {
+        font-weight: 700;
+        color: var(--arancio-scuro);
+    }
+
+    .question-box {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .question-label {
+        color: #666;
+        margin-bottom: 10px;
+        font-size: 0.95em;
+    }
+
+    .fraction-expr {
+        font-size: 1.8em;
+        font-weight: 600;
+        color: var(--testo);
+    }
+
+    .frac {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        vertical-align: middle;
+        margin: 0 6px;
+        line-height: 1.1;
+    }
+
+    .frac .num {
+        border-bottom: 2px solid var(--testo);
+        padding: 0 8px 2px 8px;
+    }
+
+    .frac .den {
+        padding: 2px 8px 0 8px;
+    }
+
+    .options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .opt-btn {
+        background: var(--grigio);
+        border: 2px solid var(--grigio-bordo);
+        border-radius: 8px;
+        padding: 14px 8px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+        border-color: var(--primario);
+    }
+
+    .opt-btn.correct {
+        background: #C8E6C9;
+        border-color: var(--verde);
+        color: var(--verde);
+        font-weight: 700;
+    }
+
+    .opt-btn.wrong {
+        background: #FFCDD2;
+        border-color: var(--rosso);
+        color: var(--rosso);
+        font-weight: 700;
+    }
+
+    .opt-btn:disabled {
+        cursor: default;
+    }
+
+    .feedback {
+        margin-top: 16px;
+        min-height: 24px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .feedback.ok { color: var(--verde); }
+    .feedback.no { color: var(--rosso); }
+
+    .next-btn {
+        display: block;
+        margin: 18px auto 0 auto;
+        background: var(--primario);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 26px;
+        font-size: 1em;
+        cursor: pointer;
+    }
+
+    .next-btn:hover { background: var(--primario-scuro); }
+
+    /* ---- Schermata risultati ---- */
+    .result-box {
+        text-align: center;
+    }
+
+    .result-score {
+        font-size: 2.6em;
+        font-weight: 700;
+        color: var(--primario-scuro);
+        margin: 10px 0;
+    }
+
+    .result-msg {
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .hidden { display: none; }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 14px;
+        color: var(--primario);
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 0.9em;
+    }
+
+    @media (max-width: 420px) {
+        .options { grid-template-columns: 1fr; }
+        .modes { grid-template-columns: 1fr; }
+        .fraction-expr { font-size: 1.4em; }
+    }
+</style>
+</head>
+<body>
+<div class="app">
+    <header>
+        <h1>Quiz sulle Frazioni</h1>
+        <p>Allenati con somma, differenza, prodotto, quoziente, riduzione e confronto</p>
+    </header>
+
+    <div class="card">
+
+        <!-- SCHERMATA SELEZIONE MODALITA' -->
+        <div id="screen-select">
+            <p style="text-align:center; margin-top:0;">Scegli su cosa vuoi esercitarti:</p>
+            <div class="modes">
+                <button class="mode-btn" data-mode="somma">Somma</button>
+                <button class="mode-btn" data-mode="differenza">Differenza</button>
+                <button class="mode-btn" data-mode="prodotto">Prodotto</button>
+                <button class="mode-btn" data-mode="quoziente">Quoziente</button>
+                <button class="mode-btn" data-mode="riduzione">Riduzione ai minimi termini</button>
+                <button class="mode-btn" data-mode="confronto">Confronto</button>
+                <button class="mode-btn full" data-mode="misto">Sfida mista a tempo (15 domande)</button>
+            </div>
+        </div>
+
+        <!-- SCHERMATA GIOCO -->
+        <div id="screen-game" class="hidden">
+            <div class="topbar">
+                <span id="progress-label">Domanda 1/10</span>
+                <span id="score-label">Punti: 0</span>
+                <span id="timer-label" class="timer hidden"></span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+            <div class="question-box">
+                <div class="question-label" id="question-label"></div>
+                <div class="fraction-expr" id="question-expr"></div>
+            </div>
+
+            <div class="options" id="options-container"></div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <button class="next-btn hidden" id="next-btn">Prossima domanda</button>
+        </div>
+
+        <!-- SCHERMATA RISULTATI -->
+        <div id="screen-result" class="hidden">
+            <div class="result-box">
+                <div class="question-label">Hai completato il quiz!</div>
+                <div class="result-score" id="result-score">0/10</div>
+                <div class="result-msg" id="result-msg"></div>
+                <button class="next-btn" id="retry-btn">Rigioca</button>
+                <br>
+                <span class="back-link" id="back-link">Torna alla scelta della modalità</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    // ---------- Utility matematiche ----------
+    function gcd(a, b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b) { var t = b; b = a % b; a = t; }
+        return a || 1;
+    }
+
+    function simplify(n, d) {
+        if (d < 0) { n = -n; d = -d; }
+        var g = gcd(n, d);
+        return [n / g, d / g];
+    }
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomFraction(maxDen) {
+        var d = randInt(2, maxDen);
+        var n = randInt(1, maxDen);
+        return simplify(n, d);
+    }
+
+    function fracToString(n, d) {
+        if (d === 1) return String(n);
+        return n + "/" + d;
+    }
+
+    function fracHTML(n, d) {
+        if (d === 1) return '<span style="padding:0 6px;">' + n + '</span>';
+        return '<span class="frac"><span class="num">' + n + '</span><span class="den">' + d + '</span></span>';
+    }
+
+    function fracsEqual(a, b) {
+        return a[0] === b[0] && a[1] === b[1];
+    }
+
+    // ---------- Generazione domande ----------
+    function generaDomanda(tipo) {
+        if (tipo === "misto") {
+            var tipi = ["somma", "differenza", "prodotto", "quoziente", "riduzione", "confronto"];
+            tipo = tipi[randInt(0, tipi.length - 1)];
+        }
+
+        var f1, f2, risultato, testo, exprHTML, opzioni, corretta;
+
+        if (tipo === "somma" || tipo === "differenza") {
+            f1 = randomFraction(9);
+            f2 = randomFraction(9);
+            var n1 = f1[0], d1 = f1[1], n2 = f2[0], d2 = f2[1];
+            var num, den;
+            if (tipo === "somma") {
+                num = n1 * d2 + n2 * d1;
+                den = d1 * d2;
+                testo = "Calcola la somma (risultato ridotto ai minimi termini):";
+                exprHTML = fracHTML(n1, d1) + " + " + fracHTML(n2, d2) + " = ?";
+            } else {
+                // evita risultati negativi: ordina in modo che il risultato sia positivo
+                if ((n1 / d1) < (n2 / d2)) { var tmp = f1; f1 = f2; f2 = tmp; n1 = f1[0]; d1 = f1[1]; n2 = f2[0]; d2 = f2[1]; }
+                num = n1 * d2 - n2 * d1;
+                den = d1 * d2;
+                testo = "Calcola la differenza (risultato ridotto ai minimi termini):";
+                exprHTML = fracHTML(n1, d1) + " &minus; " + fracHTML(n2, d2) + " = ?";
+            }
+            risultato = simplify(num, den);
+            corretta = fracToString(risultato[0], risultato[1]);
+            opzioni = [corretta];
+            opzioni.push(fracToString(num, den)); // non semplificata
+            opzioni.push(fracToString(risultato[0] + 1, risultato[1]));
+            opzioni.push(fracToString(n1 * n2, d1 * d2 === 0 ? 1 : d1 + d2 === 0 ? 1 : (d1 + d2)));
+        }
+        else if (tipo === "prodotto") {
+            f1 = randomFraction(9);
+            f2 = randomFraction(9);
+            var pn = f1[0] * f2[0];
+            var pd = f1[1] * f2[1];
+            risultato = simplify(pn, pd);
+            testo = "Calcola il prodotto (risultato ridotto ai minimi termini):";
+            exprHTML = fracHTML(f1[0], f1[1]) + " &times; " + fracHTML(f2[0], f2[1]) + " = ?";
+            corretta = fracToString(risultato[0], risultato[1]);
+            opzioni = [corretta];
+            opzioni.push(fracToString(pn, pd));
+            opzioni.push(fracToString(f1[0] + f2[0], f1[1] + f2[1]));
+            opzioni.push(fracToString(risultato[0], risultato[1] + 1));
+        }
+        else if (tipo === "quoziente") {
+            f1 = randomFraction(9);
+            f2 = randomFraction(9);
+            var qn = f1[0] * f2[1];
+            var qd = f1[1] * f2[0];
+            risultato = simplify(qn, qd);
+            testo = "Calcola il quoziente (risultato ridotto ai minimi termini):";
+            exprHTML = fracHTML(f1[0], f1[1]) + " : " + fracHTML(f2[0], f2[1]) + " = ?";
+            corretta = fracToString(risultato[0], risultato[1]);
+            opzioni = [corretta];
+            opzioni.push(fracToString(f1[0] * f2[0], f1[1] * f2[1])); // errore: moltiplica senza invertire
+            opzioni.push(fracToString(qn, qd + 1));
+            opzioni.push(fracToString(risultato[1], risultato[0])); // reciproco per errore
+        }
+        else if (tipo === "riduzione") {
+            var base = randomFraction(9);
+            var k = randInt(2, 6);
+            var n = base[0] * k;
+            var d = base[1] * k;
+            testo = "Riduci ai minimi termini:";
+            exprHTML = fracHTML(n, d) + " = ?";
+            corretta = fracToString(base[0], base[1]);
+            opzioni = [corretta];
+            opzioni.push(fracToString(n, d));
+            opzioni.push(fracToString(base[0] + 1, base[1]));
+            opzioni.push(fracToString(base[0], base[1] + 1));
+        }
+        else { // confronto
+            f1 = randomFraction(9);
+            f2 = randomFraction(9);
+            while (fracsEqual(f1, f2)) { f2 = randomFraction(9); }
+            var v1 = f1[0] / f1[1], v2 = f2[0] / f2[1];
+            testo = "Quale delle due frazioni è maggiore?";
+            exprHTML = fracHTML(f1[0], f1[1]) + "&nbsp;&nbsp;&nbsp;e&nbsp;&nbsp;&nbsp;" + fracHTML(f2[0], f2[1]);
+            var optA = fracToString(f1[0], f1[1]) + " è maggiore";
+            var optB = fracToString(f2[0], f2[1]) + " è maggiore";
+            corretta = v1 > v2 ? optA : optB;
+            return {
+                testo: testo,
+                exprHTML: exprHTML,
+                opzioni: shuffle([optA, optB]),
+                corretta: corretta
+            };
+        }
+
+        // rimuovi duplicati tra le opzioni generate
+        var uniche = [];
+        opzioni.forEach(function (o) {
+            if (uniche.indexOf(o) === -1) uniche.push(o);
+        });
+        while (uniche.length < 4) {
+            var extra = fracToString(randInt(1, 9), randInt(2, 9));
+            if (uniche.indexOf(extra) === -1) uniche.push(extra);
+        }
+
+        return {
+            testo: testo,
+            exprHTML: exprHTML,
+            opzioni: shuffle(uniche.slice(0, 4)),
+            corretta: corretta
+        };
+    }
+
+    function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+
+    // ---------- Stato del gioco ----------
+    var stato = {
+        modo: null,
+        domande: [],
+        indice: 0,
+        punteggio: 0,
+        totale: 10,
+        aTempo: false,
+        timerId: null,
+        secondiRimasti: 0
+    };
+
+    var screenSelect = document.getElementById("screen-select");
+    var screenGame = document.getElementById("screen-game");
+    var screenResult = document.getElementById("screen-result");
+
+    var progressLabel = document.getElementById("progress-label");
+    var scoreLabel = document.getElementById("score-label");
+    var timerLabel = document.getElementById("timer-label");
+    var progressFill = document.getElementById("progress-fill");
+    var questionLabel = document.getElementById("question-label");
+    var questionExpr = document.getElementById("question-expr");
+    var optionsContainer = document.getElementById("options-container");
+    var feedback = document.getElementById("feedback");
+    var nextBtn = document.getElementById("next-btn");
+
+    document.querySelectorAll(".mode-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            avviaQuiz(btn.getAttribute("data-mode"));
+        });
+    });
+
+    document.getElementById("retry-btn").addEventListener("click", function () {
+        avviaQuiz(stato.modo);
+    });
+
+    document.getElementById("back-link").addEventListener("click", function () {
+        mostraSchermata(screenSelect);
+    });
+
+    nextBtn.addEventListener("click", function () {
+        stato.indice++;
+        mostraDomanda();
+    });
+
+    function mostraSchermata(el) {
+        [screenSelect, screenGame, screenResult].forEach(function (s) {
+            s.classList.add("hidden");
+        });
+        el.classList.remove("hidden");
+    }
+
+    function avviaQuiz(modo) {
+        stato.modo = modo;
+        stato.indice = 0;
+        stato.punteggio = 0;
+        stato.aTempo = (modo === "misto");
+        stato.totale = stato.aTempo ? 15 : 10;
+        stato.domande = [];
+        for (var i = 0; i < stato.totale; i++) {
+            stato.domande.push(generaDomanda(modo));
+        }
+        timerLabel.classList.toggle("hidden", !stato.aTempo);
+        mostraSchermata(screenGame);
+        mostraDomanda();
+    }
+
+    function fermaTimer() {
+        if (stato.timerId) {
+            clearInterval(stato.timerId);
+            stato.timerId = null;
+        }
+    }
+
+    function avviaTimer() {
+        fermaTimer();
+        stato.secondiRimasti = 20;
+        timerLabel.textContent = "⏱ " + stato.secondiRimasti + "s";
+        stato.timerId = setInterval(function () {
+            stato.secondiRimasti--;
+            timerLabel.textContent = "⏱ " + stato.secondiRimasti + "s";
+            if (stato.secondiRimasti <= 0) {
+                fermaTimer();
+                gestisciRisposta(null, true);
+            }
+        }, 1000);
+    }
+
+    function mostraDomanda() {
+        feedback.textContent = "";
+        feedback.className = "feedback";
+        nextBtn.classList.add("hidden");
+
+        if (stato.indice >= stato.totale) {
+            fermaTimer();
+            mostraRisultati();
+            return;
+        }
+
+        var q = stato.domande[stato.indice];
+        progressLabel.textContent = "Domanda " + (stato.indice + 1) + "/" + stato.totale;
+        scoreLabel.textContent = "Punti: " + stato.punteggio;
+        progressFill.style.width = (100 * stato.indice / stato.totale) + "%";
+
+        questionLabel.textContent = q.testo;
+        questionExpr.innerHTML = q.exprHTML;
+
+        optionsContainer.innerHTML = "";
+        q.opzioni.forEach(function (opz) {
+            var b = document.createElement("button");
+            b.className = "opt-btn";
+            b.textContent = opz;
+            b.addEventListener("click", function () {
+                gestisciRisposta(opz, false);
+            });
+            optionsContainer.appendChild(b);
+        });
+
+        if (stato.aTempo) avviaTimer();
+    }
+
+    function gestisciRisposta(sceltaUtente, scaduto) {
+        fermaTimer();
+        var q = stato.domande[stato.indice];
+        var bottoni = optionsContainer.querySelectorAll(".opt-btn");
+        bottoni.forEach(function (b) {
+            b.disabled = true;
+            if (b.textContent === q.corretta) b.classList.add("correct");
+            else if (b.textContent === sceltaUtente) b.classList.add("wrong");
+        });
+
+        if (!scaduto && sceltaUtente === q.corretta) {
+            stato.punteggio++;
+            feedback.textContent = "Esatto! ✔";
+            feedback.className = "feedback ok";
+        } else if (scaduto) {
+            feedback.textContent = "Tempo scaduto! La risposta corretta era " + q.corretta;
+            feedback.className = "feedback no";
+        } else {
+            feedback.textContent = "Sbagliato. La risposta corretta era " + q.corretta;
+            feedback.className = "feedback no";
+        }
+
+        scoreLabel.textContent = "Punti: " + stato.punteggio;
+        nextBtn.classList.remove("hidden");
+        nextBtn.textContent = (stato.indice + 1 >= stato.totale) ? "Vedi risultati" : "Prossima domanda";
+    }
+
+    function mostraRisultati() {
+        var perc = Math.round(100 * stato.punteggio / stato.totale);
+        document.getElementById("result-score").textContent = stato.punteggio + "/" + stato.totale;
+        var msg;
+        if (perc === 100) msg = "Perfetto! Padroneggi l'argomento.";
+        else if (perc >= 70) msg = "Molto bene, qualche ripasso e sarà perfetto.";
+        else if (perc >= 50) msg = "Bene, ma serve ancora un po' di pratica.";
+        else msg = "Rivedi la teoria e riprova: puoi migliorare!";
+        document.getElementById("result-msg").textContent = msg + " (" + perc + "%)";
+        mostraSchermata(screenResult);
+    }
+
+})();
+</script>
+</body>
+</html>

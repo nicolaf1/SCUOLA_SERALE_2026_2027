@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Proprietà delle Operazioni - Giochi Interattivi</title>
+<style>
+  :root{
+    --primary:#4F86C6;
+    --primary-dark:#2c5f8a;
+    --secondary:#f2994a;
+    --success:#27ae60;
+    --danger:#e74c3c;
+    --bg:#eef3fa;
+    --card:#ffffff;
+    --text:#233044;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:linear-gradient(135deg,#dfe9f7 0%,#f5f8fd 100%);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  header{
+    background:linear-gradient(120deg,var(--primary-dark),var(--primary));
+    color:white;
+    padding:22px 16px 18px;
+    text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  }
+  header h1{margin:0 0 4px;font-size:1.55rem;}
+  header p{margin:0;opacity:0.9;font-size:0.93rem;}
+
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin:18px auto 0;
+    max-width:920px;
+    padding:0 12px;
+  }
+  .tab-btn{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .tab-btn:hover{background:#eaf1fb;}
+  .tab-btn.active{
+    background:var(--primary);
+    color:white;
+    box-shadow:0 3px 8px rgba(79,134,198,0.4);
+  }
+
+  main{max-width:920px;margin:22px auto;padding:0 14px;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 6px 20px rgba(30,60,100,0.10);
+    padding:24px;
+    margin-bottom:20px;
+    display:none;
+  }
+  .card.active{display:block;}
+  .card h2{margin-top:0;color:var(--primary-dark);font-size:1.25rem;}
+  .istruzioni{
+    background:#fff6e9;
+    border-left:4px solid var(--secondary);
+    padding:10px 14px;
+    border-radius:8px;
+    font-size:0.9rem;
+    margin-bottom:18px;
+  }
+
+  .equazione{
+    text-align:center;
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:#f4f8fd;
+    border-radius:12px;
+    padding:22px 12px;
+    margin:14px 0;
+    letter-spacing:0.5px;
+  }
+  .equazione .blank{
+    display:inline-block;
+    min-width:52px;
+    border-bottom:3px solid var(--secondary);
+    color:var(--secondary);
+  }
+
+  .scelte{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-top:16px;
+  }
+  button.choice{
+    background:white;
+    border:2px solid var(--primary);
+    color:var(--primary-dark);
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+    flex:1 1 200px;
+    max-width:260px;
+  }
+  button.choice:hover{background:#eaf1fb;}
+  button.choice:active{transform:scale(0.97);}
+  button.choice.corretta{background:var(--success);border-color:var(--success);color:white;}
+  button.choice.sbagliata{background:var(--danger);border-color:var(--danger);color:white;}
+
+  button.action{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.2s, transform 0.1s;
+  }
+  button.action:hover{background:var(--primary-dark);}
+  button.action:active{transform:scale(0.97);}
+  button.action.secondary{background:var(--secondary);}
+  button.action.secondary:hover{background:#d97e2f;}
+  button.action.vero{background:var(--success);}
+  button.action.vero:hover{background:#1e8449;}
+  button.action.falso{background:var(--danger);}
+  button.action.falso:hover{background:#c0392b;}
+
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    margin-top:16px;
+  }
+  .controls input[type=number]{
+    width:90px;
+    text-align:center;
+    font-size:1.2rem;
+    font-weight:700;
+    padding:8px;
+    border:2px solid var(--primary);
+    border-radius:8px;
+  }
+
+  .feedback{
+    margin-top:16px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:600;
+    text-align:center;
+    display:none;
+  }
+  .feedback.ok{background:#e5f8ed;color:var(--success);display:block;}
+  .feedback.no{background:#fdeceb;color:var(--danger);display:block;}
+
+  .score{
+    text-align:center;
+    font-size:0.92rem;
+    color:var(--primary-dark);
+    font-weight:600;
+    margin-top:12px;
+  }
+
+  .timerbar-wrap{
+    height:10px;
+    background:#e3eaf3;
+    border-radius:6px;
+    overflow:hidden;
+    margin:10px 0 4px;
+  }
+  .timerbar{
+    height:100%;
+    background:linear-gradient(90deg,var(--success),var(--secondary));
+    width:100%;
+    transition:width 0.1s linear;
+  }
+  .streak{
+    text-align:center;
+    font-size:0.85rem;
+    color:var(--secondary);
+    font-weight:700;
+    margin-top:4px;
+  }
+
+  .abbinamento-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-top:14px;
+  }
+  .colonna h3{
+    text-align:center;
+    color:var(--primary-dark);
+    font-size:1rem;
+    margin-bottom:10px;
+  }
+  .item-abbinamento{
+    background:#f4f8fd;
+    border:2px solid #d3e0f0;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    font-size:0.9rem;
+    font-weight:600;
+    text-align:center;
+    cursor:pointer;
+    transition:all 0.15s;
+    color:var(--text);
+  }
+  .item-abbinamento:hover{border-color:var(--primary);background:#eaf1fb;}
+  .item-abbinamento.selezionato{border-color:var(--secondary);background:#fff3e6;}
+  .item-abbinamento.abbinato{
+    background:#e5f8ed;
+    border-color:var(--success);
+    color:var(--success);
+    cursor:default;
+    opacity:0.85;
+  }
+  .item-abbinamento.errore{
+    background:#fdeceb;
+    border-color:var(--danger);
+    animation:shake 0.3s;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+
+  .completato{
+    text-align:center;
+    font-size:1.2rem;
+    font-weight:700;
+    color:var(--success);
+    margin-top:14px;
+    display:none;
+  }
+
+  .reset-bar{text-align:center;margin-top:26px;}
+  .reset-bar button{
+    background:#95a5a6;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .reset-bar button:hover{background:#7f8c8d;}
+
+  @media (max-width:600px){
+    .abbinamento-grid{grid-template-columns:1fr;}
+    .equazione{font-size:1.15rem;padding:16px 8px;}
+    button.choice{flex:1 1 100%;max-width:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔢 Le Proprietà delle Operazioni 🔢</h1>
+  <p>Giochi interattivi su commutativa, associativa, dissociativa, invariantiva, distributiva ed elementi neutri</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="tab1">1. Riconosci</button>
+  <button class="tab-btn" data-tab="tab2">2. Completa</button>
+  <button class="tab-btn" data-tab="tab3">3. Vero o Falso</button>
+  <button class="tab-btn" data-tab="tab4">4. Abbinamento</button>
+</div>
+
+<main>
+
+  <!-- GIOCO 1: RICONOSCI LA PROPRIETA' -->
+  <section class="card active" id="tab1">
+    <h2>Riconosci la proprietà</h2>
+    <div class="istruzioni">Osserva l'uguaglianza e scegli il nome della proprietà che rappresenta.</div>
+
+    <div class="equazione" id="g1-equazione"></div>
+
+    <div class="scelte" id="g1-scelte"></div>
+
+    <div class="controls">
+      <button class="action secondary" id="g1-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="g1-feedback"></div>
+    <div class="score" id="g1-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- GIOCO 2: COMPLETA L'UGUAGLIANZA -->
+  <section class="card" id="tab2">
+    <h2>Completa l'uguaglianza</h2>
+    <div class="istruzioni">Trova il numero mancante che rende vera l'uguaglianza, applicando la proprietà indicata.</div>
+
+    <div style="text-align:center;font-weight:700;color:var(--secondary);" id="g2-nome-proprieta"></div>
+    <div class="equazione" id="g2-equazione"></div>
+
+    <div class="controls">
+      <input type="number" id="g2-risposta" placeholder="?">
+      <button class="action" id="g2-verifica">Verifica</button>
+      <button class="action secondary" id="g2-nuovo">Nuovo esercizio</button>
+    </div>
+
+    <div class="feedback" id="g2-feedback"></div>
+    <div class="score" id="g2-score">Punteggio: 0 / 0</div>
+  </section>
+
+  <!-- GIOCO 3: VERO O FALSO LAMPO -->
+  <section class="card" id="tab3">
+    <h2>Vero o Falso lampo ⚡</h2>
+    <div class="istruzioni">Hai 8 secondi per decidere se l'uguaglianza mostrata è vera o falsa. Rispondi il più velocemente possibile!</div>
+
+    <div class="timerbar-wrap"><div class="timerbar" id="g3-timerbar"></div></div>
+
+    <div class="equazione" id="g3-equazione"></div>
+
+    <div class="controls">
+      <button class="action vero" id="g3-vero">✅ Vero</button>
+      <button class="action falso" id="g3-falso">❌ Falso</button>
+    </div>
+    <div class="controls">
+      <button class="action secondary" id="g3-nuovo">Nuova domanda</button>
+    </div>
+
+    <div class="feedback" id="g3-feedback"></div>
+    <div class="score" id="g3-score">Punteggio: 0 / 0</div>
+    <div class="streak" id="g3-streak">Serie corrette consecutive: 0</div>
+  </section>
+
+  <!-- GIOCO 4: ABBINAMENTO -->
+  <section class="card" id="tab4">
+    <h2>Abbinamento</h2>
+    <div class="istruzioni">Clicca prima il nome di una proprietà, poi l'uguaglianza corrispondente. Se l'abbinamento è corretto, resterà evidenziato in verde.</div>
+
+    <div class="abbinamento-grid">
+      <div class="colonna">
+        <h3>Proprietà</h3>
+        <div id="g4-nomi"></div>
+      </div>
+      <div class="colonna">
+        <h3>Esempi</h3>
+        <div id="g4-esempi"></div>
+      </div>
+    </div>
+
+    <div class="completato" id="g4-completato">🎉 Ottimo lavoro! Hai abbinato tutte le proprietà! 🎉</div>
+
+    <div class="controls">
+      <button class="action secondary" id="g4-nuovo">Nuova partita</button>
+    </div>
+
+    <div class="feedback" id="g4-feedback"></div>
+    <div class="score" id="g4-score">Partite completate: 0 &nbsp;|&nbsp; Errori totali: 0</div>
+  </section>
+
+  <div class="reset-bar">
+    <button id="reset-all">Azzera tutti i punteggi</button>
+  </div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============ UTILITY ============ */
+
+function randInt(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+/* ============ DATABASE DELLE PROPRIETA' ============ */
+/* Ogni proprietà espone: id, nome, operazione, genera()
+   genera() ritorna { vero, falso, fillDisplay, fillAnswer } */
+
+const PROPRIETA = [
+
+  { id:"comm_add", nome:"Proprietà commutativa dell'addizione", operazione:"Addizione",
+    genera(){
+      const a = randInt(3, 60), b = randInt(3, 60);
+      return {
+        vero: a + " + " + b + " = " + b + " + " + a,
+        falso: a + " + " + b + " = " + b + " + " + (a + randInt(1,5)),
+        fillDisplay: a + " + " + b + " = " + b + " + <span class='blank'>___</span>",
+        fillAnswer: a
+      };
+    }
+  },
+
+  { id:"assoc_add", nome:"Proprietà associativa dell'addizione", operazione:"Addizione",
+    genera(){
+      const a = randInt(2, 30), b = randInt(2, 30), c = randInt(2, 30);
+      return {
+        vero: "(" + a + " + " + b + ") + " + c + " = " + a + " + (" + b + " + " + c + ")",
+        falso: "(" + a + " + " + b + ") + " + c + " = " + a + " + (" + b + " + " + (c + randInt(1,4)) + ")",
+        fillDisplay: "(" + a + " + " + b + ") + " + c + " = " + a + " + (" + b + " + <span class='blank'>___</span>)",
+        fillAnswer: c
+      };
+    }
+  },
+
+  { id:"dissoc_add", nome:"Proprietà dissociativa dell'addizione", operazione:"Addizione",
+    genera(){
+      const a1 = randInt(2, 20), a2 = randInt(2, 20), b = randInt(2, 40);
+      const a = a1 + a2;
+      return {
+        vero: a + " + " + b + " = (" + a1 + " + " + a2 + ") + " + b,
+        falso: a + " + " + b + " = (" + a1 + " + " + (a2 + randInt(1,4)) + ") + " + b,
+        fillDisplay: a + " + " + b + " = (" + a1 + " + <span class='blank'>___</span>) + " + b,
+        fillAnswer: a2
+      };
+    }
+  },
+
+  { id:"inv_add", nome:"Proprietà invariantiva dell'addizione", operazione:"Addizione",
+    genera(){
+      const a = randInt(5, 40), b = randInt(15, 50), k = randInt(1, 10);
+      return {
+        vero: a + " + " + b + " = (" + a + " + " + k + ") + (" + b + " - " + k + ")",
+        falso: a + " + " + b + " = (" + a + " + " + k + ") + (" + b + " - " + (k + randInt(1,3)) + ")",
+        fillDisplay: a + " + " + b + " = (" + a + " + " + k + ") + <span class='blank'>___</span>",
+        fillAnswer: b - k
+      };
+    }
+  },
+
+  { id:"neutro_add", nome:"Elemento neutro dell'addizione", operazione:"Addizione",
+    genera(){
+      const a = randInt(2, 90);
+      return {
+        vero: a + " + 0 = " + a,
+        falso: a + " + 0 = " + (a + randInt(1,5)),
+        fillDisplay: a + " + <span class='blank'>___</span> = " + a,
+        fillAnswer: 0
+      };
+    }
+  },
+
+  { id:"inv_sub", nome:"Proprietà invariantiva della sottrazione", operazione:"Sottrazione",
+    genera(){
+      const b = randInt(5, 30), a = b + randInt(5, 40), k = randInt(1, 15);
+      return {
+        vero: a + " - " + b + " = (" + a + " + " + k + ") - (" + b + " + " + k + ")",
+        falso: a + " - " + b + " = (" + a + " + " + k + ") - (" + b + " + " + (k + randInt(1,4)) + ")",
+        fillDisplay: a + " - " + b + " = (" + a + " + " + k + ") - <span class='blank'>___</span>",
+        fillAnswer: b + k
+      };
+    }
+  },
+
+  { id:"comm_mul", nome:"Proprietà commutativa della moltiplicazione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 12), b = randInt(2, 12);
+      return {
+        vero: a + " × " + b + " = " + b + " × " + a,
+        falso: a + " × " + b + " = " + b + " × " + (a + randInt(1,3)),
+        fillDisplay: a + " × " + b + " = " + b + " × <span class='blank'>___</span>",
+        fillAnswer: a
+      };
+    }
+  },
+
+  { id:"assoc_mul", nome:"Proprietà associativa della moltiplicazione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 9), b = randInt(2, 9), c = randInt(2, 9);
+      return {
+        vero: "(" + a + " × " + b + ") × " + c + " = " + a + " × (" + b + " × " + c + ")",
+        falso: "(" + a + " × " + b + ") × " + c + " = " + a + " × (" + b + " × " + (c + randInt(1,3)) + ")",
+        fillDisplay: "(" + a + " × " + b + ") × " + c + " = " + a + " × (" + b + " × <span class='blank'>___</span>)",
+        fillAnswer: c
+      };
+    }
+  },
+
+  { id:"dissoc_mul", nome:"Proprietà dissociativa della moltiplicazione", operazione:"Moltiplicazione",
+    genera(){
+      const a1 = randInt(2, 9), a2 = randInt(2, 9), b = randInt(2, 9);
+      const a = a1 * a2;
+      return {
+        vero: a + " × " + b + " = (" + a1 + " × " + a2 + ") × " + b,
+        falso: a + " × " + b + " = (" + a1 + " × " + (a2 + randInt(1,3)) + ") × " + b,
+        fillDisplay: a + " × " + b + " = (" + a1 + " × <span class='blank'>___</span>) × " + b,
+        fillAnswer: a2
+      };
+    }
+  },
+
+  { id:"distr_add", nome:"Proprietà distributiva rispetto all'addizione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 12), b = randInt(2, 12), c = randInt(2, 12);
+      return {
+        vero: a + " × (" + b + " + " + c + ") = " + a + "×" + b + " + " + a + "×" + c,
+        falso: a + " × (" + b + " + " + c + ") = " + a + "×" + b + " + " + (a * c + randInt(1,5)),
+        fillDisplay: a + " × (" + b + " + " + c + ") = " + a + "×" + b + " + <span class='blank'>___</span>",
+        fillAnswer: a * c
+      };
+    }
+  },
+
+  { id:"distr_sub", nome:"Proprietà distributiva rispetto alla sottrazione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 12), c = randInt(2, 10), b = c + randInt(2, 10);
+      return {
+        vero: a + " × (" + b + " - " + c + ") = " + a + "×" + b + " - " + a + "×" + c,
+        falso: a + " × (" + b + " - " + c + ") = " + a + "×" + b + " - " + (a * c + randInt(1,5)),
+        fillDisplay: a + " × (" + b + " - " + c + ") = " + a + "×" + b + " - <span class='blank'>___</span>",
+        fillAnswer: a * c
+      };
+    }
+  },
+
+  { id:"neutro_mul", nome:"Elemento neutro della moltiplicazione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 90);
+      return {
+        vero: a + " × 1 = " + a,
+        falso: a + " × 1 = " + (a + randInt(1,5)),
+        fillDisplay: a + " × <span class='blank'>___</span> = " + a,
+        fillAnswer: 1
+      };
+    }
+  },
+
+  { id:"assorb_mul", nome:"Elemento assorbente della moltiplicazione", operazione:"Moltiplicazione",
+    genera(){
+      const a = randInt(2, 90);
+      return {
+        vero: a + " × 0 = 0",
+        falso: a + " × 0 = " + a,
+        fillDisplay: a + " × <span class='blank'>___</span> = 0",
+        fillAnswer: 0
+      };
+    }
+  },
+
+  { id:"inv_div", nome:"Proprietà invariantiva della divisione", operazione:"Divisione",
+    genera(){
+      const a = randInt(10, 60), b = randInt(2, 10), k = randInt(2, 5);
+      return {
+        vero: a + " : " + b + " = (" + a + "×" + k + ") : (" + b + "×" + k + ")",
+        falso: a + " : " + b + " = (" + a + "×" + k + ") : (" + (b*k + randInt(1,4)) + ")",
+        fillDisplay: a + " : " + b + " = (" + a + "×" + k + ") : <span class='blank'>___</span>",
+        fillAnswer: b * k
+      };
+    }
+  },
+
+  { id:"distr_div", nome:"Proprietà distributiva del dividendo", operazione:"Divisione",
+    genera(){
+      const d = randInt(2, 9), q1 = randInt(2, 9), q2 = randInt(2, 9);
+      const a = q1 * d, b = q2 * d;
+      return {
+        vero: "(" + a + " + " + b + ") : " + d + " = (" + a + ":" + d + ") + (" + b + ":" + d + ")",
+        falso: "(" + a + " + " + b + ") : " + d + " = (" + a + ":" + d + ") + " + (q2 + randInt(1,3)),
+        fillDisplay: "(" + a + " + " + b + ") : " + d + " = " + q1 + " + <span class='blank'>___</span>",
+        fillAnswer: q2
+      };
+    }
+  },
+
+  { id:"neutro_div", nome:"Elemento neutro della divisione", operazione:"Divisione",
+    genera(){
+      const a = randInt(2, 90);
+      return {
+        vero: a + " : 1 = " + a,
+        falso: a + " : 1 = " + (a + randInt(1,5)),
+        fillDisplay: a + " : <span class='blank'>___</span> = " + a,
+        fillAnswer: 1
+      };
+    }
+  }
+
+];
+
+function proprietaCasuale(escludiId){
+  let pool = PROPRIETA;
+  if (escludiId){
+    pool = PROPRIETA.filter(function(p){ return p.id !== escludiId; });
+  }
+  return pool[randInt(0, pool.length - 1)];
+}
+
+/* ============ GESTIONE TAB ============ */
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const cards = document.querySelectorAll(".card");
+
+tabButtons.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabButtons.forEach(function(b){ b.classList.remove("active"); });
+    cards.forEach(function(c){ c.classList.remove("active"); });
+    btn.classList.add("active");
+    document.getElementById(btn.getAttribute("data-tab")).classList.add("active");
+  });
+});
+
+/* ============ SCORE HELPER ============ */
+
+function makeScoreTracker(elementId, prefix){
+  let correct = 0, total = 0;
+  const el = document.getElementById(elementId);
+  function update(){
+    el.textContent = (prefix || "Punteggio: ") + correct + " / " + total;
+  }
+  update();
+  return {
+    registra: function(isCorrect){ total++; if (isCorrect) correct++; update(); },
+    reset: function(){ correct = 0; total = 0; update(); }
+  };
+}
+
+/* ============ GIOCO 1: RICONOSCI LA PROPRIETA' ============ */
+
+const g1Score = makeScoreTracker("g1-score");
+let g1Corrente = null;
+
+function nuovoG1(){
+  const prop = proprietaCasuale();
+  const es = prop.genera();
+  g1Corrente = { prop: prop };
+
+  document.getElementById("g1-equazione").textContent = es.vero;
+
+  const distrattori = shuffle(PROPRIETA.filter(function(p){ return p.id !== prop.id; }))
+    .slice(0, 3)
+    .map(function(p){ return p.nome; });
+  const opzioni = shuffle([prop.nome].concat(distrattori));
+
+  const contScelte = document.getElementById("g1-scelte");
+  contScelte.innerHTML = "";
+  opzioni.forEach(function(nomeOpz){
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = nomeOpz;
+    btn.addEventListener("click", function(){
+      const corretto = (nomeOpz === prop.nome);
+      g1Score.registra(corretto);
+      const fb = document.getElementById("g1-feedback");
+      Array.from(contScelte.children).forEach(function(b){ b.disabled = true; });
+      if (corretto){
+        btn.classList.add("corretta");
+        fb.className = "feedback ok";
+        fb.textContent = "Esatto! È la " + prop.nome.charAt(0).toLowerCase() + prop.nome.slice(1) + ".";
+      } else {
+        btn.classList.add("sbagliata");
+        Array.from(contScelte.children).forEach(function(b){
+          if (b.textContent === prop.nome) b.classList.add("corretta");
+        });
+        fb.className = "feedback no";
+        fb.textContent = "Non corretto. La proprietà giusta era: " + prop.nome + ".";
+      }
+    });
+    contScelte.appendChild(btn);
+  });
+
+  const fb = document.getElementById("g1-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("g1-nuovo").addEventListener("click", nuovoG1);
+
+/* ============ GIOCO 2: COMPLETA L'UGUAGLIANZA ============ */
+
+const g2Score = makeScoreTracker("g2-score");
+let g2Corrente = null;
+
+function nuovoG2(){
+  const prop = proprietaCasuale();
+  const es = prop.genera();
+  g2Corrente = { prop: prop, risposta: es.fillAnswer };
+
+  document.getElementById("g2-nome-proprieta").textContent = "Proprietà: " + prop.nome;
+  document.getElementById("g2-equazione").innerHTML = es.fillDisplay;
+  document.getElementById("g2-risposta").value = "";
+
+  const fb = document.getElementById("g2-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+document.getElementById("g2-verifica").addEventListener("click", function(){
+  const val = parseInt(document.getElementById("g2-risposta").value, 10);
+  const fb = document.getElementById("g2-feedback");
+  if (isNaN(val)){
+    fb.className = "feedback no";
+    fb.textContent = "Inserisci un numero.";
+    return;
+  }
+  const corretto = (val === g2Corrente.risposta);
+  g2Score.registra(corretto);
+  if (corretto){
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! Il numero mancante era " + g2Corrente.risposta + ".";
+  } else {
+    fb.className = "feedback no";
+    fb.textContent = "Non corretto. Il numero mancante era " + g2Corrente.risposta + ".";
+  }
+});
+
+document.getElementById("g2-nuovo").addEventListener("click", nuovoG2);
+
+/* ============ GIOCO 3: VERO O FALSO LAMPO ============ */
+
+const g3Score = makeScoreTracker("g3-score");
+let g3Corrente = null;
+let g3Streak = 0;
+let g3Timer = null;
+let g3TempoRimasto = 0;
+const G3_DURATA = 8000; // ms
+const G3_INTERVALLO = 100;
+
+function aggiornaStreakG3(){
+  document.getElementById("g3-streak").textContent = "Serie corrette consecutive: " + g3Streak;
+}
+
+function fermaTimerG3(){
+  if (g3Timer){ clearInterval(g3Timer); g3Timer = null; }
+}
+
+function nuovoG3(){
+  fermaTimerG3();
+  const prop = proprietaCasuale();
+  const es = prop.genera();
+  const isVeroEsercizio = Math.random() < 0.5;
+  g3Corrente = { prop: prop, isVero: isVeroEsercizio, risposta: null };
+
+  document.getElementById("g3-equazione").textContent = isVeroEsercizio ? es.vero : es.falso;
+
+  const fb = document.getElementById("g3-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+
+  const barra = document.getElementById("g3-timerbar");
+  barra.style.width = "100%";
+  g3TempoRimasto = G3_DURATA;
+
+  g3Timer = setInterval(function(){
+    g3TempoRimasto -= G3_INTERVALLO;
+    const pct = Math.max(0, (g3TempoRimasto / G3_DURATA) * 100);
+    barra.style.width = pct + "%";
+    if (g3TempoRimasto <= 0){
+      fermaTimerG3();
+      valutaG3(null); // tempo scaduto
+    }
+  }, G3_INTERVALLO);
+}
+
+function valutaG3(rispostaUtente){
+  fermaTimerG3();
+  const fb = document.getElementById("g3-feedback");
+  const corretto = (rispostaUtente === g3Corrente.isVero);
+
+  g3Score.registra(corretto);
+  if (corretto){
+    g3Streak++;
+    fb.className = "feedback ok";
+    fb.textContent = "Esatto! L'uguaglianza era " + (g3Corrente.isVero ? "vera" : "falsa") + ".";
+  } else {
+    g3Streak = 0;
+    fb.className = "feedback no";
+    if (rispostaUtente === null){
+      fb.textContent = "Tempo scaduto! L'uguaglianza era " + (g3Corrente.isVero ? "vera" : "falsa") + ".";
+    } else {
+      fb.textContent = "Non corretto. L'uguaglianza era " + (g3Corrente.isVero ? "vera" : "falsa") + ".";
+    }
+  }
+  aggiornaStreakG3();
+}
+
+document.getElementById("g3-vero").addEventListener("click", function(){ if (g3Timer) valutaG3(true); });
+document.getElementById("g3-falso").addEventListener("click", function(){ if (g3Timer) valutaG3(false); });
+document.getElementById("g3-nuovo").addEventListener("click", nuovoG3);
+
+/* ============ GIOCO 4: ABBINAMENTO ============ */
+
+let g4Stato = null; // { coppie: [{id, nome, esempio, abbinata:bool}], selNome, selEsempio, errori }
+const g4PartiteCompletate = { n: 0 };
+const g4ErroriTotali = { n: 0 };
+
+function aggiornaScoreG4(){
+  document.getElementById("g4-score").textContent =
+    "Partite completate: " + g4PartiteCompletate.n + " | Errori totali: " + g4ErroriTotali.n;
+}
+
+function nuovoG4(){
+  const scelte = shuffle(PROPRIETA).slice(0, 6);
+  const coppie = scelte.map(function(p){
+    const es = p.genera();
+    return { id: p.id, nome: p.nome, esempio: es.vero, abbinata: false };
+  });
+  g4Stato = { coppie: coppie, selNomeId: null, selEsempioId: null };
+
+  const contNomi = document.getElementById("g4-nomi");
+  const contEsempi = document.getElementById("g4-esempi");
+  contNomi.innerHTML = "";
+  contEsempi.innerHTML = "";
+
+  shuffle(coppie).forEach(function(c){
+    const div = document.createElement("div");
+    div.className = "item-abbinamento";
+    div.textContent = c.nome;
+    div.setAttribute("data-id", c.id);
+    div.setAttribute("data-tipo", "nome");
+    div.addEventListener("click", function(){ selezionaG4(c.id, "nome", div); });
+    contNomi.appendChild(div);
+  });
+
+  shuffle(coppie).forEach(function(c){
+    const div = document.createElement("div");
+    div.className = "item-abbinamento";
+    div.textContent = c.esempio;
+    div.setAttribute("data-id", c.id);
+    div.setAttribute("data-tipo", "esempio");
+    div.addEventListener("click", function(){ selezionaG4(c.id, "esempio", div); });
+    contEsempi.appendChild(div);
+  });
+
+  document.getElementById("g4-completato").style.display = "none";
+  const fb = document.getElementById("g4-feedback");
+  fb.className = "feedback";
+  fb.textContent = "";
+}
+
+function selezionaG4(id, tipo, elemento){
+  if (elemento.classList.contains("abbinata")) return;
+
+  if (tipo === "nome"){
+    document.querySelectorAll("#g4-nomi .item-abbinamento").forEach(function(el){
+      el.classList.remove("selezionato");
+    });
+    elemento.classList.add("selezionato");
+    g4Stato.selNomeId = id;
+  } else {
+    document.querySelectorAll("#g4-esempi .item-abbinamento").forEach(function(el){
+      el.classList.remove("selezionato");
+    });
+    elemento.classList.add("selezionato");
+    g4Stato.selEsempioId = id;
+  }
+
+  if (g4Stato.selNomeId && g4Stato.selEsempioId){
+    const nomeEl = document.querySelector("#g4-nomi .item-abbinamento.selezionato");
+    const esempioEl = document.querySelector("#g4-esempi .item-abbinamento.selezionato");
+
+    if (g4Stato.selNomeId === g4Stato.selEsempioId){
+      nomeEl.classList.remove("selezionato");
+      esempioEl.classList.remove("selezionato");
+      nomeEl.classList.add("abbinata");
+      esempioEl.classList.add("abbinata");
+
+      const coppia = g4Stato.coppie.find(function(c){ return c.id === g4Stato.selNomeId; });
+      coppia.abbinata = true;
+
+      const tutteAbbinate = g4Stato.coppie.every(function(c){ return c.abbinata; });
+      if (tutteAbbinate){
+        document.getElementById("g4-completato").style.display = "block";
+        g4PartiteCompletate.n++;
+        aggiornaScoreG4();
+      }
+    } else {
+      nomeEl.classList.add("errore");
+      esempioEl.classList.add("errore");
+      g4ErroriTotali.n++;
+      aggiornaScoreG4();
+      setTimeout(function(){
+        nomeEl.classList.remove("selezionato", "errore");
+        esempioEl.classList.remove("selezionato", "errore");
+      }, 500);
+    }
+
+    g4Stato.selNomeId = null;
+    g4Stato.selEsempioId = null;
+  }
+}
+
+document.getElementById("g4-nuovo").addEventListener("click", nuovoG4);
+
+/* ============ RESET GENERALE ============ */
+
+document.getElementById("reset-all").addEventListener("click", function(){
+  g1Score.reset();
+  g2Score.reset();
+  g3Score.reset();
+  g3Streak = 0;
+  aggiornaStreakG3();
+  g4PartiteCompletate.n = 0;
+  g4ErroriTotali.n = 0;
+  aggiornaScoreG4();
+});
+
+/* ============ INIZIALIZZAZIONE ============ */
+
+nuovoG1();
+nuovoG2();
+nuovoG3();
+nuovoG4();
+aggiornaScoreG4();
+
+</script>
+</body>
+</html>
