@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistica Descrittiva - Quiz e Giochi</title>
+<style>
+  :root {
+    --primario: #1a5490;
+    --primario-scuro: #0d3a66;
+    --primario-chiaro: #e8f1fa;
+    --grigio-box: #f0f0f0;
+    --grigio-bordo: #cfcfcf;
+    --arancio: #e67e22;
+    --arancio-scuro: #c0651a;
+    --verde: #2e8b57;
+    --rosso: #c0392b;
+    --testo: #2c2c2c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--primario-chiaro) 0%, #ffffff 260px);
+    color: var(--testo);
+    margin: 0;
+    padding: 0 0 60px 0;
+  }
+
+  header {
+    background: var(--primario);
+    color: white;
+    padding: 28px 20px 22px 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  header h1 { margin: 0 0 6px 0; font-size: 1.7em; }
+  header p { margin: 0; opacity: 0.9; font-size: 0.95em; }
+
+  .container { max-width: 850px; margin: 0 auto; padding: 0 18px; }
+
+  nav.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: -20px auto 26px auto;
+    max-width: 850px;
+    padding: 0 18px;
+  }
+  nav.tabs button {
+    flex: 1 1 auto;
+    min-width: 150px;
+    background: white;
+    border: 2px solid var(--primario);
+    color: var(--primario);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+  }
+  nav.tabs button:hover { background: var(--primario-chiaro); }
+  nav.tabs button.active {
+    background: var(--primario);
+    color: white;
+  }
+
+  .sezione { display: none; animation: fadeIn 0.3s ease; }
+  .sezione.attiva { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+
+  .card {
+    background: white;
+    border: 1px solid var(--grigio-bordo);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .teoria {
+    background: var(--grigio-box);
+    border-left: 5px solid var(--primario);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+  }
+  .teoria strong { color: var(--primario-scuro); }
+
+  /* QUIZ */
+  #quiz-progress {
+    text-align: center;
+    font-weight: 600;
+    color: var(--primario);
+    margin-bottom: 10px;
+  }
+  .domanda-testo {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--primario-scuro);
+  }
+  .opzioni { display: flex; flex-direction: column; gap: 10px; }
+  .opzione {
+    background: var(--grigio-box);
+    border: 2px solid var(--grigio-bordo);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.98em;
+    transition: all 0.15s ease;
+  }
+  .opzione:hover { border-color: var(--primario); }
+  .opzione.corretta { background: #e3f6ea; border-color: var(--verde); color: var(--verde); font-weight: 600; }
+  .opzione.sbagliata { background: #fbe6e3; border-color: var(--rosso); color: var(--rosso); font-weight: 600; }
+  .opzione.disabilitata { pointer-events: none; opacity: 0.75; }
+
+  .feedback {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.92em;
+    display: none;
+  }
+  .feedback.mostra { display: block; }
+  .feedback.ok { background: #e3f6ea; color: var(--verde); border: 1px solid var(--verde); }
+  .feedback.no { background: #fbe6e3; color: var(--rosso); border: 1px solid var(--rosso); }
+
+  .btn {
+    background: var(--arancio);
+    color: white;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background 0.2s ease;
+  }
+  .btn:hover { background: var(--arancio-scuro); }
+  .btn:disabled { background: #cccccc; cursor: not-allowed; }
+  .btn.secondario {
+    background: white;
+    color: var(--primario);
+    border: 2px solid var(--primario);
+  }
+  .btn.secondario:hover { background: var(--primario-chiaro); }
+
+  #quiz-risultato {
+    text-align: center;
+    padding: 30px 20px;
+  }
+  #quiz-risultato h2 { color: var(--primario); }
+  .punteggio-grande { font-size: 2.6em; font-weight: 700; color: var(--arancio); margin: 10px 0; }
+
+  /* ABBINAMENTO */
+  .abbinamento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 600px) {
+    .abbinamento-grid { grid-template-columns: 1fr; }
+  }
+  .colonna-titolo {
+    text-align: center;
+    font-weight: 700;
+    color: var(--primario-scuro);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+  }
+  .item-abbinamento {
+    background: var(--grigio-box);
+    border: 2px solid var(--grigio-bordo);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 0.92em;
+    transition: all 0.15s ease;
+  }
+  .item-abbinamento:hover { border-color: var(--primario); }
+  .item-abbinamento.selezionato { border-color: var(--arancio); background: #fdf1e3; }
+  .item-abbinamento.abbinato { background: #e3f6ea; border-color: var(--verde); color: var(--verde); cursor: default; pointer-events: none; }
+  .item-abbinamento.errore { background: #fbe6e3; border-color: var(--rosso); animation: shake 0.3s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  #abbinamento-stato {
+    text-align: center;
+    margin-top: 16px;
+    font-weight: 600;
+    color: var(--primario);
+  }
+
+  /* SFIDA CALCOLO */
+  .dati-box {
+    background: var(--primario-chiaro);
+    border: 2px dashed var(--primario);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    font-size: 1.25em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--primario-scuro);
+    margin-bottom: 20px;
+  }
+  .campi-sfida {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 600px) {
+    .campi-sfida { grid-template-columns: 1fr; }
+  }
+  .campo-gruppo label {
+    display: block;
+    font-weight: 600;
+    color: var(--primario-scuro);
+    margin-bottom: 5px;
+    font-size: 0.9em;
+  }
+  .campo-gruppo input {
+    width: 100%;
+    padding: 9px 11px;
+    border: 2px solid var(--grigio-bordo);
+    border-radius: 6px;
+    font-size: 1em;
+  }
+  .campo-gruppo input:focus { outline: none; border-color: var(--primario); }
+  .campo-gruppo input.corretto { border-color: var(--verde); background: #e3f6ea; }
+  .campo-gruppo input.sbagliato { border-color: var(--rosso); background: #fbe6e3; }
+  .campo-gruppo .risposta-mostrata {
+    font-size: 0.82em;
+    color: var(--rosso);
+    margin-top: 3px;
+    display: none;
+  }
+  .campo-gruppo .risposta-mostrata.mostra { display: block; }
+
+  #sfida-esito {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    display: none;
+    font-weight: 600;
+  }
+  #sfida-esito.mostra { display: block; }
+
+  .badge-livello {
+    display: inline-block;
+    background: var(--arancio);
+    color: white;
+    font-size: 0.75em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  footer {
+    text-align: center;
+    color: #888;
+    font-size: 0.82em;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Statistica Descrittiva</h1>
+  <p>Quiz interattivo e giochi di ripasso — glossario, indici e rappresentazioni grafiche</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-target="tab-quiz">📝 Quiz</button>
+  <button class="tab-btn" data-target="tab-abbinamento">🔗 Abbina i termini</button>
+  <button class="tab-btn" data-target="tab-sfida">🧮 Sfida: calcola gli indici</button>
+</nav>
+
+<div class="container">
+
+  <!-- ================= QUIZ ================= -->
+  <section id="tab-quiz" class="sezione attiva">
+    <div class="teoria">
+      <strong>Come funziona:</strong> rispondi alle 10 domande scegliendo l'opzione corretta. Riceverai un punteggio finale con il riepilogo.
+    </div>
+
+    <div id="quiz-domanda-container" class="card">
+      <div id="quiz-progress">Domanda 1 di 10</div>
+      <div class="domanda-testo" id="quiz-testo"></div>
+      <div class="opzioni" id="quiz-opzioni"></div>
+      <div class="feedback" id="quiz-feedback"></div>
+      <button class="btn" id="quiz-avanti" disabled>Avanti →</button>
+    </div>
+
+    <div id="quiz-risultato" class="card" style="display:none;">
+      <h2>Risultato</h2>
+      <div class="punteggio-grande" id="quiz-punteggio-finale"></div>
+      <p id="quiz-commento"></p>
+      <button class="btn" id="quiz-ricomincia">Ricomincia il quiz</button>
+    </div>
+  </section>
+
+  <!-- ================= ABBINAMENTO ================= -->
+  <section id="tab-abbinamento" class="sezione">
+    <div class="teoria">
+      <strong>Come funziona:</strong> clicca prima un termine a sinistra, poi la definizione corrispondente a destra. Se l'abbinamento è corretto, le caselle diventano verdi.
+    </div>
+    <div class="card">
+      <div class="abbinamento-grid">
+        <div>
+          <div class="colonna-titolo">Termine</div>
+          <div id="colonna-termini"></div>
+        </div>
+        <div>
+          <div class="colonna-titolo">Definizione</div>
+          <div id="colonna-definizioni"></div>
+        </div>
+      </div>
+      <div id="abbinamento-stato">0 / 8 abbinamenti trovati</div>
+      <div style="text-align:center;">
+        <button class="btn secondario" id="abbinamento-reset">Rimescola e ricomincia</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SFIDA CALCOLO ================= -->
+  <section id="tab-sfida" class="sezione">
+    <div class="teoria">
+      <strong>Come funziona:</strong> viene generata una serie di dati casuale. Calcola <em>moda</em>, <em>mediana</em>, <em>media aritmetica</em> e <em>campo di variazione</em>, poi controlla le risposte.
+      <span class="badge-livello" id="badge-esercizio">Esercizio 1</span>
+    </div>
+    <div class="card">
+      <div class="dati-box" id="sfida-dati"></div>
+
+      <div class="campi-sfida">
+        <div class="campo-gruppo">
+          <label for="input-moda">Moda</label>
+          <input type="text" id="input-moda" placeholder="es. 5">
+          <div class="risposta-mostrata" id="ans-moda"></div>
+        </div>
+        <div class="campo-gruppo">
+          <label for="input-mediana">Mediana</label>
+          <input type="text" id="input-mediana" placeholder="es. 4">
+          <div class="risposta-mostrata" id="ans-mediana"></div>
+        </div>
+        <div class="campo-gruppo">
+          <label for="input-media">Media aritmetica (2 decimali)</label>
+          <input type="text" id="input-media" placeholder="es. 4.28">
+          <div class="risposta-mostrata" id="ans-media"></div>
+        </div>
+        <div class="campo-gruppo">
+          <label for="input-campo">Campo di variazione</label>
+          <input type="text" id="input-campo" placeholder="es. 8">
+          <div class="risposta-mostrata" id="ans-campo"></div>
+        </div>
+      </div>
+
+      <button class="btn" id="sfida-controlla">Controlla le risposte</button>
+      <button class="btn secondario" id="sfida-nuovo">Nuovo esercizio</button>
+
+      <div id="sfida-esito"></div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Materiale didattico — Statistica descrittiva</footer>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------- NAVIGAZIONE TAB ----------
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var sezioni = document.querySelectorAll(".sezione");
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      tabBtns.forEach(function(b) { b.classList.remove("active"); });
+      sezioni.forEach(function(s) { s.classList.remove("attiva"); });
+      btn.classList.add("active");
+      document.getElementById(btn.getAttribute("data-target")).classList.add("attiva");
+    });
+  });
+
+  // =========================================================
+  // QUIZ
+  // =========================================================
+  var domande = [
+    {
+      testo: "Cosa studia la statistica descrittiva?",
+      opzioni: [
+        "La raccolta, la rappresentazione e l'analisi dei dati",
+        "Le previsioni sui dati raccolti",
+        "Solo il calcolo delle probabilità",
+        "La progettazione dei questionari"
+      ],
+      corretta: 0
+    },
+    {
+      testo: "Cosa studia la statistica inferenziale?",
+      opzioni: [
+        "La raccolta dei dati grezzi",
+        "Fare previsioni sui dati raccolti",
+        "La classificazione delle modalità",
+        "Il calcolo della deviazione standard"
+      ],
+      corretta: 1
+    },
+    {
+      testo: "Che cos'è la POPOLAZIONE in statistica?",
+      opzioni: [
+        "Il singolo individuo analizzato",
+        "L'insieme delle persone o degli oggetti analizzati",
+        "Il numero di osservazioni di una modalità",
+        "Un sottoinsieme scelto per comodità"
+      ],
+      corretta: 1
+    },
+    {
+      testo: "Il CAMPIONE è...",
+      opzioni: [
+        "Un sinonimo di popolazione",
+        "La caratteristica che si intende analizzare",
+        "Un sottoinsieme della popolazione su cui svolgere l'analisi quando la popolazione è troppo grande",
+        "Il numero di modalità di un carattere"
+      ],
+      corretta: 2
+    },
+    {
+      testo: "Nell'esempio del colore degli occhi (Verdi 12, Azzurri 16, Castani 58, Neri 14), qual è la MODA?",
+      opzioni: ["Verdi", "Azzurri", "Castani", "Neri"],
+      corretta: 2
+    },
+    {
+      testo: "Dati i numeri 1, 2, 3, 3, 5, 5, 5 (già ordinati), qual è la MEDIANA?",
+      opzioni: ["2", "3", "5", "3,43 circa"],
+      corretta: 1
+    },
+    {
+      testo: "Qual è la MEDIA ARITMETICA degli stessi numeri 1, 2, 3, 3, 5, 5, 5?",
+      opzioni: ["3", "5", "circa 3,43", "4"],
+      corretta: 2
+    },
+    {
+      testo: "Come si definisce il CAMPO DI VARIAZIONE?",
+      opzioni: [
+        "La somma di tutti i valori diviso il numero di osservazioni",
+        "La differenza fra il valore massimo e il valore minimo delle osservazioni",
+        "La modalità con la frequenza più alta",
+        "La radice quadrata della varianza"
+      ],
+      corretta: 1
+    },
+    {
+      testo: "La DEVIAZIONE STANDARD è definita come...",
+      opzioni: [
+        "La radice quadrata della varianza",
+        "La differenza tra massimo e minimo",
+        "Il valore centrale di una serie ordinata",
+        "La media pesata delle osservazioni"
+      ],
+      corretta: 0
+    },
+    {
+      testo: "Quale rappresentazione grafica mostra le modalità come 'fette' proporzionali alle percentuali?",
+      opzioni: [
+        "Diagramma a barre",
+        "Diagramma a nastri",
+        "Diagramma a torta (aerogramma)",
+        "Ideogramma"
+      ],
+      corretta: 2
+    }
+  ];
+
+  var quizIndice = 0;
+  var quizPunteggio = 0;
+  var quizRisposto = false;
+
+  var elTesto = document.getElementById("quiz-testo");
+  var elOpzioni = document.getElementById("quiz-opzioni");
+  var elFeedback = document.getElementById("quiz-feedback");
+  var elAvanti = document.getElementById("quiz-avanti");
+  var elProgress = document.getElementById("quiz-progress");
+  var elDomandaContainer = document.getElementById("quiz-domanda-container");
+  var elRisultato = document.getElementById("quiz-risultato");
+  var elPunteggioFinale = document.getElementById("quiz-punteggio-finale");
+  var elCommento = document.getElementById("quiz-commento");
+
+  function mostraDomanda() {
+    quizRisposto = false;
+    var d = domande[quizIndice];
+    elProgress.textContent = "Domanda " + (quizIndice + 1) + " di " + domande.length;
+    elTesto.textContent = d.testo;
+    elOpzioni.innerHTML = "";
+    elFeedback.className = "feedback";
+    elFeedback.textContent = "";
+    elAvanti.disabled = true;
+    elAvanti.textContent = (quizIndice === domande.length - 1) ? "Vedi risultato →" : "Avanti →";
+
+    d.opzioni.forEach(function(testoOpz, idx) {
+      var div = document.createElement("div");
+      div.className = "opzione";
+      div.textContent = testoOpz;
+      div.addEventListener("click", function() {
+        if (quizRisposto) return;
+        quizRisposto = true;
+        var tutteLeOpzioni = elOpzioni.querySelectorAll(".opzione");
+        tutteLeOpzioni.forEach(function(o) { o.classList.add("disabilitata"); });
+
+        if (idx === d.corretta) {
+          div.classList.add("corretta");
+          quizPunteggio++;
+          elFeedback.className = "feedback mostra ok";
+          elFeedback.textContent = "✓ Corretto!";
+        } else {
+          div.classList.add("sbagliata");
+          tutteLeOpzioni[d.corretta].classList.add("corretta");
+          elFeedback.className = "feedback mostra no";
+          elFeedback.textContent = "✗ Risposta esatta: " + d.opzioni[d.corretta];
+        }
+        elAvanti.disabled = false;
+      });
+      elOpzioni.appendChild(div);
+    });
+  }
+
+  elAvanti.addEventListener("click", function() {
+    quizIndice++;
+    if (quizIndice < domande.length) {
+      mostraDomanda();
+    } else {
+      mostraRisultatoFinale();
+    }
+  });
+
+  function mostraRisultatoFinale() {
+    elDomandaContainer.style.display = "none";
+    elRisultato.style.display = "block";
+    elPunteggioFinale.textContent = quizPunteggio + " / " + domande.length;
+    var perc = quizPunteggio / domande.length;
+    var commento;
+    if (perc === 1) commento = "Perfetto! Padroneggi tutti i concetti fondamentali.";
+    else if (perc >= 0.7) commento = "Molto bene! Ripassa i punti che hai sbagliato.";
+    else if (perc >= 0.4) commento = "Discreto lavoro, ma serve un ripasso più approfondito.";
+    else commento = "Rivedi il glossario e gli indici statistici prima di riprovare.";
+    elCommento.textContent = commento;
+  }
+
+  document.getElementById("quiz-ricomincia").addEventListener("click", function() {
+    quizIndice = 0;
+    quizPunteggio = 0;
+    elDomandaContainer.style.display = "block";
+    elRisultato.style.display = "none";
+    mostraDomanda();
+  });
+
+  mostraDomanda();
+
+  // =========================================================
+  // GIOCO DI ABBINAMENTO
+  // =========================================================
+  var coppie = [
+    { termine: "Popolazione", definizione: "Insieme delle persone o degli oggetti analizzati" },
+    { termine: "Unità statistica", definizione: "Singolo individuo della popolazione" },
+    { termine: "Carattere", definizione: "Caratteristica della popolazione che si intende analizzare" },
+    { termine: "Modalità", definizione: "Attributo in cui si articola un carattere" },
+    { termine: "Frequenza", definizione: "Numero delle osservazioni associate a ciascuna modalità" },
+    { termine: "Distribuzione statistica", definizione: "Associa a ciascuna modalità la corrispondente frequenza" },
+    { termine: "Campione", definizione: "Sottoinsieme della popolazione su cui svolgere l'analisi" },
+    { termine: "Moda", definizione: "Modalità che presenta la massima frequenza" }
+  ];
+
+  var colTermini = document.getElementById("colonna-termini");
+  var colDefinizioni = document.getElementById("colonna-definizioni");
+  var statoAbbinamento = document.getElementById("abbinamento-stato");
+
+  var selezionatoTermine = null;
+  var selezionatoDefinizione = null;
+  var abbinatiCorretti = 0;
+
+  function mescola(array) {
+    var copia = array.slice();
+    for (var i = copia.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = copia[i]; copia[i] = copia[j]; copia[j] = tmp;
+    }
+    return copia;
+  }
+
+  function inizializzaAbbinamento() {
+    abbinatiCorretti = 0;
+    selezionatoTermine = null;
+    selezionatoDefinizione = null;
+    statoAbbinamento.textContent = "0 / " + coppie.length + " abbinamenti trovati";
+
+    colTermini.innerHTML = "";
+    colDefinizioni.innerHTML = "";
+
+    var terminiMescolati = mescola(coppie.map(function(c, i) { return { testo: c.termine, id: i }; }));
+    var definizioniMescolate = mescola(coppie.map(function(c, i) { return { testo: c.definizione, id: i }; }));
+
+    terminiMescolati.forEach(function(item) {
+      var div = document.createElement("div");
+      div.className = "item-abbinamento";
+      div.textContent = item.testo;
+      div.dataset.id = item.id;
+      div.addEventListener("click", function() { onCliccaTermine(div, item.id); });
+      colTermini.appendChild(div);
+    });
+
+    definizioniMescolate.forEach(function(item) {
+      var div = document.createElement("div");
+      div.className = "item-abbinamento";
+      div.textContent = item.testo;
+      div.dataset.id = item.id;
+      div.addEventListener("click", function() { onCliccaDefinizione(div, item.id); });
+      colDefinizioni.appendChild(div);
+    });
+  }
+
+  function onCliccaTermine(div, id) {
+    if (div.classList.contains("abbinato")) return;
+    if (selezionatoTermine) selezionatoTermine.el.classList.remove("selezionato");
+    selezionatoTermine = { el: div, id: id };
+    div.classList.add("selezionato");
+    provaAbbinamento();
+  }
+
+  function onCliccaDefinizione(div, id) {
+    if (div.classList.contains("abbinato")) return;
+    if (selezionatoDefinizione) selezionatoDefinizione.el.classList.remove("selezionato");
+    selezionatoDefinizione = { el: div, id: id };
+    div.classList.add("selezionato");
+    provaAbbinamento();
+  }
+
+  function provaAbbinamento() {
+    if (!selezionatoTermine || !selezionatoDefinizione) return;
+    if (selezionatoTermine.id === selezionatoDefinizione.id) {
+      selezionatoTermine.el.classList.remove("selezionato");
+      selezionatoDefinizione.el.classList.remove("selezionato");
+      selezionatoTermine.el.classList.add("abbinato");
+      selezionatoDefinizione.el.classList.add("abbinato");
+      abbinatiCorretti++;
+      statoAbbinamento.textContent = abbinatiCorretti + " / " + coppie.length + " abbinamenti trovati";
+      if (abbinatiCorretti === coppie.length) {
+        statoAbbinamento.textContent = "🎉 Completato! Tutti gli abbinamenti trovati!";
+      }
+      selezionatoTermine = null;
+      selezionatoDefinizione = null;
+    } else {
+      var t = selezionatoTermine.el, d = selezionatoDefinizione.el;
+      t.classList.add("errore");
+      d.classList.add("errore");
+      setTimeout(function() {
+        t.classList.remove("errore", "selezionato");
+        d.classList.remove("errore", "selezionato");
+      }, 450);
+      selezionatoTermine = null;
+      selezionatoDefinizione = null;
+    }
+  }
+
+  document.getElementById("abbinamento-reset").addEventListener("click", inizializzaAbbinamento);
+  inizializzaAbbinamento();
+
+  // =========================================================
+  // SFIDA DI CALCOLO
+  // =========================================================
+  var numeroEsercizio = 1;
+  var serieCorrente = [];
+
+  function generaSerie() {
+    var n = 7 + Math.floor(Math.random() * 3); // tra 7 e 9 numeri
+    var serie = [];
+    for (var i = 0; i < n; i++) {
+      serie.push(1 + Math.floor(Math.random() * 10));
+    }
+    // garantiamo una moda chiara ripetendo un valore
+    var valoreModa = serie[0];
+    serie.push(valoreModa);
+    return serie;
+  }
+
+  function calcolaModa(serie) {
+    var conteggio = {};
+    serie.forEach(function(v) { conteggio[v] = (conteggio[v] || 0) + 1; });
+    var maxFreq = 0, moda = [];
+    Object.keys(conteggio).forEach(function(k) {
+      if (conteggio[k] > maxFreq) {
+        maxFreq = conteggio[k];
+        moda = [k];
+      } else if (conteggio[k] === maxFreq) {
+        moda.push(k);
+      }
+    });
+    return moda.map(Number).sort(function(a,b){return a-b;});
+  }
+
+  function calcolaMediana(serie) {
+    var ordinata = serie.slice().sort(function(a,b){return a-b;});
+    var n = ordinata.length;
+    var meta = Math.floor(n / 2);
+    if (n % 2 === 0) {
+      return (ordinata[meta - 1] + ordinata[meta]) / 2;
+    }
+    return ordinata[meta];
+  }
+
+  function calcolaMedia(serie) {
+    var somma = serie.reduce(function(a,b){ return a+b; }, 0);
+    return somma / serie.length;
+  }
+
+  function calcolaCampoVariazione(serie) {
+    return Math.max.apply(null, serie) - Math.min.apply(null, serie);
+  }
+
+  var elDati = document.getElementById("sfida-dati");
+  var elBadge = document.getElementById("badge-esercizio");
+  var elEsito = document.getElementById("sfida-esito");
+
+  function nuovoEsercizio() {
+    serieCorrente = generaSerie();
+    elDati.textContent = serieCorrente.join("  —  ");
+    elBadge.textContent = "Esercizio " + numeroEsercizio;
+    numeroEsercizio++;
+
+    ["moda","mediana","media","campo"].forEach(function(campo) {
+      var input = document.getElementById("input-" + campo);
+      input.value = "";
+      input.classList.remove("corretto","sbagliato");
+      var ans = document.getElementById("ans-" + campo);
+      ans.classList.remove("mostra");
+      ans.textContent = "";
+    });
+    elEsito.className = "";
+    elEsito.textContent = "";
+  }
+
+  function normalizzaNumero(str) {
+    if (!str) return NaN;
+    return parseFloat(str.replace(",", "."));
+  }
+
+  document.getElementById("sfida-controlla").addEventListener("click", function() {
+    var moda = calcolaModa(serieCorrente);
+    var mediana = calcolaMediana(serieCorrente);
+    var media = calcolaMedia(serieCorrente);
+    var campo = calcolaCampoVariazione(serieCorrente);
+
+    var inputModa = document.getElementById("input-moda");
+    var inputMediana = document.getElementById("input-mediana");
+    var inputMedia = document.getElementById("input-media");
+    var inputCampo = document.getElementById("input-campo");
+
+    var okModa = moda.indexOf(normalizzaNumero(inputModa.value)) !== -1;
+    var okMediana = Math.abs(normalizzaNumero(inputMediana.value) - mediana) < 0.001;
+    var okMedia = Math.abs(normalizzaNumero(inputMedia.value) - media) < 0.02;
+    var okCampo = Math.abs(normalizzaNumero(inputCampo.value) - campo) < 0.001;
+
+    function applica(input, ok, ansId, valoreCorretto) {
+      input.classList.remove("corretto","sbagliato");
+      input.classList.add(ok ? "corretto" : "sbagliato");
+      var ans = document.getElementById(ansId);
+      if (!ok) {
+        ans.textContent = "Risposta corretta: " + valoreCorretto;
+        ans.classList.add("mostra");
+      } else {
+        ans.classList.remove("mostra");
+      }
+    }
+
+    applica(inputModa, okModa, "ans-moda", moda.join(" oppure "));
+    applica(inputMediana, okMediana, "ans-mediana", mediana);
+    applica(inputMedia, okMedia, "ans-media", media.toFixed(2));
+    applica(inputCampo, okCampo, "ans-campo", campo);
+
+    var corrette = [okModa, okMediana, okMedia, okCampo].filter(Boolean).length;
+    elEsito.className = "mostra " + (corrette === 4 ? "" : "");
+    elEsito.style.background = corrette === 4 ? "#e3f6ea" : "#fdf1e3";
+    elEsito.style.color = corrette === 4 ? "#2e8b57" : "#c0651a";
+    elEsito.style.border = "1px solid " + (corrette === 4 ? "#2e8b57" : "#c0651a");
+    elEsito.textContent = corrette === 4
+      ? "🎉 Tutte le risposte sono corrette! Ottimo lavoro."
+      : corrette + " / 4 risposte corrette. Controlla i campi evidenziati in rosso.";
+  });
+
+  document.getElementById("sfida-nuovo").addEventListener("click", nuovoEsercizio);
+
+  nuovoEsercizio();
+
+})();
+</script>
+
+</body>
+</html>
