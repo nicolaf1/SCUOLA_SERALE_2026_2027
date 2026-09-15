@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Il concetto di limite - slider interattivo</title>
+<style>
+  :root {
+    --blue: #1a5fa8;
+    --blue-dark: #123f73;
+    --orange: #e67e22;
+    --orange-dark: #b8641a;
+    --green: #2e9e5b;
+    --bg: #eef2f6;
+    --card: #ffffff;
+    --text: #2c2c2c;
+    --grid: #dde3ea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    font-size: 16px;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .header-banner {
+    background: linear-gradient(135deg, var(--blue) 0%, #2f7fc9 100%);
+    border-radius: 14px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(26, 95, 168, 0.28);
+    text-align: center;
+  }
+  h1 {
+    color: #ffffff;
+    font-size: 1.7em;
+    margin: 0 0 6px 0;
+  }
+  .subtitle {
+    color: #dfeeff;
+    margin: 0;
+    font-size: 1em;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  label {
+    font-weight: 600;
+    color: var(--blue);
+    margin-right: 6px;
+  }
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    background: #fbfcfe;
+  }
+  .direction-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #eef4fb;
+    padding: 5px;
+    border-radius: 24px;
+  }
+  .direction-group label {
+    font-weight: 600;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 20px;
+    margin: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .direction-group label:has(input:checked) {
+    background: var(--blue);
+    color: #ffffff;
+  }
+  .direction-group input[type="radio"] {
+    accent-color: var(--blue);
+  }
+  .custom-panel {
+    display: none;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed #cdd6e0;
+  }
+  .custom-panel.visible { display: flex; }
+  .custom-panel label {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.92em;
+  }
+  input[type="text"], input[type="number"] {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    font-family: "Cambria Math", "STIX Two Math", serif;
+    background: #fbfcfe;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26, 95, 168, 0.15);
+  }
+  #customExpr { width: 230px; }
+  #customC, #customRange { width: 70px; }
+  #customError {
+    width: 100%;
+    color: #b00020;
+    font-size: 0.9em;
+    display: none;
+  }
+  .help-text {
+    width: 100%;
+    font-size: 0.85em;
+    color: #777;
+  }
+  button {
+    background: var(--orange);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 0.95em;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(230, 126, 34, 0.35);
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  button:hover { transform: translateY(-1px); opacity: 0.95; }
+  button:active { transform: translateY(0); }
+  button.secondary {
+    background: var(--blue);
+    box-shadow: 0 2px 6px rgba(26, 95, 168, 0.35);
+  }
+  #canvasWrap {
+    width: 100%;
+    overflow-x: auto;
+    text-align: center;
+    margin-top: 6px;
+  }
+  canvas {
+    background: #fdfefe;
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    max-width: 100%;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+    font-size: 0.85em;
+    color: #555;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .swatch {
+    display: inline-block;
+    width: 16px;
+    height: 4px;
+    border-radius: 2px;
+  }
+  .swatch.dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+  .swatch.dashed {
+    background: repeating-linear-gradient(90deg, #999 0 4px, transparent 4px 8px);
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .slider-row span {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 600;
+  }
+  input[type="range"] {
+    flex: 1;
+    accent-color: var(--orange);
+    height: 6px;
+  }
+  .proximity-badge {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 0.95em;
+    padding: 6px 0;
+    border-radius: 20px;
+    transition: background 0.2s, color 0.2s;
+    color: #666;
+  }
+  .proximity-badge.near {
+    background: #e4f7ec;
+    color: var(--green);
+  }
+  .proximity-badge.mid {
+    background: #fdf2e5;
+    color: var(--orange-dark);
+  }
+  .values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    font-size: 1.05em;
+  }
+  .value-box {
+    background: #eef4fb;
+    border-left: 4px solid var(--blue);
+    padding: 10px 16px;
+    border-radius: 8px;
+    min-width: 160px;
+    flex: 1 1 160px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .value-box.orange {
+    border-left-color: var(--orange);
+    background: #fdf2e9;
+  }
+  .value-box.near {
+    border-left-color: var(--green);
+    background: #e4f7ec;
+  }
+  .value-box .label-small {
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 2px;
+  }
+  .value-box .value-big {
+    font-size: 1.35em;
+    font-weight: bold;
+    color: var(--text);
+    font-family: "Cambria Math", "STIX Two Math", serif;
+  }
+  #explanation {
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: #fffbe8;
+    border-left: 4px solid #e6b800;
+    font-size: 1.02em;
+    line-height: 1.55;
+  }
+  .note {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+  }
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .card { padding: 14px; }
+    .controls-row { gap: 10px; }
+    .values { gap: 10px; }
+    .value-box { min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header-banner">
+    <h1>&#128270; Il significato di limite</h1>
+    <p class="subtitle">Muovi lo slider per far avvicinare x a x&#8320; e osserva come si comporta f(x)</p>
+  </div>
+
+  <div class="card">
+    <div class="controls-row">
+      <div>
+        <label for="funzione">Funzione:</label>
+        <select id="funzione"></select>
+      </div>
+      <div class="direction-group">
+        <label><input type="radio" name="direzione" value="destra" checked> da destra (x &rarr; x&#8320;&#8314;)</label>
+        <label><input type="radio" name="direzione" value="sinistra"> da sinistra (x &rarr; x&#8320;&#8315;)</label>
+      </div>
+      <button id="animaBtn">&#9654; Avvia animazione</button>
+      <button id="resetBtn" class="secondary">&#8635; Reset</button>
+    </div>
+
+    <div class="custom-panel" id="customPanel">
+      <label for="customExpr">f(x) =</label>
+      <input type="text" id="customExpr" value="x^2 - 3*x + 2" placeholder="es. sin(x)/x">
+      <label for="customC">x&#8320; =</label>
+      <input type="number" id="customC" value="1" step="any">
+      <label for="customRange">raggio dominio</label>
+      <input type="number" id="customRange" value="5" step="any" min="0.1">
+      <button id="customApply" class="secondary">&#10003; Applica</button>
+      <div id="customError"></div>
+      <div class="help-text">Operatori: + - * / ^ (potenza). Funzioni: sin cos tan asin acos atan sqrt abs exp ln (logaritmo naturale) log (log10) pow(a,b). Costanti: pi, e. Usa x come variabile.</div>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="plot" width="700" height="420"></canvas>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#1a5fa8;"></span> grafico di f(x)</span>
+      <span><span class="swatch dot" style="background:#e67e22;"></span> punto (x, f(x))</span>
+      <span><span class="swatch dashed"></span> x = x&#8320; e y = L</span>
+    </div>
+
+    <div class="slider-row">
+      <span style="white-space:nowrap;">lontano da x&#8320;</span>
+      <input type="range" id="slider" min="0" max="1000" value="0" step="1">
+      <span style="white-space:nowrap;">vicino a x&#8320;</span>
+    </div>
+    <div class="proximity-badge" id="proximityBadge"></div>
+
+    <div class="values">
+      <div class="value-box">
+        <span class="label-small">x</span>
+        <span class="value-big" id="valX">-</span>
+      </div>
+      <div class="value-box orange">
+        <span class="label-small">f(x)</span>
+        <span class="value-big" id="valFx">-</span>
+      </div>
+      <div class="value-box">
+        <span class="label-small">distanza |x - x&#8320;|</span>
+        <span class="value-big" id="valDist">-</span>
+      </div>
+      <div class="value-box orange">
+        <span class="label-small" id="labelDistFL">distanza |f(x) - L|</span>
+        <span class="value-big" id="valDistFL">-</span>
+      </div>
+    </div>
+
+    <div id="explanation"></div>
+    <p class="note" id="funcNote"></p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var canvas = document.getElementById("plot");
+  var ctx = canvas.getContext("2d");
+  var W = canvas.width, H = canvas.height;
+  var padding = 40;
+
+  var funzioni = [
+    {
+      id: "lineare",
+      label: "2x + 1   (funzione continua, senza trucchi)   [x \u2192 2]",
+      f: function (x) { return 2 * x + 1; },
+      c: 2,
+      limit: 5,
+      xMin: -1, xMax: 5, yMin: -2, yMax: 11,
+      maxOffset: 3,
+      continuous: true,
+      note: "Il caso pi\u00F9 semplice possibile: la funzione \u00E8 continua, quindi \u00E8 definita anche in x = 2 e vale esattamente f(2) = 5. Il limite coincide con il valore della funzione: non c'\u00E8 nessun \"buco\" da riempire."
+    },
+    {
+      id: "raz1",
+      label: "(x\u00B2 - 1) / (x - 1)   [x \u2192 1]",
+      f: function (x) { return (x * x - 1) / (x - 1); },
+      c: 1,
+      limit: 2,
+      xMin: -1.5, xMax: 3.5, yMin: -2, yMax: 6,
+      maxOffset: 2,
+      note: "Forma indeterminata 0/0 in x = 1, ma la funzione si semplifica in x + 1 e ammette limite finito."
+    },
+    {
+      id: "raz2",
+      label: "(x\u00B2 - 4) / (x - 2)   [x \u2192 2]",
+      f: function (x) { return (x * x - 4) / (x - 2); },
+      c: 2,
+      limit: 4,
+      xMin: -1, xMax: 5, yMin: -2, yMax: 8,
+      maxOffset: 2.5,
+      note: "Stessa idea del caso precedente, con un altro punto di discontinuit\u00E0 eliminabile."
+    },
+    {
+      id: "unosux",
+      label: "1 / x   [x \u2192 0, limite che NON esiste]",
+      f: function (x) { return 1 / x; },
+      c: 0,
+      limit: null,
+      xMin: -3, xMax: 3, yMin: -10, yMax: 10,
+      maxOffset: 2,
+      note: "Da destra la funzione diverge a +\u221E, da sinistra diverge a -\u221E: i due limiti direzionali sono diversi, quindi il limite per x \u2192 0 non esiste."
+    }
+  ];
+
+  var select = document.getElementById("funzione");
+  funzioni.forEach(function (cfg, i) {
+    var opt = document.createElement("option");
+    opt.value = String(i);
+    opt.textContent = cfg.label;
+    select.appendChild(opt);
+  });
+  var customOpt = document.createElement("option");
+  customOpt.value = "custom";
+  customOpt.textContent = "Funzione personalizzata (la scrivi tu)";
+  select.appendChild(customOpt);
+
+  var slider = document.getElementById("slider");
+  var animaBtn = document.getElementById("animaBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var valX = document.getElementById("valX");
+  var valFx = document.getElementById("valFx");
+  var valDist = document.getElementById("valDist");
+  var valDistFL = document.getElementById("valDistFL");
+  var labelDistFL = document.getElementById("labelDistFL");
+  var explanation = document.getElementById("explanation");
+  var funcNote = document.getElementById("funcNote");
+  var customPanel = document.getElementById("customPanel");
+  var customExpr = document.getElementById("customExpr");
+  var customC = document.getElementById("customC");
+  var customRange = document.getElementById("customRange");
+  var customApply = document.getElementById("customApply");
+  var customError = document.getElementById("customError");
+  var proximityBadge = document.getElementById("proximityBadge");
+
+  var current = funzioni[0];
+  var animTimer = null;
+
+  function mapX(x) {
+    return padding + (x - current.xMin) / (current.xMax - current.xMin) * (W - 2 * padding);
+  }
+  function mapY(y) {
+    var yc = Math.max(current.yMin, Math.min(current.yMax, y));
+    return H - padding - (yc - current.yMin) / (current.yMax - current.yMin) * (H - 2 * padding);
+  }
+
+  function formatNum(n) {
+    if (n === null || n === undefined || !isFinite(n)) {
+      if (n === Infinity) return "+\u221E";
+      if (n === -Infinity) return "-\u221E";
+      return "non definita";
+    }
+    if (Math.abs(n) >= 1000) return n.toFixed(1);
+    if (Math.abs(n) < 0.0001 && n !== 0) return n.toExponential(2);
+    return n.toFixed(4).replace(/\.?0+$/, "").replace(/^$/, "0");
+  }
+
+  function drawAxes() {
+    ctx.strokeStyle = "#dde3ea";
+    ctx.lineWidth = 1;
+    // griglia leggera
+    var stepX = niceStep(current.xMax - current.xMin);
+    var stepY = niceStep(current.yMax - current.yMin);
+    ctx.font = "11px Arial";
+    var y0forLabels = (current.yMin <= 0 && current.yMax >= 0) ? mapY(0) : H - padding;
+    var x0forLabels = (current.xMin <= 0 && current.xMax >= 0) ? mapX(0) : padding;
+    for (var gx = Math.ceil(current.xMin / stepX) * stepX; gx <= current.xMax; gx += stepX) {
+      var px = mapX(gx);
+      ctx.beginPath();
+      ctx.moveTo(px, padding);
+      ctx.lineTo(px, H - padding);
+      ctx.stroke();
+      if (Math.abs(gx) > stepX * 0.001) {
+        ctx.fillStyle = "#999";
+        ctx.fillText(formatTick(gx), px - 8, y0forLabels + 14);
+      }
+    }
+    for (var gy = Math.ceil(current.yMin / stepY) * stepY; gy <= current.yMax; gy += stepY) {
+      var py = mapY(gy);
+      ctx.beginPath();
+      ctx.moveTo(padding, py);
+      ctx.lineTo(W - padding, py);
+      ctx.stroke();
+      if (Math.abs(gy) > stepY * 0.001) {
+        ctx.fillStyle = "#999";
+        ctx.fillText(formatTick(gy), x0forLabels - 26, py + 4);
+      }
+    }
+
+    // assi principali
+    ctx.strokeStyle = "#888";
+    ctx.lineWidth = 1.5;
+    if (current.yMin <= 0 && current.yMax >= 0) {
+      var y0 = mapY(0);
+      ctx.beginPath();
+      ctx.moveTo(padding, y0);
+      ctx.lineTo(W - padding, y0);
+      ctx.stroke();
+    }
+    if (current.xMin <= 0 && current.xMax >= 0) {
+      var x0 = mapX(0);
+      ctx.beginPath();
+      ctx.moveTo(x0, padding);
+      ctx.lineTo(x0, H - padding);
+      ctx.stroke();
+    }
+  }
+
+  function formatTick(n) {
+    var r = Math.round(n * 100) / 100;
+    return (Math.abs(r) < 1e-9 ? 0 : r).toString();
+  }
+
+  function niceStep(range) {
+    var raw = range / 8;
+    var pow10 = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var norm = raw / pow10;
+    var step;
+    if (norm < 1.5) step = 1;
+    else if (norm < 3.5) step = 2;
+    else if (norm < 7.5) step = 5;
+    else step = 10;
+    return step * pow10;
+  }
+
+  function drawCurve() {
+    ctx.strokeStyle = "#1a5fa8";
+    ctx.lineWidth = 2.5;
+
+    if (current.continuous) {
+      drawBranch(current.xMin, current.xMax);
+    } else {
+      var eps = (current.xMax - current.xMin) * 0.004;
+      drawBranch(current.xMin, current.c - eps);
+      drawBranch(current.c + eps, current.xMax);
+    }
+
+    // linea tratteggiata verticale in x = c
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = "#999";
+    ctx.lineWidth = 1;
+    var xc = mapX(current.c);
+    ctx.beginPath();
+    ctx.moveTo(xc, padding);
+    ctx.lineTo(xc, H - padding);
+    ctx.stroke();
+
+    if (current.limit !== null) {
+      var yl = mapY(current.limit);
+      ctx.beginPath();
+      ctx.moveTo(padding, yl);
+      ctx.lineTo(W - padding, yl);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // etichette c e L
+    ctx.fillStyle = "#1a5fa8";
+    ctx.font = "13px Arial";
+    ctx.fillText("x\u2080 = " + current.c, xc + 4, H - padding + 16);
+    if (current.limit !== null) {
+      ctx.fillText("L = " + current.limit, padding - 32, mapY(current.limit) - 4);
+    }
+
+    // cerchietto vuoto nel punto (c, L) per indicare punto non definito
+    if (current.limit !== null) {
+      ctx.beginPath();
+      ctx.arc(mapX(current.c), mapY(current.limit), 5, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#1a5fa8";
+      ctx.lineWidth = 2;
+      ctx.fillStyle = current.continuous ? "#1a5fa8" : "#ffffff";
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  function drawBranch(from, to) {
+    var steps = 400;
+    var started = false;
+    ctx.beginPath();
+    for (var i = 0; i <= steps; i++) {
+      var x = from + (to - from) * i / steps;
+      var y = current.f(x);
+      if (!isFinite(y)) {
+        started = false;
+        continue;
+      }
+      var py = mapY(y);
+      var px = mapX(x);
+      // se il valore esce troppo dal range, spezza il tratto (asintoto)
+      var outOfRange = y < current.yMin - (current.yMax - current.yMin) * 0.3 ||
+                        y > current.yMax + (current.yMax - current.yMin) * 0.3;
+      if (outOfRange) {
+        started = false;
+        continue;
+      }
+      if (!started) {
+        ctx.moveTo(px, py);
+        started = true;
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+    ctx.stroke();
+  }
+
+  function drawGuides(x, y) {
+    if (!isFinite(y)) return;
+    var yClamped = Math.max(current.yMin, Math.min(current.yMax, y));
+    var px = mapX(x);
+    var py = mapY(yClamped);
+    var xc = mapX(current.c);
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1.3;
+    ctx.strokeStyle = "#e67e22";
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(xc, py);
+    ctx.stroke();
+    if (current.limit !== null) {
+      var yl = mapY(current.limit);
+      ctx.strokeStyle = "#1a5fa8";
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px, yl);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  function drawPoint(x, y) {
+    if (!isFinite(y)) return;
+    var yClamped = Math.max(current.yMin, Math.min(current.yMax, y));
+    var px = mapX(x);
+    var py = mapY(yClamped);
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, 2 * Math.PI);
+    ctx.fillStyle = "#e67e22";
+    ctx.fill();
+    ctx.strokeStyle = "#a85a12";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  function getDirection() {
+    var radios = document.getElementsByName("direzione");
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i].checked) return radios[i].value;
+    }
+    return "destra";
+  }
+
+  function currentOffset() {
+    var t = Number(slider.value) / 1000; // 0 = lontano, 1 = vicino
+    return current.maxOffset * Math.pow(10, -3 * t);
+  }
+
+  function compileExpression(exprRaw) {
+    var expr = (exprRaw || "").trim();
+    if (!expr) throw new Error("Scrivi un'espressione, ad esempio: x^2 - 3*x + 2");
+    if (!/^[0-9xXeE.,+\-*/^()\sa-zA-Z]*$/.test(expr)) {
+      throw new Error("L'espressione contiene caratteri non ammessi");
+    }
+    var processed = expr.replace(/\bX\b/g, "x");
+    var order = ["asin", "acos", "atan", "sin", "cos", "tan", "sqrt", "abs", "exp", "ln", "log", "pow"];
+    var map = {
+      asin: "Math.asin", acos: "Math.acos", atan: "Math.atan",
+      sin: "Math.sin", cos: "Math.cos", tan: "Math.tan",
+      sqrt: "Math.sqrt", abs: "Math.abs", exp: "Math.exp",
+      ln: "Math.log", log: "Math.log10", pow: "Math.pow"
+    };
+    order.forEach(function (name) {
+      var re = new RegExp("\\b" + name + "\\b", "g");
+      processed = processed.replace(re, map[name]);
+    });
+    processed = processed.replace(/\bpi\b/g, "Math.PI");
+    processed = processed.replace(/\be\b/g, "Math.E");
+    processed = processed.replace(/\^/g, "**");
+
+    var fn;
+    try {
+      fn = new Function("x", "return (" + processed + ");");
+    } catch (e) {
+      throw new Error("Sintassi non valida: controlla parentesi e operatori");
+    }
+    try {
+      fn(1.2345);
+    } catch (e) {
+      throw new Error("Espressione non valutabile: " + e.message);
+    }
+    return fn;
+  }
+
+  function analyzeCustom(f, c) {
+    var fc;
+    try { fc = f(c); } catch (e) { fc = NaN; }
+    if (isFinite(fc)) {
+      return { limit: fc, continuous: true, isEstimate: false, sampleLeft: fc, sampleRight: fc };
+    }
+    var h = 1e-5;
+    var left, right;
+    try { left = f(c - h); } catch (e) { left = NaN; }
+    try { right = f(c + h); } catch (e) { right = NaN; }
+    if (isFinite(left) && isFinite(right)) {
+      var scale = Math.max(1, Math.abs(left), Math.abs(right));
+      if (Math.abs(left - right) < 1e-3 * scale) {
+        return { limit: (left + right) / 2, continuous: false, isEstimate: true, sampleLeft: left, sampleRight: right };
+      }
+    }
+    return { limit: null, continuous: false, isEstimate: false, sampleLeft: left, sampleRight: right };
+  }
+
+  function computeYRange(f, xMin, xMax, c) {
+    var vals = [];
+    var steps = 400;
+    for (var i = 0; i <= steps; i++) {
+      var x = xMin + (xMax - xMin) * i / steps;
+      if (Math.abs(x - c) < (xMax - xMin) * 0.01) continue;
+      var y;
+      try { y = f(x); } catch (e) { y = NaN; }
+      if (isFinite(y)) vals.push(y);
+    }
+    if (vals.length < 2) return { yMin: -10, yMax: 10 };
+    vals.sort(function (a, b) { return a - b; });
+    var lo = vals[Math.floor(vals.length * 0.03)];
+    var hi = vals[Math.ceil(vals.length * 0.97) - 1];
+    if (hi <= lo) { hi = lo + 1; }
+    var pad = (hi - lo) * 0.15 || 1;
+    return { yMin: lo - pad, yMax: hi + pad };
+  }
+
+  function applyCustom() {
+    customError.style.display = "none";
+    var exprText = customExpr.value;
+    var c = Number(customC.value);
+    var radius = Number(customRange.value);
+    if (!isFinite(c)) { c = 0; customC.value = "0"; }
+    if (!isFinite(radius) || radius <= 0) { radius = 5; customRange.value = "5"; }
+
+    var f;
+    try {
+      f = compileExpression(exprText);
+    } catch (err) {
+      customError.textContent = err.message;
+      customError.style.display = "block";
+      return;
+    }
+
+    var xMin = c - radius, xMax = c + radius;
+    var yr = computeYRange(f, xMin, xMax, c);
+    var info = analyzeCustom(f, c);
+
+    var noteTxt;
+    if (info.continuous) {
+      noteTxt = "La funzione risulta definita e continua in x\u2080 = " + c + ": f(" + c + ") = " + formatNum(info.limit) + ".";
+    } else if (info.limit !== null) {
+      noteTxt = "La funzione non \u00E8 definita in x\u2080 = " + c + ", ma i valori calcolati molto vicino a x\u2080 da sinistra (" +
+                formatNum(info.sampleLeft) + ") e da destra (" + formatNum(info.sampleRight) +
+                ") sono quasi uguali: sembra esserci una discontinuit\u00E0 eliminabile, con limite stimato numericamente.";
+    } else {
+      noteTxt = "Attenzione: i valori vicino a x\u2080 da sinistra e da destra non coincidono (o non sono calcolabili). Il limite potrebbe non esistere, oppure serve un'analisi pi\u00F9 approfondita.";
+    }
+
+    stopAnim();
+    current = {
+      id: "custom",
+      label: "f(x) = " + exprText,
+      f: f,
+      c: c,
+      limit: info.limit,
+      continuous: info.continuous,
+      isEstimate: info.isEstimate,
+      custom: true,
+      xMin: xMin, xMax: xMax, yMin: yr.yMin, yMax: yr.yMax,
+      maxOffset: radius * 0.9,
+      note: noteTxt
+    };
+    funcNote.textContent = current.note;
+    slider.value = 0;
+    update();
+  }
+
+  function update() {
+
+    var dir = getDirection();
+    var sign = dir === "sinistra" ? -1 : 1;
+    var offset = currentOffset();
+    var x = current.c + sign * offset;
+    var y = current.f(x);
+
+    ctx.clearRect(0, 0, W, H);
+    drawAxes();
+    drawCurve();
+    drawGuides(x, y);
+    drawPoint(x, y);
+
+    valX.textContent = formatNum(x);
+    valFx.textContent = formatNum(y);
+    valDist.textContent = formatNum(Math.abs(x - current.c));
+
+    var distBox = valDistFL.closest(".value-box");
+    if (current.limit !== null) {
+      labelDistFL.textContent = "distanza |f(x) - L|";
+      var distFL = Math.abs(y - current.limit);
+      valDistFL.textContent = formatNum(distFL);
+      var scale = Math.max(1, Math.abs(current.limit));
+      var rel = distFL / scale;
+      if (rel < 0.01) {
+        proximityBadge.textContent = "\uD83C\uDFAF Ottimo, sei vicinissimo al limite!";
+        proximityBadge.className = "proximity-badge near";
+        distBox.classList.add("near");
+      } else if (rel < 0.15) {
+        proximityBadge.textContent = "Ti stai avvicinando...";
+        proximityBadge.className = "proximity-badge mid";
+        distBox.classList.remove("near");
+      } else {
+        proximityBadge.textContent = "";
+        proximityBadge.className = "proximity-badge";
+        distBox.classList.remove("near");
+      }
+    } else {
+      labelDistFL.textContent = "f(x) diverge?";
+      valDistFL.textContent = isFinite(y) ? formatNum(y) : formatNum(y);
+      proximityBadge.textContent = "";
+      proximityBadge.className = "proximity-badge";
+      distBox.classList.remove("near");
+    }
+
+    updateExplanation(x, y, offset, dir);
+  }
+
+  function updateExplanation(x, y, offset, dir) {
+    var c = current.c;
+    var txt = "";
+    if (current.continuous) {
+      txt = "La funzione \u00E8 continua, quindi f(" + c + ") \u00E8 gi\u00E0 definita e vale " + current.limit +
+            ". Man mano che x si avvicina a x\u2080 = " + c + " " +
+            (dir === "sinistra" ? "da sinistra" : "da destra") +
+            " (distanza attuale " + formatNum(offset) + "), f(x) = " + formatNum(y) +
+            " si avvicina sempre di pi\u00F9 a L = " + current.limit +
+            ": qui il limite coincide semplicemente con il valore della funzione nel punto, senza forme indeterminate.";
+    } else if (current.limit !== null) {
+      txt = "Man mano che x si avvicina a x\u2080 = " + c + " " +
+            (dir === "sinistra" ? "da sinistra" : "da destra") +
+            " (distanza attuale " + formatNum(offset) + "), il valore di f(x) = " +
+            formatNum(y) + " si avvicina sempre di pi\u00F9 a L = " + formatNum(current.limit) +
+            ". Per x = " + c + " la funzione non \u00E8 definita, ma il limite esiste comunque ed \u00E8 finito." +
+            (current.isEstimate ? " (L \u00E8 qui una stima numerica, ottenuta valutando f molto vicino a x\u2080)" : "");
+    } else if (current.custom) {
+      txt = "Muovendo x verso x\u2080 = " + c + " " + (dir === "sinistra" ? "da sinistra" : "da destra") +
+            " si ottiene f(x) = " + formatNum(y) +
+            ". In base al campionamento numerico i due lati non sembrano convergere allo stesso valore: prova a osservare entrambe le direzioni, oppure verifica analiticamente se il limite esiste.";
+    } else {
+      if (dir === "destra") {
+        txt = "Da destra, quando x \u2192 0\u207A, f(x) = 1/x cresce senza limite: f(x) = " +
+              formatNum(y) + ". Il limite destro \u00E8 +\u221E.";
+      } else {
+        txt = "Da sinistra, quando x \u2192 0\u207B, f(x) = 1/x diventa sempre pi\u00F9 negativo: f(x) = " +
+              formatNum(y) + ". Il limite sinistro \u00E8 -\u221E.";
+      }
+      txt += " Poich\u00E9 il limite da destra e il limite da sinistra sono diversi (uno \u00E8 +\u221E e l'altro -\u221E), il limite per x \u2192 0 NON ESISTE.";
+    }
+    explanation.textContent = txt;
+  }
+
+  function setFunzione(index) {
+    stopAnim();
+    current = funzioni[index];
+    slider.value = 0;
+    funcNote.textContent = current.note;
+    // per la funzione senza limite, forza il radio a "destra" come punto di partenza chiaro
+    update();
+  }
+
+  function stopAnim() {
+    if (animTimer) {
+      clearInterval(animTimer);
+      animTimer = null;
+      animaBtn.textContent = "Avvia animazione";
+    }
+  }
+
+  animaBtn.addEventListener("click", function () {
+    if (animTimer) {
+      stopAnim();
+      return;
+    }
+    slider.value = 0;
+    animaBtn.textContent = "Ferma animazione";
+    animTimer = setInterval(function () {
+      var v = Number(slider.value) + 4;
+      if (v >= 1000) {
+        v = 1000;
+        stopAnim();
+      }
+      slider.value = v;
+      update();
+    }, 40);
+  });
+
+  resetBtn.addEventListener("click", function () {
+    stopAnim();
+    slider.value = 0;
+    update();
+  });
+
+  select.addEventListener("change", function () {
+    if (select.value === "custom") {
+      customPanel.classList.add("visible");
+      applyCustom();
+    } else {
+      customPanel.classList.remove("visible");
+      setFunzione(Number(select.value));
+    }
+  });
+
+  customApply.addEventListener("click", applyCustom);
+  [customExpr, customC, customRange].forEach(function (el) {
+    el.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") applyCustom();
+    });
+  });
+
+  slider.addEventListener("input", function () {
+    stopAnim();
+    update();
+  });
+
+  var radios = document.getElementsByName("direzione");
+  for (var r = 0; r < radios.length; r++) {
+    radios[r].addEventListener("change", function () {
+      stopAnim();
+      update();
+    });
+  }
+
+  setFunzione(0);
+})();
+</script>
+</body>
+</html>
