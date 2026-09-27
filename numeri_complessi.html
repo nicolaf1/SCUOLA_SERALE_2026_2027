@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il piano di Gauss – numeri complessi</title>
+<style>
+  :root {
+    --blu: #1a5fa8;
+    --arancio: #e67e22;
+    --verde: #28a046;
+    --rosso: #c81e3c;
+    --grigio-sfondo: #f2f3f5;
+    --grigio-bordo: #d5d8dd;
+    --testo: #1f2328;
+    --testo-tenue: #5b6470;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    color: var(--testo);
+    background: var(--grigio-sfondo);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--blu);
+    color: #fff;
+    padding: 18px 24px;
+  }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  header p { margin: 4px 0 0; opacity: 0.9; font-size: 0.95rem; }
+  main {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: 20px;
+  }
+  .riquadro {
+    background: #fff;
+    border: 1px solid var(--grigio-bordo);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  #piano { width: 100%; height: auto; display: block; touch-action: none; cursor: crosshair; }
+  .suggerimento { margin: 8px 0 0; font-size: 0.9rem; color: var(--testo-tenue); }
+
+  .formula {
+    font-family: "Cambria Math", "STIX Two Math", Georgia, "Times New Roman", serif;
+    font-size: 2.4rem;
+    text-align: center;
+    margin: 4px 0 12px;
+    min-height: 3.2rem;
+  }
+  .formula .re { color: var(--verde); }
+  .formula .im { color: var(--rosso); }
+  .formula i { font-style: italic; }
+
+  .dati { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .dati td { padding: 6px 4px; border-bottom: 1px solid var(--grigio-sfondo); }
+  .dati td:last-child { text-align: right; font-family: Georgia, "Times New Roman", serif; font-size: 1.1rem; }
+  .tipo {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit !important;
+    background: var(--grigio-sfondo);
+  }
+
+  .controllo { margin: 12px 0; }
+  .controllo label { display: flex; justify-content: space-between; font-weight: 600; }
+  .controllo .valore { font-family: Georgia, serif; font-weight: normal; }
+  input[type=range] { width: 100%; }
+  #sliderA { accent-color: var(--verde); }
+  #sliderB { accent-color: var(--rosso); }
+
+  .opzioni label { display: block; margin: 6px 0; cursor: pointer; }
+  .opzioni select { margin-left: 6px; }
+
+  .modo { display: flex; border: 1px solid var(--blu); border-radius: 8px; overflow: hidden; margin: 14px 0 6px; }
+  .modo button {
+    flex: 1; padding: 8px 6px; border: none; background: #fff; color: var(--blu);
+    font: inherit; font-size: 0.95rem; cursor: pointer;
+  }
+  .modo button + button { border-left: 1px solid var(--blu); }
+  .modo button[aria-pressed="true"] { background: var(--blu); color: #fff; }
+  .nascosto { display: none !important; }
+  h2 { font-size: 1.05rem; margin: 18px 0 8px; color: var(--blu); }
+  .esempi { display: flex; flex-wrap: wrap; gap: 8px; }
+  .esempi button {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    padding: 6px 12px;
+    border: 1px solid var(--blu);
+    background: #fff;
+    color: var(--blu);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .esempi button:hover { background: var(--blu); color: #fff; }
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--arancio);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr; padding: 12px; }
+    .formula { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Il piano di Gauss</h1>
+  <p>Ogni numero complesso <i>z</i> = <i>a</i> + <i>bi</i> corrisponde al punto (<i>a</i>; <i>b</i>) del piano e al vettore che va dall'origine a quel punto.</p>
+</header>
+
+<main>
+  <section class="riquadro">
+    <svg id="piano" viewBox="0 0 640 640" role="img" aria-label="Piano di Gauss con il numero complesso selezionato"></svg>
+    <p class="suggerimento">Trascina il punto (o la punta del vettore), tocca un punto del piano, oppure usa i cursori.</p>
+  </section>
+
+  <section class="riquadro">
+    <div class="formula" id="formula" aria-live="polite"></div>
+
+    <table class="dati">
+      <tr><td>Parte reale Re(<i>z</i>)</td><td id="valRe" style="color:var(--verde)"></td></tr>
+      <tr><td>Parte immaginaria Im(<i>z</i>)</td><td id="valIm" style="color:var(--rosso)"></td></tr>
+      <tr><td>Punto del piano</td><td id="valPunto"></td></tr>
+      <tr><td>Tipo di numero</td><td><span class="tipo" id="valTipo"></span></td></tr>
+      <tr class="solo-vettore"><td>Modulo |<i>z</i>|</td><td id="valModulo" style="color:var(--blu)"></td></tr>
+      <tr class="solo-vettore"><td>Angolo con l'asse reale</td><td id="valAngolo" style="color:var(--arancio)"></td></tr>
+    </table>
+
+    <div class="controllo">
+      <label for="sliderA">Parte reale <span class="valore" id="lblA"></span></label>
+      <input type="range" id="sliderA" min="-8" max="8" step="1" value="3">
+    </div>
+    <div class="controllo">
+      <label for="sliderB">Parte immaginaria <span class="valore" id="lblB"></span></label>
+      <input type="range" id="sliderB" min="-8" max="8" step="1" value="2">
+    </div>
+
+    <div class="modo" role="group" aria-label="Rappresentazione">
+      <button type="button" data-modo="punto" aria-pressed="false">Punto</button>
+      <button type="button" data-modo="vettore" aria-pressed="false">Vettore</button>
+      <button type="button" data-modo="entrambi" aria-pressed="true">Punto e vettore</button>
+    </div>
+
+    <div class="opzioni">
+      <label id="optProiezioni"><input type="checkbox" id="chkProiezioni" checked> Mostra le proiezioni sugli assi</label>
+      <label id="optComponenti" class="solo-vettore"><input type="checkbox" id="chkComponenti" checked> Mostra i vettori componenti (<i>a</i> e <i>bi</i>)</label>
+      <label id="optModulo" class="solo-vettore"><input type="checkbox" id="chkModulo" checked> Mostra modulo e angolo</label>
+      <label><input type="checkbox" id="chkConiugato"> Mostra il coniugato</label>
+      <label>Passo
+        <select id="selPasso">
+          <option value="1" selected>1</option>
+          <option value="0.5">0,5</option>
+        </select>
+      </label>
+    </div>
+
+    <h2>Esempi</h2>
+    <div class="esempi" id="esempi"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var MAX = 8;              // gli assi vanno da -MAX a +MAX
+  var SIZE = 640;           // lato del viewBox
+  var MARGINE = 40;         // spazio attorno alla griglia
+  var UNITA = (SIZE - 2 * MARGINE) / (2 * MAX);
+  var NS = "http://www.w3.org/2000/svg";
+
+  var stato = { a: 3, b: 2, passo: 1, modo: "entrambi", proiezioni: true, componenti: true, modulo: true, coniugato: false };
+
+  var svg = document.getElementById("piano");
+  var sliderA = document.getElementById("sliderA");
+  var sliderB = document.getElementById("sliderB");
+
+  // --- conversioni di coordinate ---------------------------------------
+  function sx(x) { return SIZE / 2 + x * UNITA; }
+  function sy(y) { return SIZE / 2 - y * UNITA; }
+
+  function el(nome, attr, testo) {
+    var e = document.createElementNS(NS, nome);
+    for (var k in attr) { e.setAttribute(k, attr[k]); }
+    if (testo !== undefined) { e.textContent = testo; }
+    return e;
+  }
+
+  // --- formattazione dei numeri (virgola decimale, meno tipografico) ----
+  function fmt(n) {
+    var s = (Math.round(n * 100) / 100).toString().replace(".", ",");
+    return n < 0 ? "\u2212" + s.slice(1) : s;
+  }
+
+  function formulaHTML(a, b) {
+    if (a === 0 && b === 0) { return "<i>z</i> = 0"; }
+    var parteIm = "";
+    var absB = Math.abs(b);
+    var coeff = absB === 1 ? "" : fmt(absB);
+    if (b !== 0) { parteIm = "<span class=\"im\">" + coeff + "<i>i</i></span>"; }
+    if (b === 0) { return "<i>z</i> = <span class=\"re\">" + fmt(a) + "</span>"; }
+    if (a === 0) {
+      return "<i>z</i> = " + (b < 0 ? "<span class=\"im\">\u2212</span>" : "") + parteIm;
+    }
+    var segno = b < 0 ? " \u2212 " : " + ";
+    return "<i>z</i> = <span class=\"re\">" + fmt(a) + "</span>" + segno + parteIm;
+  }
+
+  function testoModulo(a, b) {
+    var q = Math.round((a * a + b * b) * 100) / 100;
+    var r = Math.sqrt(q);
+    var inizio = "\u221a(" + fmt(a * a) + " + " + fmt(b * b) + ")";
+    if (Math.abs(r - Math.round(r)) < 1e-9) { return inizio + " = " + fmt(Math.round(r)); }
+    return inizio + " = \u221a" + fmt(q) + " \u2248 " + fmt(Math.round(r * 100) / 100);
+  }
+
+  function testoAngolo(a, b) {
+    if (a === 0 && b === 0) { return "non definito"; }
+    var th = Math.atan2(b, a) * 180 / Math.PI;
+    if (th < 0) { th += 360; }
+    return "\u03b8 \u2248 " + fmt(Math.round(th * 10) / 10) + "\u00b0";
+  }
+
+  function tipo(a, b) {
+    if (a === 0 && b === 0) { return "zero: reale e immaginario"; }
+    if (b === 0) { return "numero reale"; }
+    if (a === 0) { return "immaginario puro"; }
+    return "numero complesso";
+  }
+
+  // --- disegno della parte fissa: griglia e assi -----------------------
+  var livelloFisso = el("g", {});
+  var livelloMobile = el("g", {});
+  svg.appendChild(livelloFisso);
+  svg.appendChild(livelloMobile);
+
+  function disegnaGriglia() {
+    var g = livelloFisso;
+    var i;
+    for (i = -MAX; i <= MAX; i++) {
+      if (i === 0) { continue; }
+      g.appendChild(el("line", { x1: sx(i), y1: sy(MAX), x2: sx(i), y2: sy(-MAX), stroke: "#e6e8eb", "stroke-width": 1 }));
+      g.appendChild(el("line", { x1: sx(-MAX), y1: sy(i), x2: sx(MAX), y2: sy(i), stroke: "#e6e8eb", "stroke-width": 1 }));
+    }
+    // assi
+    var defs = el("defs", {});
+    var marker = el("marker", { id: "punta", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    marker.appendChild(el("path", { d: "M1 1 L9 5 L1 9 z", fill: "#1f2328" }));
+    defs.appendChild(marker);
+    var markerV = el("marker", { id: "puntaVettore", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" });
+    markerV.appendChild(el("path", { d: "M1 1 L9 5 L1 9 z", fill: "#1a5fa8" }));
+    defs.appendChild(markerV);
+    var markerR = el("marker", { id: "puntaReale", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" });
+    markerR.appendChild(el("path", { d: "M1 1 L9 5 L1 9 z", fill: "#28a046" }));
+    defs.appendChild(markerR);
+    var markerI = el("marker", { id: "puntaImm", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" });
+    markerI.appendChild(el("path", { d: "M1 1 L9 5 L1 9 z", fill: "#c81e3c" }));
+    defs.appendChild(markerI);
+    var markerC = el("marker", { id: "puntaCon", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" });
+    markerC.appendChild(el("path", { d: "M1 1 L9 5 L1 9 z", fill: "#e67e22" }));
+    defs.appendChild(markerC);
+    svg.insertBefore(defs, svg.firstChild);
+
+    g.appendChild(el("line", { x1: sx(-MAX) - 10, y1: sy(0), x2: sx(MAX) + 18, y2: sy(0), stroke: "#1f2328", "stroke-width": 1.6, "marker-end": "url(#punta)" }));
+    g.appendChild(el("line", { x1: sx(0), y1: sy(-MAX) + 10, x2: sx(0), y2: sy(MAX) - 18, stroke: "#1f2328", "stroke-width": 1.6, "marker-end": "url(#punta)" }));
+
+    // tacche e numeri
+    for (i = -MAX; i <= MAX; i++) {
+      if (i === 0) { continue; }
+      g.appendChild(el("line", { x1: sx(i), y1: sy(0) - 4, x2: sx(i), y2: sy(0) + 4, stroke: "#1f2328" }));
+      g.appendChild(el("line", { x1: sx(0) - 4, y1: sy(i), x2: sx(0) + 4, y2: sy(i), stroke: "#1f2328" }));
+      if (i % 2 === 0) {
+        g.appendChild(el("text", { x: sx(i), y: sy(0) + 18, "text-anchor": "middle", "font-size": 13, fill: "#5b6470" }, fmt(i)));
+        var etichettaIm = (i === 1 ? "" : (i === -1 ? "\u2212" : fmt(i))) + "i";
+        g.appendChild(el("text", { x: sx(0) - 8, y: sy(i) + 4, "text-anchor": "end", "font-size": 13, fill: "#5b6470" }, etichettaIm));
+      }
+    }
+    g.appendChild(el("text", { x: sx(0) - 8, y: sy(0) + 18, "text-anchor": "end", "font-size": 13, fill: "#5b6470" }, "O"));
+
+    // nomi degli assi
+    g.appendChild(el("text", { x: sx(MAX) + 4, y: sy(0) - 12, "text-anchor": "end", "font-size": 15, "font-weight": 600, fill: "#28a046" }, "asse reale"));
+    g.appendChild(el("text", { x: sx(0) + 12, y: sy(MAX) - 6, "font-size": 15, "font-weight": 600, fill: "#c81e3c" }, "asse immaginario"));
+  }
+
+  // --- disegno della parte che cambia ----------------------------------
+  // freccia da (x1,y1) a (x2,y2) in coordinate del piano, accorciata di "acc" pixel in punta
+  function freccia(g, x1, y1, x2, y2, colore, marker, spessore, acc) {
+    var X1 = sx(x1), Y1 = sy(y1), X2 = sx(x2), Y2 = sy(y2);
+    var L = Math.sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));
+    if (L < 1) { return; }
+    var k = Math.min(acc, L / 2) / L;
+    g.appendChild(el("line", { x1: X1, y1: Y1, x2: X2 - (X2 - X1) * k, y2: Y2 - (Y2 - Y1) * k,
+      stroke: colore, "stroke-width": spessore, "stroke-linecap": "round", "marker-end": "url(#" + marker + ")" }));
+  }
+
+  function etichetta(g, x, y, testo, colore, ancora, dimensione) {
+    g.appendChild(el("text", { x: x, y: y, "text-anchor": ancora || "middle", "font-size": dimensione || 16,
+      "font-weight": 600, fill: colore, "font-family": "Georgia, serif",
+      stroke: "#fff", "stroke-width": 4, "paint-order": "stroke" }, testo));
+  }
+
+  function mostraPunto() { return stato.modo !== "vettore"; }
+  function mostraVettore() { return stato.modo !== "punto"; }
+
+  function disegnaPunto() {
+    while (livelloMobile.firstChild) { livelloMobile.removeChild(livelloMobile.firstChild); }
+    var a = stato.a, b = stato.b;
+    var g = livelloMobile;
+    var nonZero = !(a === 0 && b === 0);
+
+    // coniugato
+    if (stato.coniugato && b !== 0) {
+      g.appendChild(el("line", { x1: sx(a), y1: sy(b), x2: sx(a), y2: sy(-b), stroke: "#e67e22", "stroke-width": 1.2, "stroke-dasharray": "2 4" }));
+      if (mostraVettore()) { freccia(g, 0, 0, a, -b, "#e67e22", "puntaCon", 2, 9); }
+      if (mostraPunto()) {
+        g.appendChild(el("circle", { cx: sx(a), cy: sy(-b), r: 7, fill: "#fff", stroke: "#e67e22", "stroke-width": 2.5 }));
+      }
+      etichetta(g, sx(a) + (a >= 0 ? 12 : -12), sy(-b) + (b > 0 ? 22 : -12), "z\u0305 = " + testoSemplice(a, -b), "#e67e22", a >= 0 ? "start" : "end", 15);
+    }
+
+    // proiezioni tratteggiate (rappresentazione con il punto)
+    if (stato.proiezioni && mostraPunto() && !(mostraVettore() && stato.componenti)) {
+      if (b !== 0) {
+        g.appendChild(el("line", { x1: sx(a), y1: sy(0), x2: sx(a), y2: sy(b), stroke: "#28a046", "stroke-width": 1.8, "stroke-dasharray": "6 5" }));
+      }
+      if (a !== 0) {
+        g.appendChild(el("line", { x1: sx(0), y1: sy(b), x2: sx(a), y2: sy(b), stroke: "#c81e3c", "stroke-width": 1.8, "stroke-dasharray": "6 5" }));
+      }
+      if (a !== 0) {
+        g.appendChild(el("circle", { cx: sx(a), cy: sy(0), r: 5, fill: "#28a046" }));
+        etichetta(g, sx(a), sy(0) + (b > 0 ? 36 : -24), fmt(a), "#28a046");
+      }
+      if (b !== 0) {
+        g.appendChild(el("circle", { cx: sx(0), cy: sy(b), r: 5, fill: "#c81e3c" }));
+        etichetta(g, sx(0) + 10, sy(b) - 10, (b < 0 ? "\u2212" : "") + (Math.abs(b) === 1 ? "" : fmt(Math.abs(b))) + "i", "#c81e3c", "start");
+      }
+    }
+
+    // vettori componenti: a (verde) + bi (rosso), messi punta-coda
+    if (mostraVettore() && stato.componenti && nonZero) {
+      if (a !== 0) {
+        freccia(g, 0, 0, a, 0, "#28a046", "puntaReale", 3, 8);
+        etichetta(g, sx(a / 2), sy(0) + (b > 0 ? 24 : -12), fmt(a), "#28a046");
+      }
+      if (b !== 0) {
+        freccia(g, a, 0, a, b, "#c81e3c", "puntaImm", 3, 8);
+        var lblB = (b < 0 ? "\u2212" : "") + (Math.abs(b) === 1 ? "" : fmt(Math.abs(b))) + "i";
+        etichetta(g, sx(a) + (a >= 0 ? 10 : -10), sy(b / 2) + 5, lblB, "#c81e3c", a >= 0 ? "start" : "end");
+      }
+    }
+
+    // angolo con l'asse reale
+    if (mostraVettore() && stato.modulo && nonZero) {
+      var th = Math.atan2(b, a);
+      if (th < 0) { th += 2 * Math.PI; }
+      var R = 34;
+      if (th > 0.001) {
+        var ex = sx(0) + R * Math.cos(th), ey = sy(0) - R * Math.sin(th);
+        var grande = th > Math.PI ? 1 : 0;
+        g.appendChild(el("path", { d: "M " + (sx(0) + R) + " " + sy(0) + " A " + R + " " + R + " 0 " + grande + " 0 " + ex + " " + ey,
+          fill: "#e67e22", "fill-opacity": 0.15, stroke: "#e67e22", "stroke-width": 2 }));
+        g.appendChild(el("path", { d: "M " + sx(0) + " " + sy(0) + " L " + (sx(0) + R) + " " + sy(0) + " A " + R + " " + R + " 0 " + grande + " 0 " + ex + " " + ey + " Z",
+          fill: "#e67e22", "fill-opacity": 0.12, stroke: "none" }));
+        var mx = sx(0) + (R + 14) * Math.cos(th / 2), my = sy(0) - (R + 14) * Math.sin(th / 2) + 5;
+        etichetta(g, mx, my, "\u03b8", "#e67e22", "middle", 17);
+      }
+    }
+
+    // vettore z
+    if (mostraVettore() && nonZero) {
+      freccia(g, 0, 0, a, b, "#1a5fa8", "puntaVettore", 3.2, mostraPunto() ? 9 : 2);
+      if (stato.modulo) {
+        // etichetta del modulo a metà vettore, spostata perpendicolarmente
+        var L = Math.sqrt(a * a + b * b);
+        var nx = -b / L, ny = a / L;           // normale al vettore
+        if (a * b < 0) { nx = -nx; ny = -ny; } // dalla parte opposta ai componenti
+        var px = sx(a / 2) + nx * 18, py = sy(b / 2) - ny * 18;
+        etichetta(g, px, py + 5, "|z|", "#1a5fa8", "middle", 16);
+      }
+    }
+
+    // punto principale
+    if (mostraPunto()) {
+      g.appendChild(el("circle", { cx: sx(a), cy: sy(b), r: 16, fill: "#1a5fa8", "fill-opacity": 0.12 }));
+      g.appendChild(el("circle", { cx: sx(a), cy: sy(b), r: 8, fill: "#1a5fa8", stroke: "#fff", "stroke-width": 2 }));
+    } else {
+      // area invisibile per poter trascinare comodamente la punta
+      g.appendChild(el("circle", { cx: sx(a), cy: sy(b), r: 16, fill: "#1a5fa8", "fill-opacity": 0.001 }));
+    }
+    var tx = sx(a) + (a >= 0 ? 14 : -14);
+    var ty = sy(b) + (b >= 0 ? -14 : 26);
+    etichetta(g, tx, ty, "z = " + testoSemplice(a, b), "#1a5fa8", a >= 0 ? "start" : "end", 17);
+  }
+
+  function testoSemplice(a, b) {
+    if (a === 0 && b === 0) { return "0"; }
+    var absB = Math.abs(b);
+    var coeff = absB === 1 ? "" : fmt(absB);
+    if (b === 0) { return fmt(a); }
+    if (a === 0) { return (b < 0 ? "\u2212" : "") + coeff + "i"; }
+    return fmt(a) + (b < 0 ? " \u2212 " : " + ") + coeff + "i";
+  }
+
+  // --- aggiornamento del pannello --------------------------------------
+  function aggiorna() {
+    document.getElementById("formula").innerHTML = formulaHTML(stato.a, stato.b);
+    document.getElementById("valRe").textContent = fmt(stato.a);
+    document.getElementById("valIm").textContent = fmt(stato.b);
+    document.getElementById("valPunto").textContent = "(" + fmt(stato.a) + "; " + fmt(stato.b) + ")";
+    document.getElementById("valTipo").textContent = tipo(stato.a, stato.b);
+    document.getElementById("valModulo").textContent = testoModulo(stato.a, stato.b);
+    document.getElementById("valAngolo").textContent = testoAngolo(stato.a, stato.b);
+    document.getElementById("lblA").textContent = "a = " + fmt(stato.a);
+    document.getElementById("lblB").textContent = "b = " + fmt(stato.b);
+    sliderA.value = stato.a;
+    sliderB.value = stato.b;
+    disegnaPunto();
+  }
+
+  function arrotonda(v) {
+    var p = stato.passo;
+    var r = Math.round(v / p) * p;
+    r = Math.max(-MAX, Math.min(MAX, r));
+    return Math.round(r * 100) / 100 + 0; // evita -0
+  }
+
+  function imposta(a, b) {
+    stato.a = arrotonda(a) || 0;
+    stato.b = arrotonda(b) || 0;
+    aggiorna();
+  }
+
+  // --- trascinamento ---------------------------------------------------
+  var trascinando = false;
+
+  function coordinateDaEvento(ev) {
+    var pt = svg.createSVGPoint();
+    pt.x = ev.clientX;
+    pt.y = ev.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    return { x: (p.x - SIZE / 2) / UNITA, y: (SIZE / 2 - p.y) / UNITA };
+  }
+
+  svg.addEventListener("pointerdown", function (ev) {
+    trascinando = true;
+    svg.setPointerCapture(ev.pointerId);
+    var c = coordinateDaEvento(ev);
+    imposta(c.x, c.y);
+  });
+  svg.addEventListener("pointermove", function (ev) {
+    if (!trascinando) { return; }
+    var c = coordinateDaEvento(ev);
+    imposta(c.x, c.y);
+  });
+  function fine() { trascinando = false; }
+  svg.addEventListener("pointerup", fine);
+  svg.addEventListener("pointercancel", fine);
+
+  // --- controlli -------------------------------------------------------
+  sliderA.addEventListener("input", function () { imposta(parseFloat(sliderA.value), stato.b); });
+  sliderB.addEventListener("input", function () { imposta(stato.a, parseFloat(sliderB.value)); });
+
+  document.getElementById("chkProiezioni").addEventListener("change", function (e) { stato.proiezioni = e.target.checked; disegnaPunto(); });
+  document.getElementById("chkComponenti").addEventListener("change", function (e) { stato.componenti = e.target.checked; disegnaPunto(); });
+  document.getElementById("chkModulo").addEventListener("change", function (e) { stato.modulo = e.target.checked; disegnaPunto(); });
+
+  var pulsantiModo = document.querySelectorAll(".modo button");
+  function impostaModo(m) {
+    stato.modo = m;
+    for (var j = 0; j < pulsantiModo.length; j++) {
+      pulsantiModo[j].setAttribute("aria-pressed", pulsantiModo[j].getAttribute("data-modo") === m ? "true" : "false");
+    }
+    var soloV = document.querySelectorAll(".solo-vettore");
+    for (var k = 0; k < soloV.length; k++) { soloV[k].classList.toggle("nascosto", m === "punto"); }
+    document.getElementById("optProiezioni").classList.toggle("nascosto", m === "vettore");
+    disegnaPunto();
+  }
+  for (var j = 0; j < pulsantiModo.length; j++) {
+    pulsantiModo[j].addEventListener("click", function () { impostaModo(this.getAttribute("data-modo")); });
+  }
+  document.getElementById("chkConiugato").addEventListener("change", function (e) { stato.coniugato = e.target.checked; disegnaPunto(); });
+  document.getElementById("selPasso").addEventListener("change", function (e) {
+    stato.passo = parseFloat(e.target.value);
+    sliderA.step = stato.passo;
+    sliderB.step = stato.passo;
+    imposta(stato.a, stato.b);
+  });
+
+  var esempi = [[3, 2], [-2, 4], [-4, -3], [5, -1], [6, 0], [0, 5], [0, -3], [0, 0]];
+  var contenitore = document.getElementById("esempi");
+  esempi.forEach(function (e) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = testoSemplice(e[0], e[1]);
+    btn.addEventListener("click", function () { imposta(e[0], e[1]); });
+    contenitore.appendChild(btn);
+  });
+
+  disegnaGriglia();
+  aggiorna();
+  impostaModo(stato.modo);
+})();
+</script>
+</body>
+</html>
