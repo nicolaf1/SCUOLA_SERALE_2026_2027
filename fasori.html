@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I fasori: dal numero complesso alla corrente alternata</title>
+<style>
+  :root{
+    --blu:#1a5fa8;
+    --blu-chiaro:#e3edf8;
+    --arancio:#e67e22;
+    --arancio-chiaro:#fbeee1;
+    --verde:#2e8b57;
+    --verde-chiaro:#e2f2e9;
+    --rosso:#c0392b;
+    --sfondo:#eef1f4;
+    --pannello:#ffffff;
+    --testo:#1f2a36;
+    --tenue:#5b6878;
+    --bordo:#d5dbe2;
+    --griglia:#e3e8ee;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-math: "Cambria Math", "Latin Modern Math", "STIX Two Math", Cambria, Georgia, serif;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--sfondo); color:var(--testo);
+    font-family:var(--font); font-size:17px; line-height:1.6;
+  }
+  main{ max-width:1000px; margin:0 auto; padding:1.5rem 1rem 3rem; }
+  header{ max-width:1000px; margin:0 auto; padding:2rem 1rem 0.5rem; }
+  header h1{ font-size:2.1rem; line-height:1.2; margin:0 0 .4rem; color:var(--blu); font-weight:700; }
+  header p{ margin:0; color:var(--tenue); max-width:68ch; }
+  section{
+    background:var(--pannello); border:1px solid var(--bordo); border-radius:10px;
+    padding:1.4rem 1.4rem 1.6rem; margin:1.4rem 0;
+  }
+  h2{ font-size:1.35rem; margin:0 0 .6rem; color:var(--testo); }
+  h2 .n{ color:var(--blu); margin-right:.35rem; }
+  p{ max-width:72ch; margin:.5rem 0; }
+  .math{ font-family:var(--font-math); font-style:italic; white-space:nowrap; }
+  .math .up{ font-style:normal; }
+  canvas{ display:block; width:100%; background:#fbfcfd; border:1px solid var(--bordo); border-radius:8px; margin:1rem 0 .8rem; touch-action:none; }
+  .controlli{ display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:.8rem 1.4rem; align-items:end; }
+  .controllo label{ display:flex; gap:.35rem; align-items:baseline; font-size:.92rem; color:var(--tenue); margin-bottom:.15rem; }
+  .controllo output{ margin-left:auto; font-weight:600; color:var(--testo); font-variant-numeric:tabular-nums; }
+  input[type=range]{ width:100%; accent-color:var(--blu); }
+  .c-arancio input[type=range]{ accent-color:#c4620e; }
+  .c-verde input[type=range]{ accent-color:var(--verde); }
+  button{
+    font:inherit; font-size:.95rem; cursor:pointer; border-radius:6px;
+    border:1px solid var(--bordo); background:#fff; color:var(--testo); padding:.45rem .9rem;
+  }
+  button:hover{ border-color:var(--blu); }
+  button:focus-visible, input:focus-visible{ outline:3px solid #7fb0e6; outline-offset:2px; }
+  button.primario{ background:var(--blu); color:#fff; border-color:var(--blu); }
+  button.attivo{ background:var(--blu-chiaro); border-color:var(--blu); color:var(--blu); font-weight:600; }
+  .riga-bottoni{ display:flex; flex-wrap:wrap; gap:.5rem; margin:.4rem 0 .2rem; }
+  .lettura{
+    background:var(--sfondo); border-radius:8px; padding:.8rem 1rem; margin-top:1rem;
+    font-family:var(--font-math); font-size:1.08rem; line-height:1.9; overflow-x:auto;
+  }
+  .lettura .blu{ color:var(--blu); } .lettura .arancio{ color:#b85f10; } .lettura .verde{ color:var(--verde); }
+  .nota{ border-left:4px solid var(--arancio); background:var(--arancio-chiaro); padding:.6rem .9rem; margin:1rem 0 .2rem; border-radius:0 6px 6px 0; max-width:none; }
+  .spiega{ border-left:4px solid var(--blu); background:var(--blu-chiaro); padding:.6rem .9rem; margin-top:1rem; border-radius:0 6px 6px 0; min-height:3.2em; }
+  .legenda{ display:flex; flex-wrap:wrap; gap:1.2rem; font-size:.92rem; color:var(--tenue); }
+  .legenda span::before{ content:""; display:inline-block; width:22px; height:4px; border-radius:2px; vertical-align:middle; margin-right:.4rem; background:currentColor; }
+  .legenda .l-blu{ color:var(--blu); } .legenda .l-arancio{ color:var(--arancio); } .legenda .l-verde{ color:var(--verde); }
+  .legenda span b{ color:var(--testo); font-weight:500; }
+  .ripasso{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
+  .ripasso div{ background:var(--sfondo); border-radius:8px; padding:.8rem 1rem; }
+  .ripasso h3{ font-size:1rem; margin:0 0 .3rem; color:var(--tenue); font-weight:600; }
+  .domanda{ border-top:1px solid var(--bordo); padding:1rem 0 .4rem; }
+  .domanda:first-of-type{ border-top:none; }
+  .domanda > p:first-child{ font-weight:600; margin-top:0; }
+  .opz{ font-family:var(--font-math); }
+  .opzioni{ display:grid; gap:.35rem; margin:.4rem 0 .6rem; }
+  .opzioni label{ display:flex; gap:.6rem; align-items:center; padding:.4rem .7rem; border:1px solid var(--bordo); border-radius:6px; cursor:pointer; }
+  .opzioni label:hover{ border-color:var(--blu); }
+  .opzioni input{ accent-color:var(--blu); }
+  .esito{ font-size:.95rem; margin:.3rem 0 0; }
+  .esito.ok{ color:var(--verde); } .esito.no{ color:var(--rosso); }
+  .errore{ color:var(--rosso); font-size:.88rem; margin-left:.6rem; }
+  #punteggio{ font-weight:600; color:var(--blu); margin-top:1rem; }
+  footer{ text-align:center; color:var(--tenue); font-size:.85rem; padding:0 1rem 2rem; }
+  @media (max-width:640px){
+    body{ font-size:16px; }
+    header h1{ font-size:1.7rem; }
+    section{ padding:1rem; }
+    .ripasso{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>I fasori</h1>
+  <p>Dal numero complesso alla corrente alternata. Un vettore che gira descrive una tensione sinusoidale: muovi i cursori e guarda come cambia l'onda.</p>
+</header>
+
+<main>
+
+<section id="s1">
+  <h2><span class="n">1.</span>Il vettore che gira</h2>
+  <p>Il fasore è un vettore di lunghezza <span class="math">V<sub>m</sub></span> che ruota in senso antiorario. In ogni istante la sua <b>altezza</b> (la proiezione sull'asse immaginario) è il valore della tensione <span class="math">v(t)</span>. Seguendo l'altezza nel tempo si disegna una sinusoide.</p>
+
+  <canvas id="cv1" role="img" aria-label="Fasore rotante a sinistra e sinusoide corrispondente a destra"></canvas>
+
+  <div class="riga-bottoni">
+    <button id="play1" class="primario">Ferma</button>
+    <button id="zero1">Riporta a ωt = 0°</button>
+  </div>
+
+  <div class="controlli">
+    <div class="controllo">
+      <label for="amp1">Ampiezza <span class="math">V<sub>m</sub></span> <output id="amp1o">8 V</output></label>
+      <input type="range" id="amp1" min="1" max="10" step="1" value="8">
+    </div>
+    <div class="controllo">
+      <label for="fase1">Fase iniziale <span class="math">φ</span> <output id="fase1o">30°</output></label>
+      <input type="range" id="fase1" min="-180" max="180" step="15" value="30">
+    </div>
+    <div class="controllo">
+      <label for="vel1">Velocità di rotazione <output id="vel1o">1×</output></label>
+      <input type="range" id="vel1" min="0.25" max="2" step="0.25" value="1">
+    </div>
+    <div class="controllo">
+      <label for="t1">Angolo percorso <span class="math">ωt</span> <output id="t1o">0°</output></label>
+      <input type="range" id="t1" min="0" max="720" step="5" value="0">
+    </div>
+  </div>
+
+  <div class="lettura" id="lett1" aria-live="polite"></div>
+
+  <p class="nota">Nella rete elettrica il fasore compie 50 giri al secondo (50 Hz): troppo veloce per vederlo. Qui lo rallentiamo, ma la matematica è la stessa.</p>
+</section>
+
+<section id="s0">
+  <h2><span class="n">2.</span>Il fasore è un numero complesso</h2>
+  <p>Fermando il vettore all'istante <span class="math">t = 0</span>, resta un punto del piano di Gauss: è proprio il numero complesso in forma trigonometrica che abbiamo già visto.</p>
+  <div class="ripasso">
+    <div>
+      <h3>Numero complesso</h3>
+      <div class="math">z = r (<span class="up">cos</span> θ + i <span class="up">sin</span> θ)</div>
+      <p style="margin:.3rem 0 0;font-size:.95rem">modulo <span class="math">r</span>, argomento <span class="math">θ</span></p>
+    </div>
+    <div>
+      <h3>Fasore della tensione</h3>
+      <div class="math">V = V<sub>m</sub> (<span class="up">cos</span> φ + j <span class="up">sin</span> φ)</div>
+      <p style="margin:.3rem 0 0;font-size:.95rem">ampiezza <span class="math">V<sub>m</sub></span>, fase <span class="math">φ</span></p>
+    </div>
+  </div>
+  <p>In forma breve si scrive <span class="math">V = V<sub>m</sub> ∠ φ</span>, che si legge "<span class="math">V<sub>m</sub></span> con angolo <span class="math">φ</span>".</p>
+  <p class="nota">In elettrotecnica l'unità immaginaria si indica con <span class="math">j</span> e non con <span class="math">i</span>, perché la lettera <span class="math">i</span> è già usata per la corrente.</p>
+</section>
+
+<section id="s2">
+  <h2><span class="n">3.</span>Tensione e corrente: lo sfasamento</h2>
+  <p>In un circuito in corrente alternata tensione e corrente hanno la stessa frequenza, quindi i loro fasori girano insieme. L'angolo tra i due fasori resta sempre lo stesso: è lo <b>sfasamento</b> <span class="math">φ</span>. Scegli il componente.</p>
+
+  <div class="riga-bottoni" role="group" aria-label="Scegli il componente">
+    <button data-modo="R" class="attivo">Resistore</button>
+    <button data-modo="L">Induttore</button>
+    <button data-modo="C">Condensatore</button>
+    <button data-modo="X">Carico reale</button>
+  </div>
+
+  <canvas id="cv2" role="img" aria-label="Fasori della tensione e della corrente e loro sinusoidi"></canvas>
+
+  <div class="legenda">
+    <span class="l-blu"><b>tensione v(t)</b></span>
+    <span class="l-arancio"><b>corrente i(t)</b></span>
+  </div>
+
+  <div class="riga-bottoni">
+    <button id="play2" class="primario">Ferma</button>
+  </div>
+
+  <div class="controlli c-arancio">
+    <div class="controllo">
+      <label for="fase2">Fase della corrente rispetto alla tensione <output id="fase2o">0°</output></label>
+      <input type="range" id="fase2" min="-90" max="90" step="5" value="0">
+    </div>
+  </div>
+
+  <div class="spiega" id="spiega2" aria-live="polite"></div>
+  <div class="lettura" id="lett2"></div>
+  <p class="nota">Le ampiezze di tensione e corrente si misurano in unità diverse (volt e ampere): nel disegno conta solo la direzione dei fasori, non il confronto delle lunghezze.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="n">4.</span>Sommare due tensioni</h2>
+  <p>Due tensioni sinusoidali con la stessa frequenza, per esempio su due componenti in serie, si sommano sommando i loro fasori come vettori: si mette il secondo fasore in coda al primo. In forma algebrica basta sommare parti reali e parti immaginarie.</p>
+
+  <canvas id="cv3" role="img" aria-label="Somma di due fasori e delle loro sinusoidi"></canvas>
+
+  <div class="legenda">
+    <span class="l-blu"><b>V₁</b></span>
+    <span class="l-arancio"><b>V₂</b></span>
+    <span class="l-verde"><b>V = V₁ + V₂</b></span>
+  </div>
+
+  <div class="riga-bottoni">
+    <button id="play3" class="primario">Ferma</button>
+  </div>
+
+  <div class="controlli">
+    <div class="controllo">
+      <label for="a31">Ampiezza di V₁ <output id="a31o">6 V</output></label>
+      <input type="range" id="a31" min="1" max="8" step="1" value="6">
+    </div>
+    <div class="controllo">
+      <label for="f31">Fase di V₁ <output id="f31o">0°</output></label>
+      <input type="range" id="f31" min="-180" max="180" step="15" value="0">
+    </div>
+    <div class="controllo c-arancio">
+      <label for="a32">Ampiezza di V₂ <output id="a32o">4 V</output></label>
+      <input type="range" id="a32" min="1" max="8" step="1" value="4">
+    </div>
+    <div class="controllo c-arancio">
+      <label for="f32">Fase di V₂ <output id="f32o">90°</output></label>
+      <input type="range" id="f32" min="-180" max="180" step="15" value="90">
+    </div>
+  </div>
+
+  <div class="lettura" id="lett3" aria-live="polite"></div>
+  <div class="spiega" id="spiega3"></div>
+</section>
+
+<section id="s4">
+  <h2><span class="n">5.</span>Mettiti alla prova</h2>
+  <p>Scegli una risposta per ogni domanda e premi "Verifica".</p>
+  <div id="quiz"></div>
+  <div id="punteggio" aria-live="polite"></div>
+</section>
+
+</main>
+
+<footer>Matematica, classe 4MATS, corso serale</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var COL = { blu:"#1a5fa8", arancio:"#e67e22", verde:"#2e8b57", rosso:"#c0392b",
+              testo:"#1f2a36", tenue:"#5b6878", griglia:"#e3e8ee", assi:"#9aa6b4" };
+  var GRAD = Math.PI / 180;
+  var riduciMoto = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function fmt(n, dec){
+    if (dec === undefined) dec = 2;
+    var s = Math.abs(n) < 0.005 ? (0).toFixed(dec) : n.toFixed(dec);
+    return s.replace(".", ",").replace("-", "−");
+  }
+  function fmtGradi(g){
+    var r = Math.round(g * 10) / 10;
+    if (Math.abs(r - Math.round(r)) < 1e-9) return fmt(Math.round(r), 0) + "°";
+    return fmt(r, 1) + "°";
+  }
+  function algebrica(a, b){
+    var segno = b < -0.005 ? " − j" : " + j";
+    return fmt(a) + segno + fmt(Math.abs(b));
+  }
+  function normGradi(g){
+    var x = ((g + 180) % 360 + 360) % 360 - 180;
+    return x === -180 ? 180 : x;
+  }
+
+  function preparaCanvas(cv){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth;
+    var h = Math.round(Math.max(180, Math.min(340, w * (w < 600 ? 0.5 : 0.42))));
+    cv.style.height = h + "px";
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h, span: w < 600 ? 360 : 720 };
+  }
+
+  function freccia(ctx, x0, y0, x1, y1, col, spess, tratt){
+    var dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy);
+    ctx.save();
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = spess;
+    if (tratt) ctx.setLineDash([5, 4]);
+    if (L < 1) { ctx.restore(); return; }
+    var ux = dx / L, uy = dy / L, t = Math.min(11, L * 0.4);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1 - ux * t * 0.8, y1 - uy * t * 0.8); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - ux * t - uy * t * 0.45, y1 - uy * t + ux * t * 0.45);
+    ctx.lineTo(x1 - ux * t + uy * t * 0.45, y1 - uy * t - ux * t * 0.45);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function testo(ctx, s, x, y, col, allinea, corsivo, dim){
+    ctx.save();
+    ctx.fillStyle = col;
+    ctx.font = (corsivo ? "italic " : "") + (dim || 13) + "px " + (corsivo ? "Cambria, Georgia, serif" : "system-ui, sans-serif");
+    ctx.textAlign = allinea || "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(s, x, y);
+    ctx.restore();
+  }
+
+  /* Disegna la scena: fasori a sinistra, sinusoidi a destra.
+     onde: [{A, phi, col, spess, nome}] ; theta = ωt in radianti */
+  function disegna(g, opz){
+    var ctx = g.ctx, w = g.w, h = g.h;
+    ctx.clearRect(0, 0, w, h);
+    var s = h, cx = s / 2, cy = h / 2;
+    var R = (s / 2 - 22) / opz.maxA;
+    var x0 = s + 14, x1 = w - 12;
+    var span = g.span * GRAD;
+    var kx = (x1 - x0) / span;
+    var theta = opz.theta;
+    var thetaMod = ((theta % span) + span) % span;
+
+    /* assi del piano */
+    ctx.strokeStyle = COL.assi; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(8, cy); ctx.lineTo(s - 6, cy); ctx.moveTo(cx, 6); ctx.lineTo(cx, h - 6); ctx.stroke();
+    testo(ctx, "Re", s - 10, cy - 10, COL.tenue, "right");
+    testo(ctx, "Im", cx + 8, 12, COL.tenue, "left");
+
+    /* griglia del grafico */
+    ctx.strokeStyle = COL.griglia; ctx.lineWidth = 1;
+    var passo = (90 * GRAD * kx < 40) ? 180 : 90;
+    for (var gr = passo; gr <= g.span; gr += passo){
+      var xg = x0 + gr * GRAD * kx;
+      ctx.beginPath(); ctx.moveTo(xg, 8); ctx.lineTo(xg, h - 18); ctx.stroke();
+      testo(ctx, gr + "°", xg, h - 8, COL.tenue, "center", false, 11);
+    }
+    ctx.strokeStyle = COL.assi;
+    ctx.beginPath(); ctx.moveTo(x0, cy); ctx.lineTo(x1, cy); ctx.moveTo(x0, 8); ctx.lineTo(x0, h - 18); ctx.stroke();
+    testo(ctx, "ωt", x1, cy - 10, COL.tenue, "right", true, 14);
+
+    /* circonferenze guida */
+    opz.onde.forEach(function(o){
+      if (o.guida === false) return;
+      ctx.save(); ctx.strokeStyle = o.col; ctx.globalAlpha = 0.25; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.arc(cx, cy, o.A * R, 0, 2 * Math.PI); ctx.stroke(); ctx.restore();
+    });
+
+    /* sinusoidi: curva intera tenue + tratto già percorso */
+    opz.onde.forEach(function(o){
+      ctx.save(); ctx.strokeStyle = o.col; ctx.lineWidth = o.spess || 2;
+      ctx.globalAlpha = 0.22;
+      ctx.beginPath();
+      for (var px = 0; px <= x1 - x0; px += 2){
+        var ang = px / kx;
+        var y = cy - o.A * R * Math.sin(ang + o.phi);
+        if (px === 0) ctx.moveTo(x0 + px, y); else ctx.lineTo(x0 + px, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      var fine = thetaMod * kx;
+      for (var p2 = 0; p2 <= fine; p2 += 2){
+        var a2 = p2 / kx;
+        var y2 = cy - o.A * R * Math.sin(a2 + o.phi);
+        if (p2 === 0) ctx.moveTo(x0 + p2, y2); else ctx.lineTo(x0 + p2, y2);
+      }
+      ctx.stroke(); ctx.restore();
+    });
+
+    /* fasori, proiezioni e punti mobili */
+    var xm = x0 + thetaMod * kx;
+    opz.onde.forEach(function(o){
+      var ang = theta + o.phi;
+      var tx = cx + o.A * R * Math.cos(ang), ty = cy - o.A * R * Math.sin(ang);
+      if (o.coda){
+        var ca = theta + o.coda.phi;
+        var bx = cx + o.coda.A * R * Math.cos(ca), by = cy - o.coda.A * R * Math.sin(ca);
+        freccia(ctx, bx, by, bx + (tx - cx), by + (ty - cy), o.col, 1.5, true);
+      }
+      ctx.save(); ctx.strokeStyle = o.col; ctx.globalAlpha = 0.6; ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(xm, ty); ctx.stroke(); ctx.restore();
+      freccia(ctx, cx, cy, tx, ty, o.col, o.spess ? o.spess + 0.5 : 2.5, false);
+      ctx.fillStyle = o.col;
+      ctx.beginPath(); ctx.arc(xm, ty, 4.5, 0, 2 * Math.PI); ctx.fill();
+      if (o.nome){
+        var lx = cx + (o.A * R + 14) * Math.cos(ang), ly = cy - (o.A * R + 14) * Math.sin(ang);
+        testo(ctx, o.nome, lx, ly, o.col, "center", true, 15);
+      }
+    });
+
+    if (opz.extra) opz.extra(ctx, cx, cy, R, theta);
+  }
+
+  /* ---------- gestione animazione ---------- */
+  var scene = [];
+  var ultimo = null;
+  function ciclo(ts){
+    var dt = ultimo === null ? 0 : Math.min(0.05, (ts - ultimo) / 1000);
+    ultimo = ts;
+    scene.forEach(function(sc){
+      if (sc.attiva){ sc.theta += dt * sc.omega(); sc.dopoAvanzamento && sc.dopoAvanzamento(); }
+      sc.ridisegna();
+    });
+    requestAnimationFrame(ciclo);
+  }
+  function collegaPlay(btn, sc){
+    function agg(){ btn.textContent = sc.attiva ? "Ferma" : "Avvia"; }
+    btn.addEventListener("click", function(){ sc.attiva = !sc.attiva; agg(); });
+    sc.aggBottone = agg;
+    agg();
+  }
+  var PERIODO = 4; /* secondi per un giro a velocità 1 */
+
+  /* ---------- sezione 1 ---------- */
+  (function(){
+    var cv = document.getElementById("cv1");
+    var amp = document.getElementById("amp1"), fase = document.getElementById("fase1");
+    var vel = document.getElementById("vel1"), tSl = document.getElementById("t1");
+    var g = preparaCanvas(cv);
+    var sc = { theta: 0, attiva: !riduciMoto };
+    sc.omega = function(){ return 2 * Math.PI / PERIODO * parseFloat(vel.value); };
+    sc.dopoAvanzamento = function(){
+      var deg = ((sc.theta / GRAD) % 720 + 720) % 720;
+      tSl.value = Math.round(deg / 5) * 5;
+      document.getElementById("t1o").textContent = Math.round(deg) + "°";
+      aggiornaLettura();
+    };
+    function aggiornaLettura(){
+      var A = parseFloat(amp.value), phD = parseFloat(fase.value), ph = phD * GRAD;
+      var tDeg = Math.round(((sc.theta / GRAD) % 720 + 720) % 720) % 720;
+      var v = A * Math.sin((tDeg + phD) * GRAD);
+      var segno = phD < 0 ? " − " : " + ";
+      document.getElementById("lett1").innerHTML =
+        "<span class='blu'>v(t) = " + A + " sin(ωt" + segno + Math.abs(phD) + "°)</span><br>" +
+        "con ωt = " + tDeg + "°: &nbsp; v = " + A + " · sin(" + fmtGradi(((tDeg + phD) % 360 + 360) % 360) + ") = <b>" + fmt(v) + " V</b><br>" +
+        "fasore: &nbsp;<span class='blu'>V = " + A + " ∠ " + fmtGradi(phD) + " = " + A + " (cos " + fmtGradi(phD) + " + j sin " + fmtGradi(phD) + ") = " + algebrica(A * Math.cos(ph), A * Math.sin(ph)) + "</span>";
+    }
+    sc.ridisegna = function(){
+      disegna(g, {
+        maxA: 10, theta: sc.theta,
+        onde: [{ A: parseFloat(amp.value), phi: parseFloat(fase.value) * GRAD, col: COL.blu, spess: 2.5, nome: "V" }],
+        extra: function(ctx, cx, cy, R, theta){
+          var ang = theta + parseFloat(fase.value) * GRAD;
+          var a = ((ang % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+          ctx.save(); ctx.strokeStyle = COL.rosso; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(cx, cy, 20, 0, -a, true); ctx.stroke(); ctx.restore();
+          testo(ctx, "ωt + φ", cx + 30 * Math.cos(a / 2) + 6, cy - 30 * Math.sin(a / 2), COL.rosso, "left", true, 13);
+        }
+      });
+    };
+    function aggOut(){
+      document.getElementById("amp1o").textContent = amp.value + " V";
+      document.getElementById("fase1o").textContent = fmtGradi(parseFloat(fase.value));
+      document.getElementById("vel1o").textContent = String(vel.value).replace(".", ",") + "×";
+      aggiornaLettura();
+    }
+    [amp, fase, vel].forEach(function(el){ el.addEventListener("input", aggOut); });
+    tSl.addEventListener("input", function(){
+      sc.attiva = false; sc.aggBottone();
+      sc.theta = parseFloat(tSl.value) * GRAD;
+      document.getElementById("t1o").textContent = tSl.value + "°";
+      aggiornaLettura();
+    });
+    document.getElementById("zero1").addEventListener("click", function(){
+      sc.attiva = false; sc.aggBottone(); sc.theta = 0; tSl.value = 0;
+      document.getElementById("t1o").textContent = "0°"; aggiornaLettura();
+    });
+    sc.resize = function(){ g = preparaCanvas(cv); };
+    collegaPlay(document.getElementById("play1"), sc);
+    aggOut();
+    scene.push(sc);
+  })();
+
+  /* ---------- sezione 2 ---------- */
+  (function(){
+    var cv = document.getElementById("cv2");
+    var fase = document.getElementById("fase2");
+    var g = preparaCanvas(cv);
+    var sc = { theta: 0, attiva: !riduciMoto };
+    sc.omega = function(){ return 2 * Math.PI / PERIODO; };
+    var modo = "R";
+    var bottoni = document.querySelectorAll("#s2 [data-modo]");
+    var testi = {
+      R: "<b>Resistore.</b> Tensione e corrente sono <b>in fase</b>: φ = 0°. I due fasori sono sovrapposti e le due onde raggiungono il massimo nello stesso istante.",
+      L: "<b>Induttore.</b> La corrente è <b>in ritardo di 90°</b> rispetto alla tensione. Il fasore I sta 90° indietro rispetto a V, cioè lo segue nella rotazione: l'onda della corrente arriva al massimo un quarto di periodo dopo.",
+      C: "<b>Condensatore.</b> La corrente è <b>in anticipo di 90°</b> rispetto alla tensione. Il fasore I sta 90° avanti rispetto a V: l'onda della corrente arriva al massimo un quarto di periodo prima."
+    };
+    function spiegazioneLibera(d){
+      if (d === 0) return "<b>Carico reale.</b> Con φ = 0° il carico si comporta come un resistore: tensione e corrente in fase.";
+      if (d < 0) return "<b>Carico reale.</b> La corrente è in ritardo di " + Math.abs(d) + "°: il carico è <b>ohmico-induttivo</b>, come un motore elettrico o un trasformatore.";
+      return "<b>Carico reale.</b> La corrente è in anticipo di " + d + "°: il carico è <b>ohmico-capacitivo</b>.";
+    }
+    function aggiorna(){
+      var d = parseInt(fase.value, 10);
+      document.getElementById("fase2o").textContent = (d > 0 ? "+" : "") + fmtGradi(d);
+      document.getElementById("spiega2").innerHTML = modo === "X" ? spiegazioneLibera(d) : testi[modo];
+      var ms = Math.abs(d) / 360 * 20;
+      var rel = d === 0 ? "in fase" : (d < 0 ? "in ritardo" : "in anticipo");
+      document.getElementById("lett2").innerHTML =
+        "<span class='blu'>V = 8 ∠ 0°</span> &nbsp;&nbsp; <span class='arancio'>I = 5 ∠ " + fmtGradi(d) + "</span><br>" +
+        "sfasamento φ = " + fmtGradi(Math.abs(d)) + " (" + rel + ")" +
+        (d === 0 ? "" : "; &nbsp;a 50 Hz corrisponde a uno spostamento nel tempo di " + fmt(ms, 2) + " ms");
+    }
+    bottoni.forEach(function(b){
+      b.addEventListener("click", function(){
+        modo = b.getAttribute("data-modo");
+        bottoni.forEach(function(x){ x.classList.toggle("attivo", x === b); });
+        if (modo === "R") fase.value = 0;
+        if (modo === "L") fase.value = -90;
+        if (modo === "C") fase.value = 90;
+        if (modo === "X") fase.value = -30;
+        aggiorna();
+      });
+    });
+    fase.addEventListener("input", function(){
+      modo = "X";
+      bottoni.forEach(function(x){ x.classList.toggle("attivo", x.getAttribute("data-modo") === "X"); });
+      aggiorna();
+    });
+    sc.ridisegna = function(){
+      var d = parseInt(fase.value, 10);
+      disegna(g, {
+        maxA: 9, theta: sc.theta,
+        onde: [
+          { A: 8, phi: 0, col: COL.blu, spess: 2.5, nome: "V" },
+          { A: 5, phi: d * GRAD, col: COL.arancio, spess: 2.5, nome: "I" }
+        ],
+        extra: function(ctx, cx, cy, R, theta){
+          if (d === 0) return;
+          var aV = theta, aI = theta + d * GRAD;
+          ctx.save(); ctx.strokeStyle = COL.rosso; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(cx, cy, 26, -aV, -aI, d > 0); ctx.stroke(); ctx.restore();
+          var m = (aV + aI) / 2;
+          testo(ctx, "φ", cx + 38 * Math.cos(m), cy - 38 * Math.sin(m), COL.rosso, "center", true, 15);
+        }
+      });
+    };
+    sc.resize = function(){ g = preparaCanvas(cv); };
+    collegaPlay(document.getElementById("play2"), sc);
+    aggiorna();
+    scene.push(sc);
+  })();
+
+  /* ---------- sezione 3 ---------- */
+  (function(){
+    var cv = document.getElementById("cv3");
+    var a1 = document.getElementById("a31"), f1 = document.getElementById("f31");
+    var a2 = document.getElementById("a32"), f2 = document.getElementById("f32");
+    var g = preparaCanvas(cv);
+    var sc = { theta: 0, attiva: !riduciMoto };
+    sc.omega = function(){ return 2 * Math.PI / PERIODO; };
+    function calcola(){
+      var A1 = parseFloat(a1.value), p1 = parseFloat(f1.value) * GRAD;
+      var A2 = parseFloat(a2.value), p2 = parseFloat(f2.value) * GRAD;
+      var re = A1 * Math.cos(p1) + A2 * Math.cos(p2);
+      var im = A1 * Math.sin(p1) + A2 * Math.sin(p2);
+      return { A1: A1, p1: p1, A2: A2, p2: p2, re: re, im: im, A: Math.hypot(re, im), p: Math.atan2(im, re) };
+    }
+    function aggiorna(){
+      document.getElementById("a31o").textContent = a1.value + " V";
+      document.getElementById("a32o").textContent = a2.value + " V";
+      document.getElementById("f31o").textContent = fmtGradi(parseFloat(f1.value));
+      document.getElementById("f32o").textContent = fmtGradi(parseFloat(f2.value));
+      var c = calcola();
+      document.getElementById("lett3").innerHTML =
+        "<span class='blu'>V₁ = " + c.A1 + " ∠ " + fmtGradi(c.p1 / GRAD) + " = " + algebrica(c.A1 * Math.cos(c.p1), c.A1 * Math.sin(c.p1)) + "</span><br>" +
+        "<span class='arancio'>V₂ = " + c.A2 + " ∠ " + fmtGradi(c.p2 / GRAD) + " = " + algebrica(c.A2 * Math.cos(c.p2), c.A2 * Math.sin(c.p2)) + "</span><br>" +
+        "<span class='verde'>V = V₁ + V₂ = " + algebrica(c.re, c.im) +
+        (c.A < 0.005 ? " = 0" : " = " + fmt(c.A) + " ∠ " + fmtGradi(c.p / GRAD)) + "</span>";
+      var somma = c.A1 + c.A2, diff = parseFloat(f1.value) - parseFloat(f2.value);
+      var stesso = Math.abs(normGradi(diff)) < 0.01;
+      var opposto = Math.abs(Math.abs(normGradi(diff)) - 180) < 0.01;
+      var msg;
+      if (stesso) msg = "Le due tensioni sono <b>in fase</b>: in questo caso particolare le ampiezze si sommano davvero (" + c.A1 + " + " + c.A2 + " = " + somma + ").";
+      else if (opposto) msg = "Le due tensioni sono in <b>opposizione di fase</b>: i fasori puntano in versi opposti e le ampiezze si sottraggono.";
+      else msg = "Attenzione: l'ampiezza della somma è " + fmt(c.A) + " V, non " + c.A1 + " + " + c.A2 + " = " + somma + " V. Le tensioni non raggiungono il massimo nello stesso istante, quindi si sommano i <b>fasori</b>, non le ampiezze.";
+      document.getElementById("spiega3").innerHTML = msg;
+    }
+    [a1, f1, a2, f2].forEach(function(el){ el.addEventListener("input", aggiorna); });
+    sc.ridisegna = function(){
+      var c = calcola();
+      var o1 = { A: c.A1, phi: c.p1, col: COL.blu, spess: 1.5, nome: "V₁", guida: false };
+      disegna(g, {
+        maxA: Math.max(c.A1 + c.A2, 4), theta: sc.theta,
+        onde: [
+          o1,
+          { A: c.A2, phi: c.p2, col: COL.arancio, spess: 1.5, nome: "V₂", guida: false, coda: o1 },
+          { A: c.A, phi: c.p, col: COL.verde, spess: 3, nome: "V", guida: true }
+        ]
+      });
+    };
+    sc.resize = function(){ g = preparaCanvas(cv); };
+    collegaPlay(document.getElementById("play3"), sc);
+    aggiorna();
+    scene.push(sc);
+  })();
+
+  /* ---------- quiz ---------- */
+  (function(){
+    var domande = [
+      { q: "Il fasore V = 10 ∠ 0° rappresenta la tensione:",
+        o: ["v(t) = 10 sin(ωt)", "v(t) = 10 sin(ωt + 10°)", "v(t) = sin(10ωt)", "v(t) = 10 + ωt"], c: 0,
+        s: "Il modulo del fasore è l'ampiezza (10 V) e l'angolo è la fase iniziale (0°)." },
+      { q: "Il fasore V = 6 + j8 ha ampiezza:",
+        o: ["14 V", "10 V", "2 V", "48 V"], c: 1,
+        s: "Ampiezza = modulo = √(6² + 8²) = √(36 + 64) = √100 = 10 V." },
+      { q: "Il fasore 4 ∠ 90° in forma algebrica è:",
+        o: ["4", "−4", "j4", "4 + j4"], c: 2,
+        s: "4 (cos 90° + j sin 90°) = 4 (0 + j · 1) = j4: il fasore punta verso l'alto, sull'asse immaginario." },
+      { q: "In un induttore ideale, la corrente rispetto alla tensione è:",
+        o: ["in fase", "in anticipo di 90°", "in ritardo di 90°", "in opposizione di fase"], c: 2,
+        s: "Nell'induttore la corrente è in ritardo di 90°: raggiunge il massimo un quarto di periodo dopo la tensione." },
+      { q: "In un condensatore ideale, la corrente rispetto alla tensione è:",
+        o: ["in anticipo di 90°", "in ritardo di 90°", "in fase", "in ritardo di 180°"], c: 0,
+        s: "Nel condensatore la corrente è in anticipo di 90° rispetto alla tensione." },
+      { q: "Due tensioni in serie valgono V₁ = 3 ∠ 0° e V₂ = 4 ∠ 90°. L'ampiezza della tensione totale è:",
+        o: ["7 V", "1 V", "12 V", "5 V"], c: 3,
+        s: "V = 3 + j4, quindi l'ampiezza è √(3² + 4²) = √25 = 5 V, non 3 + 4 = 7 V." }
+    ];
+    var box = document.getElementById("quiz");
+    var giuste = {};
+    domande.forEach(function(d, i){
+      var div = document.createElement("div");
+      div.className = "domanda";
+      var html = "<p>" + (i + 1) + ". " + d.q + "</p><div class='opzioni'>";
+      d.o.forEach(function(op, j){
+        html += "<label><input type='radio' name='q" + i + "' value='" + j + "'> <span class='opz'>" + op + "</span></label>";
+      });
+      html += "</div><button type='button' data-q='" + i + "'>Verifica</button><span class='errore' id='err" + i + "'></span><p class='esito' id='es" + i + "'></p>";
+      div.innerHTML = html;
+      box.appendChild(div);
+      div.querySelectorAll("input").forEach(function(inp){
+        inp.addEventListener("change", function(){ document.getElementById("err" + i).textContent = ""; });
+      });
+      div.querySelector("button").addEventListener("click", function(){
+        var scelta = div.querySelector("input[name='q" + i + "']:checked");
+        var es = document.getElementById("es" + i);
+        if (!scelta){
+          document.getElementById("err" + i).textContent = "Scegli una risposta prima di verificare.";
+          es.textContent = ""; es.className = "esito";
+          return;
+        }
+        var ok = parseInt(scelta.value, 10) === d.c;
+        giuste[i] = ok;
+        es.className = "esito " + (ok ? "ok" : "no");
+        es.textContent = (ok ? "Giusto. " : "Non è corretto. ") + d.s;
+        var n = 0, tot = 0;
+        Object.keys(giuste).forEach(function(k){ tot++; if (giuste[k]) n++; });
+        document.getElementById("punteggio").textContent = "Risposte corrette: " + n + " su " + tot + " verificate (" + domande.length + " domande in tutto).";
+      });
+    });
+  })();
+
+  var timerResize = null;
+  window.addEventListener("resize", function(){
+    clearTimeout(timerResize);
+    timerResize = setTimeout(function(){ scene.forEach(function(sc){ sc.resize(); }); }, 120);
+  });
+
+  requestAnimationFrame(ciclo);
+})();
+</script>
+</body>
+</html>
