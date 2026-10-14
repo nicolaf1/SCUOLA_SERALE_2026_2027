@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funzioni: relazioni speciali</title>
+<style>
+:root{
+  --blu:#1a5fa8; --blu-chiaro:#e8f0fa; --arancio:#e67e22; --arancio-chiaro:#fdf2e6;
+  --grigio:#f4f5f7; --grigio-bordo:#d6dae0; --testo:#222; --testo2:#555;
+  --magenta:#c2185b; --verde:#1e9e4a; --rosso:#c62828; --verde-ok:#2e7d32;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--testo);background:var(--grigio);line-height:1.55}
+header{background:var(--blu);color:#fff;padding:28px 16px 22px;text-align:center}
+header h1{margin:0 0 6px;font-size:1.9rem}
+header p{margin:0;opacity:.9}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--grigio-bordo);display:flex;gap:4px;overflow-x:auto;padding:8px 12px}
+nav a{white-space:nowrap;text-decoration:none;color:var(--blu);padding:6px 12px;border-radius:18px;font-size:.92rem}
+nav a:hover{background:var(--blu-chiaro)}
+main{max-width:980px;margin:0 auto;padding:16px}
+section{background:#fff;border-radius:12px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{color:var(--blu);margin-top:0;border-bottom:2px solid var(--blu-chiaro);padding-bottom:6px}
+h3{color:var(--blu);margin-bottom:6px}
+.m{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;white-space:nowrap}
+.mr{font-family:"Cambria Math","Times New Roman",serif;white-space:nowrap}
+.formula{text-align:center;font-family:"Cambria Math","Times New Roman",serif;font-size:1.15rem;margin:12px 0;overflow-x:auto}
+.def{border-left:5px solid var(--blu);background:var(--blu-chiaro);padding:14px 18px;border-radius:0 8px 8px 0;margin:14px 0}
+.def b.tit{color:var(--blu)}
+.attenzione{border-left:5px solid var(--arancio);background:var(--arancio-chiaro);padding:12px 18px;border-radius:0 8px 8px 0;margin:14px 0}
+.c-dom{color:var(--magenta);font-weight:600}
+.c-cod{color:var(--verde);font-weight:600}
+.c-blu{color:var(--blu);font-weight:600}
+.due{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:760px){.due{grid-template-columns:1fr}section{padding:18px 16px}}
+svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.setA{fill:none;stroke:var(--magenta);stroke-width:2}
+.setB{fill:none;stroke:var(--verde);stroke-width:2}
+.punto{fill:#222}
+.etich{font-family:"Times New Roman",serif;font-size:17px}
+.nomeA{fill:var(--magenta);font-family:"Times New Roman",serif;font-style:italic;font-size:22px}
+.nomeB{fill:var(--verde);font-family:"Times New Roman",serif;font-style:italic;font-size:22px}
+.freccia{fill:none;stroke:var(--blu);stroke-width:1.8}
+.freccia.err{stroke:var(--rosso);stroke-width:2.4}
+.halo-img{fill:var(--blu-chiaro);stroke:var(--blu);stroke-width:1}
+.halo-miss{fill:none;stroke:var(--arancio);stroke-width:2.5;stroke-dasharray:4 3}
+.halo-sel{fill:#ffe9c7;stroke:var(--arancio);stroke-width:2.5}
+.hit{fill:transparent;cursor:pointer}
+.hit:hover{fill:rgba(26,95,168,.12)}
+.tre{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center}
+@media(max-width:760px){.tre{grid-template-columns:1fr}}
+.tre .cap{font-weight:700;color:var(--blu);margin-top:4px}
+.tre .sub{font-size:.9rem;color:var(--testo2)}
+button{font:inherit;cursor:pointer;border:1px solid var(--blu);background:#fff;color:var(--blu);padding:7px 14px;border-radius:8px;margin:3px}
+button:hover{background:var(--blu-chiaro)}
+button.pieno{background:var(--blu);color:#fff}
+button.pieno:hover{background:#154c87}
+button:disabled{opacity:.5;cursor:default}
+select{font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--grigio-bordo)}
+.pannello{background:var(--grigio);border-radius:10px;padding:12px 16px;margin-top:10px}
+.verdetto{font-weight:700;font-size:1.1rem;padding:10px 14px;border-radius:8px;margin:8px 0}
+.verdetto.si{background:#e6f4ea;color:var(--verde-ok)}
+.verdetto.no{background:#fdecea;color:var(--rosso)}
+.verdetto.neutro{background:#fff;color:var(--testo2)}
+ul.motivi{margin:6px 0 0;padding-left:20px}
+.istr{font-size:.93rem;color:var(--testo2)}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+th,td{border-bottom:1px solid var(--grigio-bordo);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--blu-chiaro);color:var(--blu)}
+.si-t{color:var(--verde-ok);font-weight:700}
+.no-t{color:var(--rosso);font-weight:700}
+.insiemi{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:8px 0}
+.insiemi input{font:inherit;width:150px;padding:6px 8px;border-radius:8px;border:1px solid var(--grigio-bordo)}
+.insiemi input:focus{outline:2px solid var(--blu-chiaro);border-color:var(--blu)}
+.errore-in{color:var(--rosso);font-weight:600;min-height:0}
+.notazione{display:flex;justify-content:center;margin:14px 0}
+.quizbox{border:2px solid var(--blu-chiaro);border-radius:12px;padding:18px}
+.qnum{font-size:.9rem;color:var(--testo2)}
+.qtesto{font-size:1.08rem;margin:6px 0 10px}
+.opzioni{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.opzioni button.giusta{background:#e6f4ea;border-color:var(--verde-ok);color:var(--verde-ok)}
+.opzioni button.sbagliata{background:#fdecea;border-color:var(--rosso);color:var(--rosso)}
+.spiega{margin-top:8px;padding:10px 14px;border-radius:8px;background:var(--grigio)}
+.barra{height:8px;background:var(--grigio);border-radius:4px;overflow:hidden;margin:6px 0 12px}
+.barra div{height:100%;background:var(--arancio);transition:width .3s}
+footer{text-align:center;color:var(--testo2);font-size:.85rem;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Le funzioni</h1>
+  <p>Una funzione è un tipo speciale di relazione fra due insiemi</p>
+</header>
+
+<nav>
+  <a href="#relazioni">1. Relazioni</a>
+  <a href="#definizione">2. Definizione</a>
+  <a href="#nomi">3. Nomi e simboli</a>
+  <a href="#laboratorio">4. Laboratorio</a>
+  <a href="#grafico">5. Grafico</a>
+  <a href="#tipi">6. Iniettive, suriettive, biiettive</a>
+  <a href="#vita">7. Esempi reali</a>
+  <a href="#quiz">8. Quiz</a>
+</nav>
+
+<main>
+
+<!-- 1. RELAZIONI -->
+<section id="relazioni">
+  <h2>1. Si parte dalle relazioni</h2>
+  <p>Prendiamo due insiemi, per esempio</p>
+  <div class="formula"><span class="c-dom">A</span> = {2, 5, 8, 9} &nbsp;&nbsp;&nbsp; <span class="c-cod">B</span> = {1, 2, 3}</div>
+  <p>Il <b>prodotto cartesiano</b> <span class="m">A</span> × <span class="m">B</span> è l'insieme di <b>tutte</b> le coppie ordinate (primo elemento preso da <span class="m">A</span>, secondo elemento preso da <span class="m">B</span>):</p>
+  <div class="formula">A × B = {(2,1), (2,2), (2,3), (5,1), (5,2), (5,3),<br>(8,1), (8,2), (8,3), (9,1), (9,2), (9,3)}</div>
+  <p>Sono 4 · 3 = 12 coppie.</p>
+  <div class="def">
+    <b class="tit">Relazione.</b> Una <b>relazione</b> da <span class="m">A</span> a <span class="m">B</span> è una qualsiasi scelta di coppie del prodotto cartesiano, cioè un sottoinsieme di <span class="m">A</span> × <span class="m">B</span>.
+  </div>
+  <p>Ogni coppia scelta si può disegnare come una <b>freccia</b> che va da un elemento di <span class="m">A</span> a un elemento di <span class="m">B</span>. Una relazione è quindi un insieme di frecce, senza nessuna regola: da un elemento possono partire zero, una o tante frecce.</p>
+  <div class="due">
+    <div>
+      <svg id="svgRel1"></svg>
+      <p class="istr" style="text-align:center">Una relazione qualsiasi:<br>{(2,1), (5,1), (5,3), (9,2)}</p>
+    </div>
+    <div>
+      <svg id="svgRel2"></svg>
+      <p class="istr" style="text-align:center">Un'altra relazione:<br>{(2,1), (5,1), (8,2), (9,2)}</p>
+    </div>
+  </div>
+  <p>La seconda relazione ha qualcosa di speciale: <b>da ogni elemento di <span class="m">A</span> parte esattamente una freccia</b>. È proprio questa la proprietà che la rende una <b>funzione</b>.</p>
+</section>
+
+<!-- 2. DEFINIZIONE -->
+<section id="definizione">
+  <h2>2. La funzione: una relazione speciale</h2>
+  <div class="def">
+    <b class="tit">Definizione.</b> Una relazione fra due insiemi <span class="m">A</span> e <span class="m">B</span> che associa a <b>ogni</b> elemento di <span class="m">A</span> <b>uno e un solo</b> elemento di <span class="m">B</span> si chiama <b>FUNZIONE</b>.
+  </div>
+  <p>Con le frecce: <b>da ogni elemento di <span class="m">A</span> parte una e una sola freccia</b>. La regola contiene due richieste:</p>
+  <table>
+    <tr><th>Richiesta</th><th>Cosa vuol dire</th><th>Esempio di violazione</th></tr>
+    <tr><td><b>almeno una</b> freccia</td><td>nessun elemento di <span class="m">A</span> resta senza freccia</td><td>8 non è collegato a niente</td></tr>
+    <tr><td><b>non più di una</b> freccia</td><td>nessun elemento di <span class="m">A</span> ha due o più frecce</td><td>da 5 partono due frecce, verso 1 e verso 3</td></tr>
+  </table>
+  <div class="attenzione">
+    <b>Attenzione: la regola riguarda solo l'insieme di partenza <span class="m">A</span>.</b><br>
+    Negli elementi di <span class="m">B</span> possono arrivare zero, una o molte frecce: questo <b>non</b> impedisce di avere una funzione. Nell'esempio, in 1 arrivano due frecce e in 3 non arriva nessuna freccia, eppure è una funzione.
+  </div>
+</section>
+
+<!-- 3. NOMI E SIMBOLI -->
+<section id="nomi">
+  <h2>3. Nomi e simboli</h2>
+  <div class="due">
+    <div><svg id="svgNomi"></svg></div>
+    <div>
+      <ul>
+        <li><span class="c-dom">Dominio</span>: l'insieme di partenza <span class="m">A</span>.</li>
+        <li><span class="c-cod">Codominio</span>: l'insieme di arrivo <span class="m">B</span>.</li>
+        <li><b>Immagine</b> di un elemento: l'elemento di <span class="m">B</span> a cui arriva la sua freccia. Si scrive <span class="m">f</span>(5) = 1 e si legge «<i>f</i> di 5 è uguale a 1».</li>
+        <li><span class="c-blu">Insieme immagine</span>: l'insieme di tutti gli elementi di <span class="m">B</span> raggiunti da almeno una freccia. Qui è {1, 2}.</li>
+      </ul>
+    </div>
+  </div>
+  <p>Una funzione si indica così:</p>
+  <svg viewBox="0 0 420 120" style="max-width:420px">
+    <text x="210" y="40" text-anchor="middle" style="font-family:'Times New Roman',serif;font-size:30px;font-style:italic">f :  <tspan fill="#c2185b">A</tspan>  →  <tspan fill="#1e9e4a">B</tspan></text>
+    <path d="M140 105 Q 150 75 178 40" class="freccia" style="stroke:#555" marker-end="url(#mGrigio)"/>
+    <path d="M232 98 L 222 50" class="freccia" style="stroke:#c2185b" marker-end="url(#mMag)"/>
+    <path d="M330 98 Q 320 70 280 45" class="freccia" style="stroke:#1e9e4a" marker-end="url(#mVer)"/>
+    <defs>
+      <marker id="mGrigio" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+      <marker id="mMag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c2185b"/></marker>
+      <marker id="mVer" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1e9e4a"/></marker>
+    </defs>
+    <text x="120" y="117" text-anchor="middle" font-size="14" fill="#555">nome della funzione</text>
+    <text x="235" y="114" text-anchor="middle" font-size="14" fill="#c2185b">dominio</text>
+    <text x="345" y="114" text-anchor="middle" font-size="14" fill="#1e9e4a">codominio</text>
+  </svg>
+  <p>Per l'esempio: <span class="mr"><i>f</i> : <i>A</i> → <i>B</i>, &nbsp; <i>f</i>(2) = 1, &nbsp; <i>f</i>(5) = 1, &nbsp; <i>f</i>(8) = 2, &nbsp; <i>f</i>(9) = 2.</span></p>
+  <p>Il nome di una funzione si indica con lettere minuscole corsive: si preferisce <span class="m">f</span>, ma si usano anche <span class="m">g</span>, <span class="m">h</span>, …</p>
+</section>
+
+<!-- 4. LABORATORIO -->
+<section id="laboratorio">
+  <h2>4. Laboratorio: costruisci una relazione</h2>
+  <p class="istr">Clicca un elemento di <span class="c-dom">A</span> (si colora di arancione), poi clicca un elemento di <span class="c-cod">B</span>: la freccia viene aggiunta. Ripetendo lo stesso clic la freccia viene tolta. Il programma ti dice se hai costruito una funzione.</p>
+  <div class="insiemi">
+    <label><span class="c-dom">A</span> = { <input id="inA" type="text" value="2, 5, 8, 9"> }</label>
+    <label><span class="c-cod">B</span> = { <input id="inB" type="text" value="1, 2, 3"> }</label>
+    <button class="pieno" id="btApplica">Usa questi insiemi</button>
+    <label>oppure scegli:
+      <select id="selInsiemi">
+        <option value="">—</option>
+        <option value="2, 5, 8, 9|1, 2, 3">A = {2, 5, 8, 9}, B = {1, 2, 3}</option>
+        <option value="1, 2, 3|1, 2, 3, 4">A = {1, 2, 3}, B = {1, 2, 3, 4}</option>
+        <option value="1, 2, 3|1, 2, 3">A = {1, 2, 3}, B = {1, 2, 3}</option>
+        <option value="1, 2, 3, 4|a, b, c">A = {1, 2, 3, 4}, B = {a, b, c}</option>
+      </select>
+    </label>
+  </div>
+  <p class="istr" style="margin:4px 0 8px">Scrivi gli elementi separati da virgole (numeri o lettere, al massimo 7 per insieme), poi premi «Usa questi insiemi».</p>
+  <div id="inErrore" class="errore-in"></div>
+  <div>
+    <button id="btEsempio">Esempio della dispensa</button>
+    <button id="btSenza">Elemento senza freccia</button>
+    <button id="btDoppia">Elemento con due frecce</button>
+    <button id="btSvuota">Cancella tutto</button>
+  </div>
+  <div class="due" style="margin-top:10px">
+    <div><svg id="svgLab"></svg></div>
+    <div><svg id="svgPiano"></svg>
+      <p class="istr" style="text-align:center">○ coppie di <span class="m">A</span> × <span class="m">B</span> &nbsp; <span style="color:var(--blu)">●</span> coppie scelte</p>
+    </div>
+  </div>
+  <div class="pannello">
+    <div><b>Coppie scelte:</b> <span id="labCoppie" class="mr"></span></div>
+    <div id="labVerdetto" class="verdetto neutro"></div>
+    <div id="labDettagli"></div>
+  </div>
+</section>
+
+<!-- 5. GRAFICO -->
+<section id="grafico">
+  <h2>5. Il grafico di una funzione</h2>
+  <p>L'insieme delle coppie scelte da una funzione si chiama <b>grafico</b> della funzione e si indica con <span class="m">G<sub>f</sub></span>. È un sottoinsieme di <span class="m">A</span> × <span class="m">B</span>:</p>
+  <div class="formula">G<sub>f</sub> = {(2,1), (5,1), (8,2), (9,2)} ⊆ A × B</div>
+  <p>Le coppie si possono disegnare come punti nel piano cartesiano: sull'asse <span class="m">x</span> gli elementi del dominio, sull'asse <span class="m">y</span> quelli del codominio.</p>
+  <svg id="svgGrafico" style="max-width:520px"></svg>
+  <div class="def">
+    <b class="tit">Il test della retta verticale.</b> Nel piano, «ogni elemento di <span class="m">A</span> ha una e una sola immagine» diventa: <b>su ogni retta verticale che passa per un elemento del dominio c'è uno e un solo punto del grafico</b>.<br>
+    Due punti sulla stessa verticale ⇒ un elemento ha due immagini ⇒ <b>non</b> è una funzione.
+  </div>
+  <p class="istr">Prova nel laboratorio con il pulsante «Elemento con due frecce»: nel piano compare una linea rossa sulla verticale con due punti.</p>
+</section>
+
+<!-- 6. TIPI -->
+<section id="tipi">
+  <h2>6. Funzioni iniettive, suriettive, biiettive</h2>
+  <p>Ora guardiamo il codominio <span class="m">B</span>, cioè <b>quante frecce arrivano</b> in ogni elemento.</p>
+  <div class="tre">
+    <div><svg id="svgIni"></svg><div class="cap">iniettiva</div><div class="sub">elementi diversi hanno immagini diverse: in ogni elemento di <i>B</i> arriva <b>al massimo una</b> freccia</div></div>
+    <div><svg id="svgSur"></svg><div class="cap">suriettiva</div><div class="sub">ogni elemento di <i>B</i> è raggiunto da <b>almeno una</b> freccia: l'insieme immagine è tutto <i>B</i></div></div>
+    <div><svg id="svgBii"></svg><div class="cap">biiettiva</div><div class="sub">sia iniettiva sia suriettiva: in ogni elemento di <i>B</i> arriva <b>esattamente una</b> freccia</div></div>
+  </div>
+  <div class="attenzione" style="margin-top:18px">
+    <b>Riassunto con le frecce</b>
+    <table>
+      <tr><th></th><th>frecce che partono da ogni elemento di <i>A</i></th><th>frecce che arrivano in ogni elemento di <i>B</i></th></tr>
+      <tr><td><b>funzione</b></td><td>esattamente 1</td><td>qualsiasi numero</td></tr>
+      <tr><td><b>iniettiva</b></td><td>esattamente 1</td><td>0 oppure 1</td></tr>
+      <tr><td><b>suriettiva</b></td><td>esattamente 1</td><td>almeno 1</td></tr>
+      <tr><td><b>biiettiva</b></td><td>esattamente 1</td><td>esattamente 1</td></tr>
+    </table>
+  </div>
+  <p>La funzione dell'esempio (<span class="m">f</span>(2) = 1, <span class="m">f</span>(5) = 1, <span class="m">f</span>(8) = 2, <span class="m">f</span>(9) = 2) <b>non è iniettiva</b> (2 e 5 hanno la stessa immagine) e <b>non è suriettiva</b> (3 non viene raggiunto).</p>
+</section>
+
+<!-- 7. VITA REALE -->
+<section id="vita">
+  <h2>7. Funzioni nella vita di tutti i giorni</h2>
+  <table>
+    <tr><th>Da… a…</th><th>Associo…</th><th>Funzione?</th><th>Perché</th></tr>
+    <tr><td>persone → codici</td><td>a ogni persona il suo codice fiscale</td><td class="si-t">sì</td><td>ognuno ha uno e un solo codice fiscale (ed è anche iniettiva: persone diverse hanno codici diversi)</td></tr>
+    <tr><td>prodotti → prezzi</td><td>a ogni prodotto di un negozio il suo prezzo</td><td class="si-t">sì</td><td>ogni prodotto ha un solo prezzo; prodotti diversi possono costare uguale</td></tr>
+    <tr><td>comuni → province</td><td>a ogni comune italiano la sua provincia</td><td class="si-t">sì</td><td>ogni comune sta in una sola provincia</td></tr>
+    <tr><td>persone → numeri di telefono</td><td>a ogni persona il suo numero</td><td class="no-t">no</td><td>c'è chi ha due numeri e chi non ne ha nessuno</td></tr>
+    <tr><td>genitori → figli</td><td>a ogni genitore i suoi figli</td><td class="no-t">no</td><td>un genitore può avere più figli</td></tr>
+    <tr><td>numeri → numeri</td><td>a ogni numero <span class="m">x</span> il suo quadrato <span class="m">x</span>²</td><td class="si-t">sì</td><td>il quadrato di un numero è unico (ma non è iniettiva: 3² = (−3)² = 9)</td></tr>
+  </table>
+</section>
+
+<!-- 8. QUIZ -->
+<section id="quiz">
+  <h2>8. Quiz: mettiti alla prova</h2>
+  <div class="quizbox">
+    <div class="qnum" id="qNum"></div>
+    <div class="barra"><div id="qBarra" style="width:0%"></div></div>
+    <div class="qtesto" id="qTesto"></div>
+    <svg id="qSvg" style="max-width:380px"></svg>
+    <div class="opzioni" id="qOpzioni"></div>
+    <div id="qSpiega"></div>
+    <div style="margin-top:10px"><button class="pieno" id="qAvanti" disabled>Avanti →</button></div>
+  </div>
+</section>
+
+</main>
+<footer>Corso serale — Matematica · Introduzione al concetto di funzione</footer>
+
+<script>
+var NS = "http://www.w3.org/2000/svg";
+var uid = 0;
+
+function el(tag, attrs, parent) {
+  var e = document.createElementNS(NS, tag);
+  for (var k in attrs) { e.setAttribute(k, attrs[k]); }
+  if (parent) { parent.appendChild(e); }
+  return e;
+}
+function txt(s, attrs, parent) {
+  var t = el("text", attrs, parent);
+  t.textContent = s;
+  return t;
+}
+
+/* Diagramma a frecce generico.
+   A, B: array di etichette; pairs: array di [i, j] (indici).
+   o: { nomi:bool, img:bool, errori:bool, sel:indice, click:fn, labelDom:bool } */
+function drawDiagram(svg, A, B, pairs, o) {
+  o = o || {};
+  while (svg.firstChild) { svg.removeChild(svg.firstChild); }
+  var n = Math.max(A.length, B.length);
+  var top = o.labelDom ? 30 : 30;
+  var bottom = o.labelDom ? 40 : 10;
+  var H = top + bottom + 30 + 44 * n;
+  var W = 440;
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  var id = "mk" + (uid++);
+  var defs = el("defs", {}, svg);
+  var mk = el("marker", {id: id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto"}, defs);
+  el("path", {d: "M0,0 L10,5 L0,10 z", style: "fill:#1a5fa8"}, mk);
+  var mkR = el("marker", {id: id + "r", viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto"}, defs);
+  el("path", {d: "M0,0 L10,5 L0,10 z", style: "fill:#c62828"}, mkR);
+
+  var ry = (H - top - bottom) / 2 - 4;
+  var cy = top + ry + 4;
+  var xA = 110, xB = 330;
+  el("ellipse", {cx: xA, cy: cy, rx: 64, ry: ry, "class": "setA"}, svg);
+  el("ellipse", {cx: xB, cy: cy, rx: 64, ry: ry, "class": "setB"}, svg);
+  txt("A", {x: 40, y: 24, "class": "nomeA"}, svg);
+  txt("B", {x: 392, y: 24, "class": "nomeB"}, svg);
+  if (o.labelDom) {
+    txt("dominio", {x: xA, y: H - 10, "text-anchor": "middle", style: "fill:#c2185b;font-size:15px"}, svg);
+    txt("codominio", {x: xB, y: H - 10, "text-anchor": "middle", style: "fill:#1e9e4a;font-size:15px"}, svg);
+  }
+  function posA(i) { return {x: xA + 12, y: cy - ry + (i + 1) * (2 * ry) / (A.length + 1)}; }
+  function posB(j) { return {x: xB - 12, y: cy - ry + (j + 1) * (2 * ry) / (B.length + 1)}; }
+
+  var outCount = A.map(function () { return 0; });
+  var inCount = B.map(function () { return 0; });
+  pairs.forEach(function (p) { outCount[p[0]]++; inCount[p[1]]++; });
+
+  // aloni
+  if (o.img) {
+    B.forEach(function (b, j) { if (inCount[j] > 0) { var q = posB(j); el("circle", {cx: q.x, cy: q.y, r: 13, "class": "halo-img"}, svg); } });
+  }
+  A.forEach(function (a, i) {
+    var p = posA(i);
+    if (o.sel === i) { el("circle", {cx: p.x, cy: p.y, r: 13, "class": "halo-sel"}, svg); }
+    else if (o.errori && outCount[i] === 0) { el("circle", {cx: p.x, cy: p.y, r: 13, "class": "halo-miss"}, svg); }
+  });
+
+  // frecce
+  pairs.forEach(function (pr) {
+    var p = posA(pr[0]), q = posB(pr[1]);
+    var x1 = p.x + 6, y1 = p.y, x2 = q.x - 8, y2 = q.y;
+    var cx = (x1 + x2) / 2, ccy = (y1 + y2) / 2 - 22;
+    var bad = o.errori && outCount[pr[0]] > 1;
+    el("path", {d: "M" + x1 + "," + y1 + " Q" + cx + "," + ccy + " " + x2 + "," + y2,
+      "class": "freccia" + (bad ? " err" : ""), "marker-end": "url(#" + (bad ? id + "r" : id) + ")"}, svg);
+  });
+
+  // punti ed etichette
+  A.forEach(function (a, i) {
+    var p = posA(i);
+    el("circle", {cx: p.x, cy: p.y, r: 3.5, "class": "punto"}, svg);
+    txt(String(a), {x: p.x - 20, y: p.y + 6, "text-anchor": "end", "class": "etich"}, svg);
+    if (o.click) {
+      var h = el("circle", {cx: p.x - 10, cy: p.y, r: 18, "class": "hit"}, svg);
+      h.addEventListener("click", function () { o.click("A", i); });
+    }
+  });
+  B.forEach(function (b, j) {
+    var q = posB(j);
+    el("circle", {cx: q.x, cy: q.y, r: 3.5, "class": "punto"}, svg);
+    txt(String(b), {x: q.x + 14, y: q.y + 6, "class": "etich"}, svg);
+    if (o.click) {
+      var h = el("circle", {cx: q.x + 10, cy: q.y, r: 18, "class": "hit"}, svg);
+      h.addEventListener("click", function () { o.click("B", j); });
+    }
+  });
+}
+
+/* Piano cartesiano con A x B (indici) */
+function drawPiano(svg, A, B, pairs, o) {
+  o = o || {};
+  while (svg.firstChild) { svg.removeChild(svg.firstChild); }
+  var W = 440, H = 300, ox = 50, oy = 255;
+  var numerico = o.numerico;
+  var xmax = numerico ? Math.max.apply(null, A) + 1 : A.length + 1;
+  var ymax = numerico ? Math.max.apply(null, B) + 1 : B.length + 1;
+  var sx = (W - ox - 30) / xmax, sy = (oy - 25) / ymax;
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  function X(i) { return ox + (numerico ? A[i] : i + 1) * sx; }
+  function Y(j) { return oy - (numerico ? B[j] : j + 1) * sy; }
+  var id = "ax" + (uid++);
+  var defs = el("defs", {}, svg);
+  var mk = el("marker", {id: id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto"}, defs);
+  el("path", {d: "M0,0 L10,5 L0,10 z", style: "fill:#333"}, mk);
+  el("line", {x1: ox - 10, y1: oy, x2: W - 10, y2: oy, style: "stroke:#333;stroke-width:1.3", "marker-end": "url(#" + id + ")"}, svg);
+  el("line", {x1: ox, y1: oy + 10, x2: ox, y2: 10, style: "stroke:#333;stroke-width:1.3", "marker-end": "url(#" + id + ")"}, svg);
+  txt("x", {x: W - 14, y: oy + 22, style: "font-style:italic;font-size:16px;font-family:serif"}, svg);
+  txt("y", {x: ox - 22, y: 20, style: "font-style:italic;font-size:16px;font-family:serif"}, svg);
+  txt("O", {x: ox - 16, y: oy + 18, style: "font-style:italic;font-size:15px;font-family:serif"}, svg);
+
+  var count = A.map(function () { return 0; });
+  pairs.forEach(function (p) { count[p[0]]++; });
+
+  // verticali di controllo
+  A.forEach(function (a, i) {
+    var col = count[i] > 1 ? "#c62828" : (count[i] === 0 && o.errori ? "#e67e22" : "#d6dae0");
+    var w = count[i] > 1 || (count[i] === 0 && o.errori) ? 2 : 1;
+    el("line", {x1: X(i), y1: oy, x2: X(i), y2: 25, style: "stroke:" + col + ";stroke-width:" + w + ";stroke-dasharray:4 4"}, svg);
+    txt(String(a), {x: X(i), y: oy + 20, "text-anchor": "middle", style: "fill:#c2185b;font-size:15px"}, svg);
+  });
+  B.forEach(function (b, j) {
+    txt(String(b), {x: ox - 10, y: Y(j) + 5, "text-anchor": "end", style: "fill:#1e9e4a;font-size:15px"}, svg);
+  });
+  // tutte le coppie
+  A.forEach(function (a, i) {
+    B.forEach(function (b, j) {
+      el("circle", {cx: X(i), cy: Y(j), r: 4.5, style: "fill:#fff;stroke:#9aa3ad;stroke-width:1.2"}, svg);
+    });
+  });
+  pairs.forEach(function (p) {
+    el("circle", {cx: X(p[0]), cy: Y(p[1]), r: 6, style: "fill:#1a5fa8"}, svg);
+    if (o.etichette) {
+      txt("(" + A[p[0]] + ", " + B[p[1]] + ")", {x: X(p[0]) - 6, y: Y(p[1]) - 11, "text-anchor": "middle", style: "fill:#1a5fa8;font-size:13px"}, svg);
+    }
+  });
+}
+
+/* Analisi di una relazione */
+function analizza(A, B, pairs) {
+  var imm = A.map(function () { return []; });
+  var inCount = B.map(function () { return 0; });
+  pairs.forEach(function (p) { imm[p[0]].push(p[1]); inCount[p[1]]++; });
+  var mancanti = [], multipli = [];
+  imm.forEach(function (l, i) { if (l.length === 0) { mancanti.push(i); } if (l.length > 1) { multipli.push(i); } });
+  var funz = mancanti.length === 0 && multipli.length === 0;
+  var iniettiva = funz && inCount.every(function (c) { return c <= 1; });
+  var suriettiva = funz && inCount.every(function (c) { return c >= 1; });
+  return {imm: imm, inCount: inCount, mancanti: mancanti, multipli: multipli, funz: funz, iniettiva: iniettiva, suriettiva: suriettiva};
+}
+
+/* ---------- figure statiche ---------- */
+var A0 = [2, 5, 8, 9], B0 = [1, 2, 3];
+drawDiagram(document.getElementById("svgRel1"), A0, B0, [[0, 0], [1, 0], [1, 2], [3, 1]], {});
+drawDiagram(document.getElementById("svgRel2"), A0, B0, [[0, 0], [1, 0], [2, 1], [3, 1]], {});
+drawDiagram(document.getElementById("svgNomi"), A0, B0, [[0, 0], [1, 0], [2, 1], [3, 1]], {img: true, labelDom: true});
+drawPiano(document.getElementById("svgGrafico"), A0, B0, [[0, 0], [1, 0], [2, 1], [3, 1]], {numerico: true, etichette: true});
+drawDiagram(document.getElementById("svgIni"), [1, 2, 3], ["a", "b", "c", "d"], [[0, 0], [1, 1], [2, 2]], {});
+drawDiagram(document.getElementById("svgSur"), [1, 2, 3, 4], ["a", "b", "c"], [[0, 0], [1, 1], [2, 2], [3, 2]], {});
+drawDiagram(document.getElementById("svgBii"), [1, 2, 3], ["a", "b", "c"], [[0, 0], [1, 1], [2, 2]], {});
+
+/* ---------- laboratorio ---------- */
+var lab = {A: [2, 5, 8, 9], B: [1, 2, 3], pairs: [], sel: null};
+
+function leggiInsieme(testo, nome) {
+  var el = testo.split(/[,;]/).map(function (x) { return x.trim(); }).filter(function (x) { return x !== ""; });
+  if (el.length === 0) { return {err: "L'insieme " + nome + " è vuoto: scrivi almeno un elemento."}; }
+  if (el.length > 7) { return {err: "L'insieme " + nome + " ha " + el.length + " elementi: il massimo è 7."}; }
+  var visti = {};
+  for (var i = 0; i < el.length; i++) {
+    if (el[i].length > 6) { return {err: "L'elemento \"" + el[i] + "\" di " + nome + " è troppo lungo (massimo 6 caratteri)."}; }
+    if (visti[el[i]]) { return {err: "In " + nome + " l'elemento " + el[i] + " è scritto due volte: in un insieme ogni elemento compare una sola volta."}; }
+    visti[el[i]] = true;
+  }
+  return {el: el};
+}
+
+function applicaInsiemi() {
+  var a = leggiInsieme(document.getElementById("inA").value, "A");
+  var b = leggiInsieme(document.getElementById("inB").value, "B");
+  var box = document.getElementById("inErrore");
+  if (a.err || b.err) { box.textContent = a.err || b.err; return; }
+  box.textContent = "";
+  lab.A = a.el; lab.B = b.el; lab.pairs = []; lab.sel = null;
+  aggiornaLab();
+}
+
+function preset(tipo) {
+  var c = lab;
+  var nA = c.A.length, nB = c.B.length;
+  if (tipo === "esempio") {
+    if (c.A.join(",") === "2,5,8,9" && c.B.join(",") === "1,2,3") { lab.pairs = [[0, 0], [1, 0], [2, 1], [3, 1]]; }
+    else { lab.pairs = []; for (var i = 0; i < nA; i++) { lab.pairs.push([i, i % nB]); } }
+  } else if (tipo === "senza") {
+    lab.pairs = [];
+    for (var k = 0; k < nA - 1; k++) { lab.pairs.push([k, k % nB]); }
+  } else if (tipo === "doppia") {
+    lab.pairs = [];
+    for (var m = 0; m < nA; m++) { lab.pairs.push([m, m % nB]); }
+    if (nB > 1) { lab.pairs.push([nA > 1 ? 1 : 0, ((nA > 1 ? 1 : 0) + 1) % nB]); }
+  } else {
+    lab.pairs = [];
+  }
+  lab.sel = null;
+  aggiornaLab();
+}
+
+function clickLab(lato, idx) {
+  if (lato === "A") {
+    lab.sel = (lab.sel === idx) ? null : idx;
+  } else if (lab.sel !== null) {
+    var pos = -1;
+    lab.pairs.forEach(function (p, k) { if (p[0] === lab.sel && p[1] === idx) { pos = k; } });
+    if (pos >= 0) { lab.pairs.splice(pos, 1); } else { lab.pairs.push([lab.sel, idx]); }
+    lab.pairs.sort(function (u, v) { return u[0] - v[0] || u[1] - v[1]; });
+  }
+  aggiornaLab();
+}
+
+function aggiornaLab() {
+  var c = lab;
+  drawDiagram(document.getElementById("svgLab"), c.A, c.B, lab.pairs, {sel: lab.sel, errori: true, img: false, click: clickLab});
+  drawPiano(document.getElementById("svgPiano"), c.A, c.B, lab.pairs, {errori: true, numerico: false});
+  document.getElementById("labCoppie").textContent = lab.pairs.length === 0 ? "nessuna" :
+    "{" + lab.pairs.map(function (p) { return "(" + c.A[p[0]] + ", " + c.B[p[1]] + ")"; }).join(", ") + "}";
+  var r = analizza(c.A, c.B, lab.pairs);
+  var v = document.getElementById("labVerdetto");
+  var d = document.getElementById("labDettagli");
+  if (lab.pairs.length === 0) {
+    v.className = "verdetto neutro";
+    v.textContent = "Aggiungi qualche freccia per cominciare.";
+    d.innerHTML = "";
+    return;
+  }
+  if (r.funz) {
+    v.className = "verdetto si";
+    v.textContent = "✔ È una funzione: da ogni elemento di A parte una e una sola freccia.";
+    var righe = c.A.map(function (a, i) { return "<i>f</i>(" + a + ") = " + c.B[r.imm[i][0]]; }).join(", &nbsp; ");
+    var img = [];
+    c.B.forEach(function (b, j) { if (r.inCount[j] > 0) { img.push(b); } });
+    var tipo;
+    if (r.iniettiva && r.suriettiva) { tipo = "<b>biiettiva</b> (iniettiva e suriettiva)"; }
+    else if (r.iniettiva) { tipo = "<b>iniettiva</b> ma non suriettiva"; }
+    else if (r.suriettiva) { tipo = "<b>suriettiva</b> ma non iniettiva"; }
+    else { tipo = "<b>né iniettiva né suriettiva</b>"; }
+    var extra = "";
+    if (c.A.length > c.B.length) { extra = "<li>Qui A ha più elementi di B: due elementi dovranno per forza avere la stessa immagine, quindi nessuna funzione può essere iniettiva.</li>"; }
+    if (c.A.length < c.B.length) { extra = "<li>Qui A ha meno elementi di B: qualche elemento di B resterà sempre scoperto, quindi nessuna funzione può essere suriettiva.</li>"; }
+    d.innerHTML = "<ul class=\"motivi\"><li class=\"mr\">" + righe + "</li>" +
+      "<li>Insieme immagine: {" + img.join(", ") + "}</li>" +
+      "<li>La funzione è " + tipo + ".</li>" + extra + "</ul>";
+  } else {
+    v.className = "verdetto no";
+    v.textContent = "✘ Non è una funzione.";
+    var mot = [];
+    r.mancanti.forEach(function (i) { mot.push("Da <b>" + c.A[i] + "</b> non parte nessuna freccia: " + c.A[i] + " non ha immagine (cerchio arancione)."); });
+    r.multipli.forEach(function (i) {
+      var dest = r.imm[i].map(function (j) { return c.B[j]; }).join(" e ");
+      mot.push("Da <b>" + c.A[i] + "</b> partono " + r.imm[i].length + " frecce (verso " + dest + "): " + c.A[i] + " avrebbe più di un'immagine (frecce rosse; nel piano, due punti sulla stessa verticale).");
+    });
+    d.innerHTML = "<ul class=\"motivi\">" + mot.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ul>";
+  }
+}
+
+document.getElementById("selInsiemi").addEventListener("change", function () {
+  if (!this.value) { return; }
+  var parti = this.value.split("|");
+  document.getElementById("inA").value = parti[0];
+  document.getElementById("inB").value = parti[1];
+  applicaInsiemi();
+  this.value = "";
+});
+document.getElementById("btApplica").addEventListener("click", applicaInsiemi);
+["inA", "inB"].forEach(function (id) {
+  document.getElementById(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { applicaInsiemi(); } });
+});
+document.getElementById("btEsempio").addEventListener("click", function () { preset("esempio"); });
+document.getElementById("btSenza").addEventListener("click", function () { preset("senza"); });
+document.getElementById("btDoppia").addEventListener("click", function () { preset("doppia"); });
+document.getElementById("btSvuota").addEventListener("click", function () { preset("vuoto"); });
+preset("esempio");
+
+/* ---------- quiz ---------- */
+var SN = ["È una funzione", "Non è una funzione"];
+var TIPI = ["Solo iniettiva", "Solo suriettiva", "Biiettiva", "Né iniettiva né suriettiva"];
+var domande = [
+  {t: "La relazione disegnata è una funzione da A a B?", A: [1, 2, 3], B: ["a", "b", "c"], p: [[0, 0], [1, 1], [2, 1]], o: SN, g: 0,
+   s: "Da ogni elemento di A parte una sola freccia. Che in b arrivino due frecce e in c nessuna non conta: la regola riguarda solo A."},
+  {t: "La relazione disegnata è una funzione da A a B?", A: [1, 2, 3], B: ["a", "b", "c"], p: [[0, 0], [0, 1], [1, 2], [2, 2]], o: SN, g: 1,
+   s: "Da 1 partono due frecce (verso a e verso b): l'elemento 1 avrebbe due immagini."},
+  {t: "La relazione disegnata è una funzione da A a B?", A: [1, 2, 3], B: ["a", "b"], p: [[0, 0], [1, 0]], o: SN, g: 1,
+   s: "Da 3 non parte nessuna freccia: 3 non ha immagine. Ogni elemento del dominio deve averne una."},
+  {t: "La relazione disegnata è una funzione da A a B?", A: [1, 2, 3], B: ["a", "b", "c"], p: [[0, 2], [1, 2], [2, 2]], o: SN, g: 0,
+   s: "Sì: tutti gli elementi di A vanno in c, ciascuno con una sola freccia. Si chiama funzione costante."},
+  {t: "A = {1, 2, 3}, B = {4, 5, 6}. La relazione R = {(1, 4), (2, 5), (3, 4)} è una funzione da A a B?", o: SN, g: 0,
+   s: "Ogni elemento di A compare una e una sola volta come primo elemento di una coppia: f(1) = 4, f(2) = 5, f(3) = 4."},
+  {t: "A = {1, 2, 3}, B = {4, 5, 6}. La relazione R = {(1, 4), (2, 5), (2, 6), (3, 6)} è una funzione da A a B?", o: SN, g: 1,
+   s: "Il 2 compare due volte come primo elemento, (2, 5) e (2, 6): avrebbe due immagini."},
+  {t: "A = studenti della classe, B = i 12 mesi. A ogni studente associo il mese in cui è nato. È una funzione?", o: SN, g: 0,
+   s: "Ogni studente è nato in uno e un solo mese. Che più studenti siano nati nello stesso mese non conta."},
+  {t: "A = i 12 mesi, B = studenti della classe. A ogni mese associo gli studenti nati in quel mese. È una funzione?", o: SN, g: 1,
+   s: "In un mese possono essere nati più studenti, oppure nessuno: non sempre c'è una e una sola immagine."},
+  {t: "Nel piano cartesiano due punti del grafico stanno sulla stessa retta verticale x = 4. Può essere il grafico di una funzione?", o: ["Sì", "No"], g: 1,
+   s: "Due punti sulla stessa verticale significano due coppie (4, y₁) e (4, y₂): il 4 avrebbe due immagini."},
+  {t: "Questa funzione è…", A: [1, 2, 3], B: ["a", "b", "c"], p: [[0, 1], [1, 2], [2, 0]], o: TIPI, g: 2,
+   s: "In ogni elemento di B arriva esattamente una freccia: è iniettiva e suriettiva, quindi biiettiva."},
+  {t: "Questa funzione è…", A: [1, 2, 3], B: ["a", "b"], p: [[0, 0], [1, 0], [2, 1]], o: TIPI, g: 1,
+   s: "Tutti gli elementi di B sono raggiunti (suriettiva), ma in a arrivano due frecce (non iniettiva)."},
+  {t: "Questa funzione è…", A: [1, 2], B: ["a", "b", "c"], p: [[0, 0], [1, 2]], o: TIPI, g: 0,
+   s: "Elementi diversi hanno immagini diverse (iniettiva), ma b non è raggiunto (non suriettiva)."},
+  {t: "Questa funzione è…", A: [1, 2, 3], B: ["a", "b"], p: [[0, 0], [1, 0], [2, 0]], o: TIPI, g: 3,
+   s: "In a arrivano tre frecce (non iniettiva) e b non è raggiunto (non suriettiva)."}
+];
+var qi = 0, punti = 0;
+
+function mostraDomanda() {
+  var q = domande[qi];
+  document.getElementById("qNum").textContent = "Domanda " + (qi + 1) + " di " + domande.length + " · punteggio: " + punti;
+  document.getElementById("qBarra").style.width = (100 * qi / domande.length) + "%";
+  document.getElementById("qTesto").textContent = q.t;
+  var svg = document.getElementById("qSvg");
+  if (q.A) { svg.style.display = "block"; drawDiagram(svg, q.A, q.B, q.p, {}); }
+  else { svg.style.display = "none"; while (svg.firstChild) { svg.removeChild(svg.firstChild); } }
+  var box = document.getElementById("qOpzioni");
+  box.innerHTML = "";
+  document.getElementById("qSpiega").innerHTML = "";
+  var av = document.getElementById("qAvanti");
+  av.disabled = true;
+  av.textContent = qi === domande.length - 1 ? "Vedi il risultato" : "Avanti →";
+  q.o.forEach(function (op, k) {
+    var b = document.createElement("button");
+    b.textContent = op;
+    b.addEventListener("click", function () { rispondi(k); });
+    box.appendChild(b);
+  });
+}
+
+function rispondi(k) {
+  var q = domande[qi];
+  var bott = document.getElementById("qOpzioni").querySelectorAll("button");
+  bott.forEach(function (b, i) {
+    b.disabled = true;
+    if (i === q.g) { b.className = "giusta"; }
+    else if (i === k) { b.className = "sbagliata"; }
+  });
+  var giusto = k === q.g;
+  if (giusto) { punti++; }
+  document.getElementById("qSpiega").innerHTML = "<div class=\"spiega\"><b>" + (giusto ? "✔ Esatto!" : "✘ Non proprio.") + "</b> " + q.s + "</div>";
+  document.getElementById("qNum").textContent = "Domanda " + (qi + 1) + " di " + domande.length + " · punteggio: " + punti;
+  document.getElementById("qAvanti").disabled = false;
+}
+
+var finito = false;
+document.getElementById("qAvanti").addEventListener("click", function () {
+  if (finito) { finito = false; qi = 0; punti = 0; mostraDomanda(); }
+  else if (qi < domande.length - 1) { qi++; mostraDomanda(); }
+  else { fine(); }
+});
+
+function fine() {
+  document.getElementById("qBarra").style.width = "100%";
+  document.getElementById("qNum").textContent = "Quiz completato";
+  var perc = Math.round(100 * punti / domande.length);
+  var msg = perc >= 85 ? "Ottimo lavoro!" : (perc >= 60 ? "Buon risultato: rivedi le domande sbagliate." : "Rileggi le sezioni 2 e 6 e riprova.");
+  document.getElementById("qTesto").textContent = "Hai risposto correttamente a " + punti + " domande su " + domande.length + " (" + perc + "%). " + msg;
+  var svg = document.getElementById("qSvg");
+  svg.style.display = "none";
+  document.getElementById("qOpzioni").innerHTML = "";
+  document.getElementById("qSpiega").innerHTML = "";
+  var av = document.getElementById("qAvanti");
+  av.disabled = false;
+  av.textContent = "Ricomincia";
+  finito = true;
+}
+mostraDomanda();
+</script>
+</body>
+</html>
