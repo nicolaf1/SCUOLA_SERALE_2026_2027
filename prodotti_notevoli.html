@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prodotti notevoli</title>
+<style>
+:root{
+  --bg:#f8f6f1; --card:#ffffff; --fg:#1d2330; --muted:#5f6878; --line:#e2ded4;
+  --ca:#2f66d0;  /* a²  */
+  --cb:#e0821f;  /* b²  */
+  --cab:#23996a; /* ab  */
+  --cc:#8a4fd0;  /* c²  */
+  --cac:#13939f; /* ac  */
+  --cbc:#d1487a; /* bc  */
+  --accent:#2f66d0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --card:#1d2129; --fg:#e8eaf0; --muted:#9aa3b2; --line:#2f3542;
+    --ca:#6f9bff; --cb:#ffaa55; --cab:#4fd39b; --cc:#b88bff; --cac:#4cc9d3; --cbc:#ff7aa8; --accent:#6f9bff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --card:#1d2129; --fg:#e8eaf0; --muted:#9aa3b2; --line:#2f3542;
+  --ca:#6f9bff; --cb:#ffaa55; --cab:#4fd39b; --cc:#b88bff; --cac:#4cc9d3; --cbc:#ff7aa8; --accent:#6f9bff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 60px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:2rem;margin:.2em 0 .1em}
+h2{font-family:Georgia,"Times New Roman",serif;font-size:1.4rem;margin:0 0 .4em}
+h3{font-size:1.02rem;margin:1.2em 0 .3em}
+.sub{color:var(--muted);margin:0 0 18px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px}
+nav a{font-size:.85rem;text-decoration:none;color:var(--fg);border:1px solid var(--line);background:var(--card);padding:5px 11px;border-radius:999px}
+nav a:hover{border-color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px;margin:0 0 22px}
+.num{display:inline-block;color:var(--muted);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.formula{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:1.45rem;text-align:center;padding:12px 8px;margin:6px 0 12px;border-radius:10px;background:color-mix(in srgb,var(--accent) 7%,transparent);overflow-x:auto;white-space:nowrap}
+.m{font-family:"Cambria Math","STIX Two Math",Georgia,serif}
+i{font-family:"Cambria Math",Georgia,serif}
+.ta{color:var(--ca);font-weight:600}.tb{color:var(--cb);font-weight:600}.tab{color:var(--cab);font-weight:600}
+.tc{color:var(--cc);font-weight:600}.tac{color:var(--cac);font-weight:600}.tbc{color:var(--cbc);font-weight:600}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+svg.fig{width:100%;max-width:360px;height:auto;display:block;margin:0 auto}
+.controls{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.controls label{display:flex;align-items:center;gap:10px;font-size:.95rem}
+.controls label span.v{min-width:2.2em;font-weight:700;font-variant-numeric:tabular-nums}
+input[type=range]{flex:1;accent-color:var(--accent)}
+.readout{font-family:"Cambria Math",Georgia,serif;font-size:1.05rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;line-height:1.8;overflow-x:auto}
+button{font:inherit;font-size:.95rem;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:7px 14px;cursor:pointer}
+button:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.note{font-size:.92rem;color:var(--muted)}
+.box{border-left:4px solid var(--accent);padding:6px 12px;margin:10px 0;background:color-mix(in srgb,var(--accent) 5%,transparent);border-radius:0 8px 8px 0}
+.warn{border-left-color:#d44;background:color-mix(in srgb,#d44 7%,transparent)}
+table{border-collapse:collapse;margin:8px auto;font-family:"Cambria Math",Georgia,serif}
+td,th{border:1px solid var(--line);padding:6px 10px;text-align:center}
+th{background:var(--bg);font-weight:600}
+.strike{text-decoration:line-through;opacity:.55}
+details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:var(--bg)}
+summary{cursor:pointer;font-family:"Cambria Math",Georgia,serif;font-size:1.05rem}
+details p{margin:.5em 0 .2em}
+.tri{text-align:center;font-family:"Cambria Math",Georgia,serif;line-height:1.9;margin:8px 0}
+.tri div span{display:inline-block;min-width:2.1em}
+.tri div.on{color:var(--accent);font-weight:700}
+.tri div.off{opacity:.45}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.9rem;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+ul.tight{margin:.3em 0;padding-left:1.2em}
+/* SVG */
+.p{stroke-width:1.6}
+.ka{fill:var(--ca);fill-opacity:.26;stroke:var(--ca)}
+.kb{fill:var(--cb);fill-opacity:.30;stroke:var(--cb)}
+.kab{fill:var(--cab);fill-opacity:.26;stroke:var(--cab)}
+.kc{fill:var(--cc);fill-opacity:.26;stroke:var(--cc)}
+.kac{fill:var(--cac);fill-opacity:.26;stroke:var(--cac)}
+.kbc{fill:var(--cbc);fill-opacity:.26;stroke:var(--cbc)}
+.kn{fill:var(--muted);fill-opacity:.10;stroke:var(--muted)}
+.ghost{fill:none;stroke:var(--muted);stroke-dasharray:5 4;stroke-width:1.4}
+.dashA{fill:none;stroke:var(--fg);stroke-dasharray:6 4;stroke-width:1.5;opacity:.65}
+.gridl{stroke:var(--fg);stroke-opacity:.13;stroke-width:.7}
+.lbl{fill:var(--fg);font-family:"Cambria Math",Georgia,serif;font-style:italic}
+.dim{stroke:var(--muted);stroke-width:1.1}
+.dimt{fill:var(--muted);font-family:"Cambria Math",Georgia,serif;font-style:italic;font-size:15px}
+.pieceB{transition:transform .9s ease;transform-box:view-box}
+.dimset{transition:opacity .5s}
+@media print{
+  body{background:#fff} section{break-inside:avoid;border-color:#bbb} nav,.controls,button{display:none}
+  details{display:block} details>*{display:block}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Prodotti notevoli</h1>
+<p class="sub">Formule che si <em>vedono</em>: ogni prodotto notevole è un modo di scomporre un'area (o un volume) in pezzi più semplici. Muovi i cursori e controlla che i conti tornino sempre.</p>
+
+<nav>
+  <a href="#s1">(a+b)²</a><a href="#s2">(a−b)²</a><a href="#s3">(a+b)(a−b)</a>
+  <a href="#s4">(a+b)³</a><a href="#s5">(a+b+c)²</a><a href="#s6">Tartaglia</a>
+  <a href="#s7">a³ ± b³</a><a href="#s8">Errori e trucchi</a><a href="#s9">Esercizi</a>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <span class="num">1 · Quadrato di binomio</span>
+  <h2>Il quadrato di una somma</h2>
+  <div class="formula">(<i>a</i> + <i>b</i>)² = <span class="ta"><i>a</i>²</span> + <span class="tab">2<i>ab</i></span> + <span class="tb"><i>b</i>²</span></div>
+  <div class="grid2">
+    <svg id="svg1" class="fig" viewBox="0 0 320 320" role="img" aria-label="Quadrato di lato a+b scomposto"></svg>
+    <div>
+      <p>Un quadrato di lato <i>a</i> + <i>b</i> si divide in <b>quattro pezzi</b>: un quadrato <span class="ta"><i>a</i>²</span>, un quadrato <span class="tb"><i>b</i>²</span> e <b>due</b> rettangoli <span class="tab"><i>a</i>·<i>b</i></span> uguali.</p>
+      <div class="controls">
+        <label><i>a</i> <input type="range" id="s1a" min="1" max="10" value="5"><span class="v" id="s1av"></span></label>
+        <label><i>b</i> <input type="range" id="s1b" min="1" max="10" value="3"><span class="v" id="s1bv"></span></label>
+      </div>
+      <div class="readout" id="r1"></div>
+      <p class="note">I quadretti grigi sono unità: puoi contarli e verificare a mano.</p>
+    </div>
+  </div>
+  <div class="box">Il termine <span class="tab">2<i>ab</i></span> si chiama <b>doppio prodotto</b>: è proprio l'area dei due rettangoli che «mancano» se si scrive, sbagliando, (<i>a</i>+<i>b</i>)² = <i>a</i>² + <i>b</i>².</div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <span class="num">2 · Quadrato di binomio</span>
+  <h2>Il quadrato di una differenza</h2>
+  <div class="formula">(<i>a</i> − <i>b</i>)² = <span class="ta"><i>a</i>²</span> − <span class="tab">2<i>ab</i></span> + <span class="tb"><i>b</i>²</span></div>
+  <div class="grid2">
+    <svg id="svg2" class="fig" viewBox="0 0 320 320" role="img" aria-label="Quadrato di lato a con il quadrato (a-b)² evidenziato"></svg>
+    <div>
+      <p>Partiamo dal quadrato grande <span class="ta"><i>a</i>²</span> e vogliamo tenere solo il quadrato grigio di lato <i>a</i> − <i>b</i>.</p>
+      <ul class="tight">
+        <li>Togliamo due strisce <i>a</i> × <i>b</i> (tratteggiate): −2<i>ab</i>.</li>
+        <li>Ma il quadratino <span class="tb"><i>b</i>²</span> nell'angolo sta in <b>entrambe</b> le strisce: l'abbiamo tolto due volte.</li>
+        <li>Quindi va <b>riaggiunto</b> una volta: + <i>b</i>².</li>
+      </ul>
+      <div class="controls">
+        <label><i>a</i> <input type="range" id="s2a" min="2" max="10" value="7"><span class="v" id="s2av"></span></label>
+        <label><i>b</i> <input type="range" id="s2b" min="1" max="9" value="2"><span class="v" id="s2bv"></span></label>
+      </div>
+      <div class="readout" id="r2"></div>
+    </div>
+  </div>
+  <div class="box">Algebricamente non serve una formula nuova: (<i>a</i> − <i>b</i>)² = (<i>a</i> + (−<i>b</i>))², e il doppio prodotto 2·<i>a</i>·(−<i>b</i>) è negativo, mentre (−<i>b</i>)² = <i>b</i>² resta positivo.</div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <span class="num">3 · Somma per differenza</span>
+  <h2>Differenza di quadrati</h2>
+  <div class="formula">(<i>a</i> + <i>b</i>)(<i>a</i> − <i>b</i>) = <span class="ta"><i>a</i>²</span> − <span class="tb"><i>b</i>²</span></div>
+  <div class="grid2">
+    <svg id="svg3" class="fig" viewBox="0 0 340 270" role="img" aria-label="Quadrato a² meno b² ricomposto in rettangolo"></svg>
+    <div>
+      <p>Togliamo dal quadrato <i>a</i>² l'angolo <i>b</i>² (tratteggiato). Resta una figura a «L» di area <i>a</i>² − <i>b</i>².</p>
+      <p>Tagliamo la L in due rettangoli, ruotiamo quello verde e lo affianchiamo: otteniamo un rettangolo di base <b><i>a</i> + <i>b</i></b> e altezza <b><i>a</i> − <i>b</i></b>.</p>
+      <p><button id="b3">Ricomponi in rettangolo</button></p>
+      <div class="controls">
+        <label><i>a</i> <input type="range" id="s3a" min="2" max="10" value="7"><span class="v" id="s3av"></span></label>
+        <label><i>b</i> <input type="range" id="s3b" min="1" max="9" value="3"><span class="v" id="s3bv"></span></label>
+      </div>
+      <div class="readout" id="r3"></div>
+    </div>
+  </div>
+  <div class="box">Qui il doppio prodotto <b>sparisce</b>: moltiplicando si ottiene +<i>ab</i> − <i>ab</i> = 0. È il prodotto notevole più usato «al contrario», per <b>scomporre</b>: <i>x</i>² − 9 = (<i>x</i> + 3)(<i>x</i> − 3).</div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <span class="num">4 · Cubo di binomio</span>
+  <h2>Il cubo di una somma</h2>
+  <div class="formula">(<i>a</i> + <i>b</i>)³ = <span class="ta"><i>a</i>³</span> + <span class="tab">3<i>a</i>²<i>b</i></span> + <span class="tb">3<i>ab</i>²</span> + <span class="tbc"><i>b</i>³</span></div>
+  <div class="grid2">
+    <svg id="svg4" class="fig" viewBox="0 0 340 360" role="img" aria-label="Cubo di lato a+b scomposto in otto blocchi"></svg>
+    <div>
+      <p>Un cubo di spigolo <i>a</i> + <i>b</i> si taglia con tre piani in <b>8 blocchi</b>. Allontanali con il cursore «esplodi» e contali:</p>
+      <div class="legend">
+        <span><span class="sw" style="background:hsl(218 65% 58%)"></span>1 cubo <i>a</i>³</span>
+        <span><span class="sw" style="background:hsl(155 55% 45%)"></span>3 blocchi <i>a</i>·<i>a</i>·<i>b</i></span>
+        <span><span class="sw" style="background:hsl(32 85% 55%)"></span>3 blocchi <i>a</i>·<i>b</i>·<i>b</i></span>
+        <span><span class="sw" style="background:hsl(340 65% 58%)"></span>1 cubo <i>b</i>³</span>
+      </div>
+      <div class="controls">
+        <label><i>a</i> <input type="range" id="s4a" min="1" max="6" value="4"><span class="v" id="s4av"></span></label>
+        <label><i>b</i> <input type="range" id="s4b" min="1" max="6" value="2"><span class="v" id="s4bv"></span></label>
+        <label>esplodi <input type="range" id="s4e" min="0" max="100" value="45"><span class="v" id="s4ev"></span></label>
+      </div>
+      <div class="readout" id="r4"></div>
+    </div>
+  </div>
+  <div class="box">Per la differenza i segni si alternano: (<i>a</i> − <i>b</i>)³ = <i>a</i>³ − 3<i>a</i>²<i>b</i> + 3<i>ab</i>² − <i>b</i>³.</div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <span class="num">5 · Quadrato di trinomio</span>
+  <h2>Il quadrato di tre termini</h2>
+  <div class="formula">(<i>a</i>+<i>b</i>+<i>c</i>)² = <span class="ta"><i>a</i>²</span>+<span class="tb"><i>b</i>²</span>+<span class="tc"><i>c</i>²</span>+<span class="tab">2<i>ab</i></span>+<span class="tac">2<i>ac</i></span>+<span class="tbc">2<i>bc</i></span></div>
+  <div class="grid2">
+    <svg id="svg5" class="fig" viewBox="0 0 320 320" role="img" aria-label="Quadrato di lato a+b+c in nove pezzi"></svg>
+    <div>
+      <p>Stessa idea del binomio, con una griglia 3 × 3: sulla diagonale i <b>quadrati</b> dei tre termini, fuori diagonale i <b>doppi prodotti</b> (ogni rettangolo compare due volte, simmetrico rispetto alla diagonale).</p>
+      <div class="controls">
+        <label><i>a</i> <input type="range" id="s5a" min="1" max="8" value="4"><span class="v" id="s5av"></span></label>
+        <label><i>b</i> <input type="range" id="s5b" min="1" max="8" value="3"><span class="v" id="s5bv"></span></label>
+        <label><i>c</i> <input type="range" id="s5c" min="1" max="8" value="2"><span class="v" id="s5cv"></span></label>
+      </div>
+      <div class="readout" id="r5"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <span class="num">6 · Potenze di binomio</span>
+  <h2>Il triangolo di Tartaglia</h2>
+  <p>I coefficienti di (<i>a</i> + <i>b</i>)<sup><i>n</i></sup> si leggono nella riga <i>n</i> del triangolo: ogni numero è la somma dei due sopra. Gli esponenti di <i>a</i> scendono da <i>n</i> a 0, quelli di <i>b</i> salgono da 0 a <i>n</i>.</p>
+  <div class="controls"><label><i>n</i> <input type="range" id="s6n" min="0" max="8" value="3"><span class="v" id="s6nv"></span></label></div>
+  <div class="tri" id="tri"></div>
+  <div class="readout" id="r6" style="text-align:center"></div>
+  <p class="note">Riga 2 → 1 2 1 è il quadrato di binomio; riga 3 → 1 3 3 1 è il cubo: gli 8 blocchi della sezione 4.</p>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <span class="num">7 · Somma e differenza di cubi</span>
+  <h2>Scomporre <i>a</i>³ ± <i>b</i>³</h2>
+  <div class="formula"><i>a</i>³ − <i>b</i>³ = (<i>a</i> − <i>b</i>)(<i>a</i>² + <i>ab</i> + <i>b</i>²)</div>
+  <div class="formula"><i>a</i>³ + <i>b</i>³ = (<i>a</i> + <i>b</i>)(<i>a</i>² − <i>ab</i> + <i>b</i>²)</div>
+  <p>Verifica con la tabella delle moltiplicazioni (prima formula): i termini in mezzo si cancellano a coppie.</p>
+  <table>
+    <tr><th>×</th><th><i>a</i>²</th><th>+<i>ab</i></th><th>+<i>b</i>²</th></tr>
+    <tr><th><i>a</i></th><td><b><i>a</i>³</b></td><td class="strike">+<i>a</i>²<i>b</i></td><td class="strike">+<i>ab</i>²</td></tr>
+    <tr><th>−<i>b</i></th><td class="strike">−<i>a</i>²<i>b</i></td><td class="strike">−<i>ab</i>²</td><td><b>−<i>b</i>³</b></td></tr>
+  </table>
+  <div class="box">Il secondo fattore <i>a</i>² ± <i>ab</i> + <i>b</i>² si chiama <b>falso quadrato</b>: somiglia a (<i>a</i> ± <i>b</i>)², ma ha <i>ab</i> invece di 2<i>ab</i>. Non si scompone ulteriormente (nei reali).</div>
+  <p class="note">Memo dei segni: il primo fattore ha lo <b>stesso</b> segno, il termine <i>ab</i> ha segno <b>opposto</b>, l'ultimo è sempre <b>+</b>.</p>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <span class="num">8 · Errori tipici e calcolo mentale</span>
+  <h2>Cosa non fare, e cosa sfruttare</h2>
+  <div class="box warn"><b>(<i>a</i> + <i>b</i>)² ≠ <i>a</i>² + <i>b</i>²</b> — Controesempio: (3 + 4)² = 49, ma 3² + 4² = 25. Mancano i due rettangoli 2·3·4 = 24.</div>
+  <div class="box warn"><b>(<i>a</i> − <i>b</i>)² ≠ <i>a</i>² − <i>b</i>²</b> — (5 − 2)² = 9, ma 25 − 4 = 21.</div>
+  <div class="box warn"><b>(−<i>a</i> − <i>b</i>)² = (<i>a</i> + <i>b</i>)²</b>, non −(<i>a</i>+<i>b</i>)²: un quadrato non è mai negativo. Invece (<i>b</i> − <i>a</i>)² = (<i>a</i> − <i>b</i>)².</div>
+  <div class="box warn"><b>(2<i>x</i>)² = 4<i>x</i>²</b>, non 2<i>x</i>²: il quadrato va applicato a <b>tutto</b> il termine, coefficiente compreso.</div>
+  <h3>Trucchi di calcolo a mente</h3>
+  <table>
+    <tr><th>Calcolo</th><th>Idea</th><th>Conto</th></tr>
+    <tr><td>31²</td><td>(30 + 1)²</td><td>900 + 60 + 1 = 961</td></tr>
+    <tr><td>49²</td><td>(50 − 1)²</td><td>2500 − 100 + 1 = 2401</td></tr>
+    <tr><td>48 · 52</td><td>(50 − 2)(50 + 2)</td><td>2500 − 4 = 2496</td></tr>
+    <tr><td>103 · 97</td><td>(100 + 3)(100 − 3)</td><td>10000 − 9 = 9991</td></tr>
+    <tr><td>65²</td><td>(60 + 5)²</td><td>3600 + 600 + 25 = 4225</td></tr>
+  </table>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <span class="num">9 · Esercizi</span>
+  <h2>Prova tu (tocca per la soluzione)</h2>
+  <details><summary>1. (<i>x</i> + 4)²</summary><p><i>x</i>² + 8<i>x</i> + 16 &nbsp; (doppio prodotto: 2·<i>x</i>·4)</p></details>
+  <details><summary>2. (3<i>a</i> − 2)²</summary><p>9<i>a</i>² − 12<i>a</i> + 4</p></details>
+  <details><summary>3. (2<i>x</i> + 5)(2<i>x</i> − 5)</summary><p>4<i>x</i>² − 25</p></details>
+  <details><summary>4. (<i>x</i> − 2<i>y</i>)²</summary><p><i>x</i>² − 4<i>xy</i> + 4<i>y</i>²</p></details>
+  <details><summary>5. (<i>x</i> + 1)³</summary><p><i>x</i>³ + 3<i>x</i>² + 3<i>x</i> + 1</p></details>
+  <details><summary>6. (<i>a</i> − 2)³</summary><p><i>a</i>³ − 6<i>a</i>² + 12<i>a</i> − 8 &nbsp; (coefficienti 1 3 3 1, segni alterni, potenze di 2: 1, 2, 4, 8)</p></details>
+  <details><summary>7. (<i>x</i> + <i>y</i> − 1)²</summary><p><i>x</i>² + <i>y</i>² + 1 + 2<i>xy</i> − 2<i>x</i> − 2<i>y</i></p></details>
+  <details><summary>8. Scomponi: <i>x</i>² − 49</summary><p>(<i>x</i> + 7)(<i>x</i> − 7)</p></details>
+  <details><summary>9. Scomponi: <i>x</i>² − 10<i>x</i> + 25</summary><p>(<i>x</i> − 5)² &nbsp; (riconosci: <i>x</i>², 5², doppio prodotto 2·<i>x</i>·5)</p></details>
+  <details><summary>10. Scomponi: 8<i>x</i>³ − 1</summary><p>(2<i>x</i> − 1)(4<i>x</i>² + 2<i>x</i> + 1)</p></details>
+  <details><summary>11. Un terreno quadrato di lato 20 m viene allargato di 3 m su due lati. Di quanto cresce l'area?</summary><p>(20 + 3)² − 20² = 2·20·3 + 3² = 120 + 9 = <b>129 m²</b>: sono i due rettangoli più il quadratino d'angolo.</p></details>
+  <details><summary>12. Calcola a mente 99 · 101 e 71².</summary><p>99·101 = 100² − 1 = 9999; &nbsp; 71² = 4900 + 140 + 1 = 5041</p></details>
+</section>
+</main>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+function mk(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function label(parent,x,y,str,size){const t=mk('text',{x,y,'text-anchor':'middle','dominant-baseline':'central',class:'lbl','font-size':size},parent);t.textContent=str;return t;}
+function piece(parent,x,y,w,h,kind,str){
+  mk('rect',{x,y,width:w,height:h,class:'p '+kind},parent);
+  const m=Math.min(w,h);
+  if(str&&m>16){label(parent,x+w/2,y+h/2,str,Math.max(11,Math.min(20,m/3.2)));}
+}
+function grid(parent,x0,y0,nx,ny,s){
+  for(let i=1;i<nx;i++)mk('line',{x1:x0+i*s,y1:y0,x2:x0+i*s,y2:y0+ny*s,class:'gridl'},parent);
+  for(let j=1;j<ny;j++)mk('line',{x1:x0,y1:y0+j*s,x2:x0+nx*s,y2:y0+j*s,class:'gridl'},parent);
+}
+// dimension line: horizontal (above) or vertical (left)
+function dim(parent,x1,y1,x2,y2,str){
+  mk('line',{x1,y1,x2,y2,class:'dim'},parent);
+  if(y1===y2){
+    mk('line',{x1,y1:y1-4,x2:x1,y2:y1+4,class:'dim'},parent);mk('line',{x1:x2,y1:y1-4,x2,y2:y1+4,class:'dim'},parent);
+    const t=mk('text',{x:(x1+x2)/2,y:y1-9,'text-anchor':'middle',class:'dimt'},parent);t.textContent=str;
+  }else{
+    mk('line',{x1:x1-4,y1,x2:x1+4,y2:y1,class:'dim'},parent);mk('line',{x1:x1-4,y1:y2,x2:x1+4,y2,class:'dim'},parent);
+    const t=mk('text',{x:x1-8,y:(y1+y2)/2,'text-anchor':'end','dominant-baseline':'central',class:'dimt'},parent);t.textContent=str;
+  }
+}
+const sp=(c,s)=>`<span class="${c}">${s}</span>`;
+
+/* 1. (a+b)² */
+function draw1(){
+  const a=+$('s1a').value,b=+$('s1b').value;$('s1av').textContent=a;$('s1bv').textContent=b;
+  const svg=$('svg1');svg.innerHTML='';const S=a+b,s=270/S,o=38;
+  piece(svg,o,o,a*s,a*s,'ka','a²');piece(svg,o+a*s,o,b*s,a*s,'kab','ab');
+  piece(svg,o,o+a*s,a*s,b*s,'kab','ab');piece(svg,o+a*s,o+a*s,b*s,b*s,'kb','b²');
+  grid(svg,o,o,S,S,s);
+  dim(svg,o,o-12,o+a*s,o-12,'a');dim(svg,o+a*s,o-12,o+S*s,o-12,'b');
+  dim(svg,o-12,o,o-12,o+a*s,'a');dim(svg,o-12,o+a*s,o-12,o+S*s,'b');
+  $('r1').innerHTML=`(${a} + ${b})² = ${S}² = <b>${S*S}</b><br>`+
+    `${sp('ta',a*a)} + ${sp('tab','2·'+a+'·'+b)} + ${sp('tb',b*b)} = ${sp('ta',a*a)} + ${sp('tab',2*a*b)} + ${sp('tb',b*b)} = <b>${a*a+2*a*b+b*b}</b>`;
+}
+
+/* 2. (a-b)² */
+function draw2(){
+  const A=$('s2a'),B=$('s2b');B.max=+A.value-1;if(+B.value>+B.max)B.value=B.max;
+  const a=+A.value,b=+B.value;$('s2av').textContent=a;$('s2bv').textContent=b;
+  const svg=$('svg2');svg.innerHTML='';const s=270/a,o=38,d=a-b;
+  piece(svg,o,o,d*s,d*s,'kn','(a−b)²');
+  piece(svg,o+d*s,o,b*s,d*s,'kab','');piece(svg,o,o+d*s,d*s,b*s,'kab','');
+  piece(svg,o+d*s,o+d*s,b*s,b*s,'kb','b²');
+  grid(svg,o,o,a,a,s);
+  mk('rect',{x:o+d*s+2,y:o+2,width:b*s-4,height:a*s-4,class:'dashA'},svg);
+  mk('rect',{x:o+2,y:o+d*s+2,width:a*s-4,height:b*s-4,class:'dashA'},svg);
+  dim(svg,o,o-12,o+d*s,o-12,'a − b');dim(svg,o+d*s,o-12,o+a*s,o-12,'b');
+  dim(svg,o-12,o,o-12,o+a*s,'a');
+  $('r2').innerHTML=`(${a} − ${b})² = ${d}² = <b>${d*d}</b><br>`+
+    `${sp('ta',a*a)} − ${sp('tab',2*a*b)} + ${sp('tb',b*b)} = <b>${a*a-2*a*b+b*b}</b>`;
+}
+
+/* 3. (a+b)(a-b) */
+let arranged=false;
+function draw3(){
+  const A=$('s3a'),B=$('s3b');B.max=+A.value-1;if(+B.value>+B.max)B.value=B.max;
+  const a=+A.value,b=+B.value;$('s3av').textContent=a;$('s3bv').textContent=b;
+  const svg=$('svg3');svg.innerHTML='';const s=Math.min(285/(a+b),215/a),o=36,d=a-b;
+  mk('rect',{x:o+d*s,y:o+d*s,width:b*s,height:b*s,class:'ghost'},svg);
+  if(b*s>18)label(svg,o+d*s+b*s/2,o+d*s+b*s/2,'b²',Math.min(18,b*s/2.6)).setAttribute('opacity','.5');
+  const gA=mk('g',{},svg);piece(gA,o,o,a*s,d*s,'ka','a(a−b)');grid(gA,o,o,a,d,s);
+  const gB=mk('g',{class:'pieceB'},svg);piece(gB,o,o+d*s,d*s,b*s,'kab','b(a−b)');grid(gB,o,o+d*s,d,b,s);
+  const P=[o+d*s,o+d*s];
+  gB.style.transformOrigin=`${P[0]}px ${P[1]}px`;
+  gB.style.transform=arranged?`translate(${2*b*s}px,0px) rotate(90deg)`:'none';
+  const d1=mk('g',{class:'dimset',opacity:arranged?0:1},svg);
+  dim(d1,o,o-12,o+a*s,o-12,'a');dim(d1,o-12,o,o-12,o+d*s,'a − b');dim(d1,o-12,o+d*s,o-12,o+a*s,'b');
+  const d2=mk('g',{class:'dimset',opacity:arranged?1:0},svg);
+  dim(d2,o,o-12,o+a*s,o-12,'a');dim(d2,o+a*s,o-12,o+(a+b)*s,o-12,'b');dim(d2,o-12,o,o-12,o+d*s,'a − b');
+  svg._dims=[d1,d2];svg._gB=gB;svg._b=b*s;
+  $('b3').textContent=arranged?'Torna al quadrato':'Ricomponi in rettangolo';
+  $('r3').innerHTML=`${sp('ta',a+'²')} − ${sp('tb',b+'²')} = ${a*a} − ${b*b} = <b>${a*a-b*b}</b><br>`+
+    `(${a} + ${b})·(${a} − ${b}) = ${a+b}·${d} = <b>${(a+b)*d}</b>`;
+}
+$('b3').addEventListener('click',()=>{
+  arranged=!arranged;const svg=$('svg3');
+  svg._gB.style.transform=arranged?`translate(${2*svg._b}px,0px) rotate(90deg)`:'none';
+  svg._dims[0].setAttribute('opacity',arranged?0:1);svg._dims[1].setAttribute('opacity',arranged?1:0);
+  $('b3').textContent=arranged?'Torna al quadrato':'Ricomponi in rettangolo';
+});
+
+/* 4. (a+b)³ isometric */
+function draw4(){
+  const a=+$('s4a').value,b=+$('s4b').value,e=+$('s4e').value/100;
+  $('s4av').textContent=a;$('s4bv').textContent=b;$('s4ev').textContent=Math.round(e*100)+'%';
+  const svg=$('svg4');svg.innerHTML='';
+  const g=e*(a+b)*0.45,T=a+b+g,s=Math.min(300/(1.732*T),330/(2*T)),cx=170,cy=180,c30=0.8660254;
+  const pr=(x,y,z)=>[cx+(x-y)*c30*s,cy+((x+y)/2-z)*s];
+  const hue={a3:218,a2b:155,ab2:32,b3:340};
+  const boxes=[];
+  for(let i=0;i<2;i++)for(let j=0;j<2;j++)for(let k=0;k<2;k++){
+    const n=i+j+k;const kind=['a3','a2b','ab2','b3'][n];
+    boxes.push({o:[i?a+g:0,j?a+g:0,k?a+g:0],d:[i?b:a,j?b:a,k?b:a],kind,n});
+  }
+  boxes.sort((p,q)=>p.n-q.n);
+  const poly=(pts,fill)=>mk('polygon',{points:pts.map(p=>pr(...p).join(',')).join(' '),fill,stroke:'rgba(0,0,0,.45)','stroke-width':1,'stroke-linejoin':'round'},svg);
+  for(const B of boxes){
+    const [x,y,z]=B.o,[dx,dy,dz]=B.d,h=hue[B.kind];
+    poly([[x,y,z+dz],[x+dx,y,z+dz],[x+dx,y+dy,z+dz],[x,y+dy,z+dz]],`hsl(${h} 65% 72%)`);
+    poly([[x+dx,y,z],[x+dx,y+dy,z],[x+dx,y+dy,z+dz],[x+dx,y,z+dz]],`hsl(${h} 58% 55%)`);
+    poly([[x,y+dy,z],[x+dx,y+dy,z],[x+dx,y+dy,z+dz],[x,y+dy,z+dz]],`hsl(${h} 55% 44%)`);
+  }
+  const S=a+b;
+  $('r4').innerHTML=`(${a} + ${b})³ = ${S}³ = <b>${S**3}</b><br>`+
+    `${sp('ta',a**3)} + ${sp('tab','3·'+(a*a*b))} + ${sp('tb','3·'+(a*b*b))} + ${sp('tbc',b**3)} = <b>${a**3+3*a*a*b+3*a*b*b+b**3}</b>`;
+}
+
+/* 5. (a+b+c)² */
+function draw5(){
+  const v=['s5a','s5b','s5c'].map(i=>+$(i).value);const [a,b,c]=v;
+  $('s5av').textContent=a;$('s5bv').textContent=b;$('s5cv').textContent=c;
+  const svg=$('svg5');svg.innerHTML='';const S=a+b+c,s=270/S,o=38;
+  const K=[['ka','kab','kac'],['kab','kb','kbc'],['kac','kbc','kc']];
+  const L=[['a²','ab','ac'],['ab','b²','bc'],['ac','bc','c²']];
+  let y=o;for(let i=0;i<3;i++){let x=o;for(let j=0;j<3;j++){piece(svg,x,y,v[j]*s,v[i]*s,K[i][j],L[i][j]);x+=v[j]*s;}y+=v[i]*s;}
+  grid(svg,o,o,S,S,s);
+  let x=o;['a','b','c'].forEach((n,j)=>{dim(svg,x,o-12,x+v[j]*s,o-12,n);dim(svg,o-12,x,o-12,x+v[j]*s,n);x+=v[j]*s;});
+  $('r5').innerHTML=`(${a}+${b}+${c})² = ${S}² = <b>${S*S}</b><br>`+
+    `${sp('ta',a*a)} + ${sp('tb',b*b)} + ${sp('tc',c*c)} + ${sp('tab',2*a*b)} + ${sp('tac',2*a*c)} + ${sp('tbc',2*b*c)} = <b>${a*a+b*b+c*c+2*(a*b+a*c+b*c)}</b>`;
+}
+
+/* 6. Tartaglia */
+function draw6(){
+  const n=+$('s6n').value;$('s6nv').textContent=n;
+  let rows=[[1]];for(let r=1;r<=8;r++){const p=rows[r-1],q=[1];for(let k=1;k<r;k++)q.push(p[k-1]+p[k]);q.push(1);rows.push(q);}
+  $('tri').innerHTML=rows.map((r,i)=>`<div class="${i===n?'on':(i>n?'off':'')}">${r.map(x=>`<span>${x}</span>`).join('')}</div>`).join('');
+  const pw=(v,e)=>e===0?'':(e===1?`<i>${v}</i>`:`<i>${v}</i><sup>${e}</sup>`);
+  const terms=rows[n].map((c,k)=>{const body=pw('a',n-k)+pw('b',k);return (c===1&&body?'':c)+body;});
+  $('r6').innerHTML=`(<i>a</i> + <i>b</i>)<sup>${n}</sup> = `+terms.join(' + ');
+}
+
+[['s1a',draw1],['s1b',draw1],['s2a',draw2],['s2b',draw2],['s3a',draw3],['s3b',draw3],
+ ['s4a',draw4],['s4b',draw4],['s4e',draw4],['s5a',draw5],['s5b',draw5],['s5c',draw5],['s6n',draw6]]
+ .forEach(([id,f])=>$(id).addEventListener('input',f));
+draw1();draw2();draw3();draw4();draw5();draw6();
+</script>
+</body>
+</html>
