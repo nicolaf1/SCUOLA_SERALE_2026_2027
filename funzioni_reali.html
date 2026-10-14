@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funzioni reali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#faf6ef; --card:#ffffff; --ink:#1f2a2e; --muted:#5f6b6d; --line:#e6dfd3;
+  --blue:#0e7c7b; --blue-soft:#ddf1ef; --green:#2f9e44; --green-soft:#e3f5e6;
+  --red:#c92a2a; --red-soft:#fdeaea; --amber:#e8590c; --amber-soft:#fdebdf;
+  --head1:#0e7c7b; --head2:#0b4f5c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12181a; --card:#1a2224; --ink:#e8eeec; --muted:#9fb0ad; --line:#2a3638;
+    --blue:#3cc6c0; --blue-soft:#16302f; --green:#69db7c; --green-soft:#17301d;
+    --red:#ff8787; --red-soft:#3a1c1c; --amber:#ff922b; --amber-soft:#3a2615;
+    --head1:#0b5c5b; --head2:#0a3640;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12181a; --card:#1a2224; --ink:#e8eeec; --muted:#9fb0ad; --line:#2a3638;
+  --blue:#3cc6c0; --blue-soft:#16302f; --green:#69db7c; --green-soft:#17301d;
+  --red:#ff8787; --red-soft:#3a1c1c; --amber:#ff922b; --amber-soft:#3a2615;
+  --head1:#0b5c5b; --head2:#0a3640;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;font-size:17px}
+h1,h2{font-family:"Fraunces",Georgia,serif;font-weight:700}
+header{color:#fff;padding:30px 16px 24px;text-align:center;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px 28px),
+    linear-gradient(135deg,var(--head1),var(--head2));}
+header h1{margin:0;font-size:1.9rem}
+header p{margin:6px 0 0;opacity:.9}
+nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav a{color:var(--blue);text-decoration:none;font-weight:700;font-size:.9rem;padding:6px 10px;border-radius:8px;background:var(--blue-soft)}
+nav a.on{background:var(--blue);color:#fff}
+main{max-width:900px;margin:0 auto;padding:16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:18px 0}
+h2{color:var(--blue);margin-top:0;font-size:1.4rem}
+h3{margin-bottom:6px}
+.step{display:inline-block;background:var(--amber);color:#fff;border-radius:50%;width:30px;height:30px;text-align:center;line-height:30px;margin-right:8px;font-size:1rem;font-family:system-ui}
+.box{border-radius:10px;padding:12px 14px;margin:12px 0}
+.idea{background:var(--blue-soft)}
+.warn{background:var(--amber-soft)}
+.ok{background:var(--green-soft)}
+.no{background:var(--red-soft)}
+.def{border-left:5px solid var(--blue);background:var(--blue-soft);padding:14px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+.def .t{font-family:"Fraunces",Georgia,serif;color:var(--blue);font-weight:700}
+.machine{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}
+.machine input{width:90px;font-size:1.2rem;padding:8px;border:2px solid var(--line);border-radius:8px;text-align:center;background:var(--bg);color:var(--ink)}
+.mbox{background:var(--blue);color:#fff;border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;font-weight:600}
+.arrow{font-size:1.6rem;color:var(--muted)}
+.out{min-width:110px;font-size:1.2rem;padding:8px 12px;border:2px dashed var(--amber);border-radius:8px;text-align:center}
+select{font-size:1rem;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.tree{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col h3{margin-top:0;padding:8px 12px;border-radius:8px}
+.alg h3{background:var(--blue-soft);color:var(--blue)}
+.tra h3{background:var(--amber-soft);color:var(--amber)}
+.tcard{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.tcard b{display:block}
+.tags{font-size:.88rem;color:var(--muted)}
+.labctl{display:flex;flex-direction:column;gap:12px}
+canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--bg);display:block}
+canvas.int{touch-action:pan-y;cursor:crosshair}
+input[type=range]{width:100%;accent-color:var(--amber)}
+input[type=checkbox]{accent-color:var(--blue);width:18px;height:18px;vertical-align:middle}
+.readout{font-size:1.1rem;padding:12px;border-radius:10px;text-align:center}
+.legend{font-size:.88rem;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.sw{display:inline-block;width:14px;height:6px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:10px 0}
+td,th{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+.ytab td,.ytab th{text-align:center;min-width:46px;font-size:1.05rem}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+.q .txt{margin-bottom:10px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{font:inherit;font-size:.95rem;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.opts button:hover{border-color:var(--blue)}
+.opts button.right{background:var(--green-soft);border-color:var(--green)}
+.opts button.wrong{background:var(--red-soft);border-color:var(--red)}
+.opts button:disabled{cursor:default}
+.fb{margin-top:10px;font-size:.95rem;display:none}
+.score{font-size:1.15rem;font-weight:700;text-align:center;padding:12px;border-radius:10px;background:var(--blue-soft)}
+.btn{font:inherit;font-size:.95rem;padding:8px 14px;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer;font-weight:700}
+.btn.alt{background:transparent;color:var(--blue)}
+.btn:disabled{opacity:.45;cursor:default}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.steps3 div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.95rem}
+.steps3 b{color:var(--amber)}
+.verdict{font-weight:600}
+.sq{max-width:560px;margin:0 auto;width:100%}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.duo .cap{text-align:center;font-weight:700;color:var(--muted);font-size:.9rem;margin-bottom:6px}
+.exq{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.exq input,.inl{width:80px;font-size:1rem;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);text-align:center}
+.mark{font-weight:700}
+.mark.y{color:var(--green)} .mark.n{color:var(--red)}
+.calc{font-size:1.1rem;padding:12px 14px;border-radius:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.card{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card:hover{border-color:var(--blue)}
+.card .n{font-family:"Fraunces",Georgia,serif;font-size:2rem;color:var(--amber);font-weight:700;line-height:1}
+.card h3{margin:6px 0;color:var(--blue)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:24px 0 8px}
+.pager a{flex:1;text-decoration:none;padding:14px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--blue);font-weight:700}
+.pager a:hover{border-color:var(--blue)}
+.pager a.next{text-align:right}
+.pager .lab{display:block;font-size:.8rem;color:var(--muted);font-weight:400}
+.pager span{flex:1}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:20px}
+@media (max-width:640px){
+  .tree,.steps3,.duo{grid-template-columns:1fr}
+  body{font-size:16px}
+  section{padding:16px}
+  header h1{font-size:1.5rem}
+}
+
+.page{display:none}
+</style>
+</head>
+<body>
+<header><h1 id="hTitle">Funzioni reali di variabile reale</h1><p id="hSub"></p></header>
+<nav><a href="#p0" data-k="0">Indice</a><a href="#p1" data-k="1">1. Il grafico</a><a href="#p2" data-k="2">2. Definizione e notazione</a><a href="#p3" data-k="3">3. Classificazione</a><a href="#p4" data-k="4">4. Dominio</a><a href="#p5" data-k="5">5. Quiz finale</a></nav>
+<main>
+<div class="page" id="p0" data-sub="Dal grafico alla formula: un percorso in 5 tappe" data-title="Funzioni reali di variabile reale">
+
+<section>
+  <h2>Il percorso</h2>
+  <p>In queste pagine scopriamo le <b>funzioni reali di variabile reale</b> partendo da ciò che si <b>vede</b> (il grafico sul piano cartesiano) per arrivare a ciò che si <b>scrive</b> (la definizione, la notazione, i calcoli). Segui le pagine in ordine: ognuna usa quello che hai visto nella precedente.</p>
+</section>
+<div class="cards">
+  <a class="card" href="#p1"><div class="n">1</div><h3>Il grafico</h3>Piano cartesiano, coppie ordinate, come si costruisce e come si legge il grafico di una funzione. Il test della retta verticale.</a>
+  <a class="card" href="#p2"><div class="n">2</div><h3>Definizione e notazione</h3>Dal grafico alla definizione: $f:A\to B$, $x\mapsto f(x)$, dominio, codominio, immagine, grafico. Calcolare $f(a)$.</a>
+  <a class="card" href="#p3"><div class="n">3</div><h3>Classificazione</h3>Funzioni algebriche (razionali e irrazionali, intere e fratte) e trascendenti.</a>
+  <a class="card" href="#p4"><div class="n">4</div><h3>Dominio</h3>Le condizioni per trovare il dominio e un laboratorio per vederlo sul grafico.</a>
+  <a class="card" href="#p5"><div class="n">5</div><h3>Quiz finale</h3>Domande su notazione, classificazione e dominio con correzione immediata.</a>
+</div>
+
+<div class="pager"><span></span><a class="next" href="#p1"><span class="lab">Pagina successiva →</span>1. Il grafico</a></div>
+</div>
+<div class="page" id="p1" data-sub="Pagina 1 di 5 · Dal piano cartesiano all'idea di funzione" data-title="Il grafico di una funzione">
+
+<section>
+  <h2><span class="step">1</span>Il piano cartesiano</h2>
+  <p>Due rette perpendicolari, l'<b>asse $x$</b> (orizzontale, detto <i>asse delle ascisse</i>) e l'<b>asse $y$</b> (verticale, <i>asse delle ordinate</i>), si incontrano nell'<b>origine</b> $O$. Ogni punto $P$ del piano corrisponde a una <b>coppia ordinata</b> di numeri $(x;\,y)$:</p>
+  <ul>
+    <li>$x$ (ascissa) dice di quanto ci spostiamo a <b>destra</b> (se positiva) o a <b>sinistra</b> (se negativa);</li>
+    <li>$y$ (ordinata) dice di quanto ci spostiamo in <b>alto</b> (se positiva) o in <b>basso</b> (se negativa).</li>
+  </ul>
+  <div class="box idea">L'ordine conta: $(2;\,3)$ e $(3;\,2)$ sono punti <b>diversi</b>. Si legge sempre prima la $x$, poi la $y$.</div>
+  <h3>Sfida: trova il punto</h3>
+  <p id="tA" style="font-size:1.15rem;font-weight:700"></p>
+  <canvas id="cvA" class="int" width="840" height="560"></canvas>
+  <div class="box" id="fbA" style="display:none"></div>
+  <div class="btnrow"><button class="btn" id="newA">Nuovo punto</button><span class="tags" id="scA"></span></div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>Una regola che produce punti</h2>
+  <p>Prendiamo una <b>regola</b>: <i>«prendi un numero $x$, elevalo al quadrato e togli $2$»</i>. A ogni $x$ la regola associa un numero $y$, quindi un punto $(x;\,y)$ del piano. Premi il pulsante per calcolare i punti uno alla volta.</p>
+  <div class="tw"><table class="ytab"><tr><th>$x$</th><td>$-3$</td><td>$-2$</td><td>$-1$</td><td>$0$</td><td>$1$</td><td>$2$</td><td>$3$</td></tr><tr id="yRow"></tr></table></div>
+  <div class="btnrow"><button class="btn" id="addB">Calcola il prossimo punto</button><button class="btn alt" id="joinB" disabled>Unisci i punti</button><button class="btn alt" id="resB">Ricomincia</button></div>
+  <div class="box idea" id="bInfo">La tabella è vuota: premi «Calcola il prossimo punto».</div>
+  <canvas id="cvB" width="840" height="560"></canvas>
+  <div class="box warn">I punti calcolati sono solo alcuni: la regola funziona per <b>qualunque</b> numero reale $x$ (anche $0{,}5$ o $-1{,}7$). Il <b>grafico</b> è l'insieme di <b>tutti</b> i punti $(x;\,y)$ prodotti dalla regola: per questo è una linea continua.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>Leggere un grafico</h2>
+  <p>Ora facciamo il percorso inverso: abbiamo la curva e vogliamo sapere quale $y$ corrisponde a un certo $x$.</p>
+  <div class="steps3">
+    <div><b>1.</b> Scegli un valore di $x$ sull'asse orizzontale.</div>
+    <div><b>2.</b> Sali (o scendi) in verticale fino a toccare la curva.</div>
+    <div><b>3.</b> Spostati in orizzontale fino all'asse $y$ e leggi il valore.</div>
+  </div>
+  <p>Scegli una curva e trascina sul grafico (o usa il cursore) per spostare la retta verticale.</p>
+  <div class="labctl">
+    <select id="pSel"></select>
+    <canvas id="cv0" class="int" width="840" height="560"></canvas>
+    <label>Valore di $x$: <b id="pVal"></b></label>
+    <input type="range" id="pR" min="-6" max="6" step="0.1" value="2">
+    <div class="readout" id="pRead"></div>
+    <div class="box verdict" id="pVerdict"></div>
+  </div>
+  <div class="def"><span class="t">Il test della retta verticale.</span> Una curva è il grafico di una funzione se <b>ogni retta verticale la incontra al massimo in un punto</b>. In questo modo a ogni $x$ corrisponde <b>un solo</b> $y$. Prova la circonferenza: per molti valori di $x$ i punti sono due!</div>
+  <div class="box idea">Al contrario, una retta <b>orizzontale</b> può incontrare il grafico di una funzione anche in più punti (guarda la parabola con $y=2$): numeri $x$ diversi possono avere lo stesso $y$.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>Esercizio: leggi dal grafico</h2>
+  <p>Il grafico rappresenta una funzione. Rispondi leggendo il grafico; se sei in difficoltà premi «Aiuto».</p>
+  <div class="sq"><canvas id="cvD" width="640" height="640"></canvas></div>
+  <div class="exq"><span>a) Se $x=3$, quanto vale $y$?</span><input id="d0"><button class="btn" data-c="0">Controlla</button><button class="btn alt" data-h="0">Aiuto</button><span class="mark" id="m0"></span></div>
+  <div class="exq"><span>b) Se $x=0$, quanto vale $y$?</span><input id="d1"><button class="btn" data-c="1">Controlla</button><button class="btn alt" data-h="1">Aiuto</button><span class="mark" id="m1"></span></div>
+  <div class="exq"><span>c) Se $x=1$, quanto vale $y$?</span><input id="d2"><button class="btn" data-c="2">Controlla</button><button class="btn alt" data-h="2">Aiuto</button><span class="mark" id="m2"></span></div>
+  <div class="exq"><span>d) Per quali valori di $x$ si ha $y=2$?</span><input id="d3a"><span>e</span><input id="d3b"><button class="btn" data-c="3">Controlla</button><button class="btn alt" data-h="3">Aiuto</button><span class="mark" id="m3"></span></div>
+  <div class="box warn" style="margin-top:16px"><b>Verso la pagina 2.</b> La frase «se $x=3$ allora $y=2$» è lunga da scrivere. In matematica si usa una notazione più compatta: $f(3)=2$. Nella prossima pagina vediamo che cosa significa e da dove viene.</div>
+</section>
+
+<div class="pager"><a class="prev" href="#p0"><span class="lab">← Pagina precedente</span>Indice</a><a class="next" href="#p2"><span class="lab">Pagina successiva →</span>2. Definizione e notazione</a></div>
+</div>
+<div class="page" id="p2" data-sub="Pagina 2 di 5 · Dal grafico alla scrittura f : A → B" data-title="Definizione e notazione">
+
+<section>
+  <h2><span class="step">1</span>Dal grafico alla definizione</h2>
+  <p>Nella pagina precedente abbiamo visto che il grafico di una funzione ha una proprietà precisa: <b>sopra ogni $x$ c'è al massimo un punto</b>. Possiamo trasformare questa osservazione in una definizione, che vale anche senza disegnare nulla.</p>
+  <div class="def"><span class="t">Definizione.</span> Dati due insiemi non vuoti $A$ e $B$, si chiama <b>funzione da $A$ in $B$</b> una legge che associa a <b>ogni</b> elemento $x$ di $A$ <b>uno e un solo</b> elemento $y$ di $B$.
+  $$f:A\to B \qquad\qquad x\mapsto y=f(x)$$</div>
+  <p>Nella definizione ci sono due parole chiave, e ognuna corrisponde a qualcosa che si vede sul grafico:</p>
+  <div class="tw"><table>
+    <tr><th>Parola chiave</th><th>Che cosa vuol dire</th><th>Sul grafico</th></tr>
+    <tr><td><b>ogni</b></td><td>nessun elemento di $A$ resta senza corrispondente</td><td>sopra ogni $x$ di $A$ c'è <b>almeno</b> un punto</td></tr>
+    <tr><td><b>uno e un solo</b></td><td>nessun elemento di $A$ ha due corrispondenti</td><td>sopra ogni $x$ c'è <b>al massimo</b> un punto (test della retta verticale)</td></tr>
+  </table></div>
+  <h3>Come si legge la notazione</h3>
+  <div class="tw"><table>
+    <tr><th>Si scrive</th><th>Si legge</th><th>Significa</th></tr>
+    <tr><td>$f:A\to B$</td><td>«$f$ da $A$ in $B$»</td><td>$f$ prende elementi di $A$ e restituisce elementi di $B$</td></tr>
+    <tr><td>$x\mapsto f(x)$</td><td>«a $x$ si associa $f$ di $x$»</td><td>la regola che trasforma $x$</td></tr>
+    <tr><td>$y=f(x)$</td><td>«$y$ uguale $f$ di $x$»</td><td>$y$ è il valore che $f$ associa a $x$</td></tr>
+    <tr><td>$f(3)=2$</td><td>«$f$ di $3$ vale $2$»</td><td>l'immagine di $3$ è $2$: il punto $(3;\,2)$ sta sul grafico</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>Frecce e punti: due modi di vedere la stessa cosa</h2>
+  <p>Una funzione tra insiemi piccoli si può disegnare con un <b>diagramma a frecce</b>: ogni freccia parte da un $x\in A$ e arriva al suo $y\in B$. Ogni freccia $x\to y$ diventa un <b>punto</b> $(x;\,y)$ del piano cartesiano. Confronta i quattro casi.</p>
+  <div class="btnrow" id="exBtns"></div>
+  <div class="duo" style="margin-top:12px">
+    <div><div class="cap">Diagramma a frecce</div><canvas id="cvV" width="400" height="400"></canvas></div>
+    <div><div class="cap">Piano cartesiano</div><canvas id="cvP" width="400" height="400"></canvas></div>
+  </div>
+  <div class="box" id="exInfo"></div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>Funzioni reali di variabile reale</h2>
+  <p>Quando $A$ e $B$ sono insiemi di <b>numeri reali</b> si parla di <b>funzione reale di variabile reale</b>. Si scrive
+  $$f:D\to\mathbb{R}\qquad\text{con } D\subseteq\mathbb{R}$$
+  e, se la funzione è definita per tutti i numeri reali, $f:\mathbb{R}\to\mathbb{R}$.</p>
+  <p>Per esempio la funzione dell'esercizio della pagina 1 si può scrivere in tre modi equivalenti:</p>
+  <p style="text-align:center">$f:\mathbb{R}\to\mathbb{R},\ \ x\mapsto x^2-2x-1$ &nbsp;&nbsp;oppure&nbsp;&nbsp; $f(x)=x^2-2x-1$ &nbsp;&nbsp;oppure&nbsp;&nbsp; $y=x^2-2x-1$</p>
+  <h3>Il vocabolario delle funzioni (e dove si vede sul grafico)</h3>
+  <div class="tw"><table>
+    <tr><th>Nome</th><th>Simbolo</th><th>Significato</th><th>Sul grafico</th></tr>
+    <tr><td>variabile indipendente</td><td>$x$</td><td>il numero che scegliamo noi</td><td>asse orizzontale</td></tr>
+    <tr><td>variabile dipendente</td><td>$y=f(x)$</td><td>il numero che dipende da $x$</td><td>asse verticale</td></tr>
+    <tr><td>immagine di $a$</td><td>$f(a)$</td><td>il valore che $f$ associa al numero $a$</td><td>l'altezza del punto del grafico sopra $x=a$</td></tr>
+    <tr><td>dominio</td><td>$D$</td><td>l'insieme degli $x$ per cui $f(x)$ esiste</td><td>l'«ombra» del grafico sull'asse $x$</td></tr>
+    <tr><td>codominio</td><td>$\mathbb{R}$</td><td>l'insieme di arrivo</td><td>tutto l'asse $y$</td></tr>
+    <tr><td>insieme immagine</td><td>$\operatorname{Im}f$</td><td>gli $y$ effettivamente raggiunti</td><td>l'«ombra» del grafico sull'asse $y$</td></tr>
+    <tr><td>grafico</td><td>$G_f$</td><td>$\{(x;\,y)\in\mathbb{R}^2:\ x\in D,\ y=f(x)\}$</td><td>la curva</td></tr>
+  </table></div>
+  <div class="box warn"><b>Attenzione:</b> $f$ e $f(x)$ non sono la stessa cosa. $f$ è la <b>funzione</b> (la regola, tutta la curva); $f(x)$ è un <b>numero</b> (il valore in un punto). Allo stesso modo $f(2)$ <b>non</b> è «$f$ per $2$»: è il numero che si ottiene mettendo $2$ al posto di $x$.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>Calcolare $f(a)$: dalla formula al punto</h2>
+  <p>Per calcolare $f(a)$ si <b>sostituisce</b> $a$ al posto di $x$ nell'espressione (meglio tra parentesi). Il risultato è l'ordinata del punto del grafico che ha ascissa $a$. Usiamo $f(x)=x^2-2x-1$, la funzione della pagina 1.</p>
+  <p>Scegli un punto $(a;\,b)$ scrivendo i numeri o cliccando sul piano: scopriamo con il calcolo se appartiene al grafico.</p>
+  <div class="btnrow">$a=$ <input class="inl" id="aIn" value="3"> &nbsp; $b=$ <input class="inl" id="bIn" value="2"></div>
+  <div class="calc box idea" id="cOut"></div>
+  <div class="sq"><canvas id="cvC" class="int" width="640" height="720"></canvas></div>
+  <div class="def"><span class="t">Regola.</span> Il punto $(a;\,b)$ appartiene al grafico di $f$ <b>se e solo se</b> $b=f(a)$. È il modo «analitico» di fare quello che sulla pagina 1 facevamo a occhio.</div>
+</section>
+
+<section>
+  <h2><span class="step">5</span>Dominio e immagine: le ombre del grafico</h2>
+  <p>Immagina di illuminare il grafico dall'alto: la sua ombra sull'asse $x$ è il <b>dominio</b>. Illuminandolo da destra, l'ombra sull'asse $y$ è l'<b>insieme immagine</b>.</p>
+  <div class="labctl">
+    <select id="sSel"></select>
+    <div class="checks"><label><input type="checkbox" id="shD" checked> mostra il dominio (asse $x$)</label> &nbsp; <label><input type="checkbox" id="shI" checked> mostra l'immagine (asse $y$)</label></div>
+    <canvas id="cvS" width="840" height="630"></canvas>
+    <div class="legend"><span><span class="sw" style="background:var(--blue)"></span>grafico</span><span><span class="sw" style="background:var(--green)"></span>dominio</span><span><span class="sw" style="background:var(--amber)"></span>insieme immagine</span></div>
+    <div class="box idea" id="sInfo"></div>
+  </div>
+  <p class="tags">Le bande continuano anche fuori dal riquadro quando il dominio o l'immagine sono illimitati.</p>
+</section>
+
+<section>
+  <h2><span class="step">6</span>La funzione come macchina</h2>
+  <p>La scrittura $x\mapsto f(x)$ fa pensare a una <b>macchina</b>: entra $x$, esce $f(x)$. Se un numero fa «inceppare» la macchina, quel numero non sta nel dominio.</p>
+  <p style="text-align:center"><select id="mSel">
+    <option value="0">f(x) = 2x + 1</option><option value="1">f(x) = x²</option><option value="2">f(x) = 1/x</option><option value="3">f(x) = √x</option>
+  </select></p>
+  <div class="machine">
+    <div><div class="tags" style="text-align:center">ingresso $x$</div><input id="mIn" value="3"></div>
+    <div class="arrow">→</div><div class="mbox" id="mBox"></div><div class="arrow">→</div>
+    <div><div class="tags" style="text-align:center">uscita $f(x)$</div><div class="out" id="mOut"></div></div>
+  </div>
+  <div class="box" id="mMsg"></div>
+</section>
+
+<section>
+  <h2><span class="step">7</span>Verifica veloce</h2>
+  <div id="quizBox2"></div>
+  <div class="score" id="score2"></div>
+  <p style="text-align:center"><button class="btn" id="reset2">Ricomincia</button></p>
+</section>
+
+<div class="pager"><a class="prev" href="#p1"><span class="lab">← Pagina precedente</span>1. Il grafico</a><a class="next" href="#p3"><span class="lab">Pagina successiva →</span>3. Classificazione</a></div>
+</div>
+<div class="page" id="p3" data-sub="Pagina 3 di 5 · Algebriche e trascendenti" data-title="Classificazione delle funzioni">
+
+<section>
+  <h2><span class="step">1</span>Come si classificano</h2>
+  <p>Ora che sappiamo che cos'è una funzione $f:D\to\mathbb{R}$, guardiamo la sua <b>espressione analitica</b> $f(x)$ e chiediamoci <b>quali operazioni</b> vi compaiono.</p>
+  <div class="tree">
+    <div class="col alg">
+      <h3>Algebriche</h3>
+      <p class="tags">Solo addizioni, sottrazioni, moltiplicazioni, divisioni, potenze e radici.</p>
+      <div class="tcard"><b>Razionale intera</b>$y=3x^2-x+2$<div class="tags">niente $x$ al denominatore, niente radici</div></div>
+      <div class="tcard"><b>Razionale fratta</b>$y=\dfrac{2x}{x+1}$<div class="tags">$x$ al denominatore</div></div>
+      <div class="tcard"><b>Irrazionale intera</b>$y=\sqrt{x-1}$<div class="tags">$x$ sotto radice, non al denominatore</div></div>
+      <div class="tcard"><b>Irrazionale fratta</b>$y=\dfrac{\sqrt{x}}{x-3}$<div class="tags">$x$ sotto radice <i>e</i> al denominatore</div></div>
+    </div>
+    <div class="col tra">
+      <h3>Trascendenti</h3>
+      <p class="tags">Compaiono esponenziali, logaritmi o funzioni goniometriche.</p>
+      <div class="tcard"><b>Esponenziale</b>$y=2^x$<div class="tags">la $x$ è all'esponente</div></div>
+      <div class="tcard"><b>Logaritmica</b>$y=\ln x$<div class="tags">la $x$ è dentro un logaritmo</div></div>
+      <div class="tcard"><b>Goniometrica</b>$y=\sin x$<div class="tags">seno, coseno, tangente…</div></div>
+    </div>
+  </div>
+  <h3>Il trucco per le algebriche: due domande</h3>
+  <p>1) C'è la $x$ <b>sotto radice</b>? &nbsp; 2) C'è la $x$ <b>al denominatore</b>?</p>
+  <div class="tw"><table>
+    <tr><th></th><th>No denominatore</th><th>Sì denominatore</th></tr>
+    <tr><th>No radice</th><td>Razionale <b>intera</b></td><td>Razionale <b>fratta</b></td></tr>
+    <tr><th>Sì radice</th><td>Irrazionale <b>intera</b></td><td>Irrazionale <b>fratta</b></td></tr>
+  </table></div>
+  <div class="box idea">Perché ci interessa? Perché il tipo di funzione ci dice subito <b>quali condizioni</b> servono per il dominio: le fratte chiedono denominatore $\neq0$, le irrazionali (con indice pari) radicando $\geq0$. Lo vediamo nella prossima pagina.</div>
+</section>
+<section>
+  <h2><span class="step">2</span>Verifica veloce</h2>
+  <div id="quizBox3"></div>
+  <div class="score" id="score3"></div>
+  <p style="text-align:center"><button class="btn" id="reset3">Ricomincia</button></p>
+</section>
+
+<div class="pager"><a class="prev" href="#p2"><span class="lab">← Pagina precedente</span>2. Definizione e notazione</a><a class="next" href="#p4"><span class="lab">Pagina successiva →</span>4. Dominio</a></div>
+</div>
+<div class="page" id="p4" data-sub="Pagina 4 di 5 · Dalle condizioni al grafico" data-title="Il dominio di una funzione">
+
+<section>
+  <h2><span class="step">1</span>Il dominio: dove la funzione esiste</h2>
+  <p>Nella pagina 2 il dominio era l'<b>ombra del grafico sull'asse $x$</b>. Ma spesso abbiamo solo l'espressione $f(x)$ e non il grafico. Allora cerchiamo le operazioni «pericolose» e scriviamo le condizioni perché $f(x)$ esista.</p>
+  <div class="tw"><table>
+    <tr><th>Se c'è…</th><th>Condizione</th><th>Esempio</th></tr>
+    <tr><td>una frazione</td><td>denominatore $\neq 0$</td><td>$\dfrac{2x}{x+1}$: $\;x+1\neq0 \Rightarrow x\neq -1$</td></tr>
+    <tr><td>una radice quadrata (indice pari)</td><td>radicando $\geq 0$</td><td>$\sqrt{x-1}$: $\;x-1\geq0\Rightarrow x\geq1$</td></tr>
+    <tr><td>un logaritmo</td><td>argomento $> 0$</td><td>$\ln(x-2)$: $\;x-2>0\Rightarrow x>2$</td></tr>
+    <tr><td>niente di tutto questo</td><td>nessuna</td><td>$3x^2-x+2$: $\;D=\mathbb{R}$</td></tr>
+  </table></div>
+  <div class="box warn"><b>Più condizioni insieme?</b> Devono valere <b>tutte</b> contemporaneamente (sistema). Esempio: $y=\dfrac{\sqrt{x}}{x-3}$ richiede $x\geq0$ <b>e</b> $x\neq3$, quindi $D=\{x\in\mathbb{R}: x\geq0,\ x\neq3\}$.</div>
+  <div class="box idea">Attenzione: la radice <b>cubica</b> (indice dispari) accetta anche numeri negativi: $\sqrt[3]{-8}=-2$. Quindi non dà condizioni.</div>
+</section>
+<section>
+  <h2><span class="step">2</span>Laboratorio: dal calcolo al grafico</h2>
+  <p>Scegli una funzione e muovi il cursore. Sull'asse $x$ vedi in <span style="color:var(--green);font-weight:700">verde</span> il dominio e in <span style="color:var(--red);font-weight:700">rosso</span> i valori esclusi: confrontali con le condizioni calcolate.</p>
+  <div class="labctl">
+    <select id="fSel"></select>
+    <div class="box idea" id="fInfo"></div>
+    <canvas id="cv" class="int" width="860" height="440"></canvas>
+    <div class="legend"><span><span class="sw" style="background:var(--green)"></span>dominio</span><span><span class="sw" style="background:var(--red)"></span>esclusi</span><span><span class="sw" style="background:var(--blue)"></span>grafico di $f$</span></div>
+    <label>Valore di $x$: <b id="xVal"></b></label>
+    <input type="range" id="xR">
+    <div class="readout" id="read"></div>
+  </div>
+</section>
+<section>
+  <h2><span class="step">3</span>Verifica veloce</h2>
+  <div id="quizBox4"></div>
+  <div class="score" id="score4"></div>
+  <p style="text-align:center"><button class="btn" id="reset4">Ricomincia</button></p>
+</section>
+
+<div class="pager"><a class="prev" href="#p3"><span class="lab">← Pagina precedente</span>3. Classificazione</a><a class="next" href="#p5"><span class="lab">Pagina successiva →</span>5. Quiz finale</a></div>
+</div>
+<div class="page" id="p5" data-sub="Pagina 5 di 5 · Quiz su tutto il percorso" data-title="Mettiti alla prova">
+
+<section>
+  <h2>Quiz finale</h2>
+  <p>Domande su tutto il percorso: notazione, lettura del grafico, classificazione e dominio. La correzione è immediata.</p>
+  <div id="quizBox5"></div>
+  <div class="score" id="score5"></div>
+  <p style="text-align:center"><button class="btn" id="reset5">Ricomincia</button></p>
+</section>
+
+<div class="pager"><a class="prev" href="#p4"><span class="lab">← Pagina precedente</span>4. Dominio</a><span></span></div>
+</div>
+
+</main>
+<footer>Matematica · Corso serale · Funzioni reali di variabile reale</footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+const K = el => { if (window.renderMathInElement) renderMathInElement(el || document.body, {delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false}); };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = v => { const r = Math.round(v*1000)/1000; return (Object.is(r,-0)?0:r).toString().replace(".", ","); };
+const fm = v => fmt(v).replace(",", "{,}");
+const parse = s => parseFloat(String(s).trim().replace(",", ".").replace("−","-"));
+const redraws = [];
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => redraws.forEach(f => f()));
+
+function plane(cv, win){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height, [x0,x1,y0,y1] = win;
+  const X = x => (x-x0)/(x1-x0)*W, Y = y => H-(y-y0)/(y1-y0)*H;
+  const P = {c,W,H,X,Y,win};
+  const ax = () => Math.min(Math.max(X(0),1),W-1), ay = () => Math.min(Math.max(Y(0),1),H-1);
+  P.inv = e => { const r = cv.getBoundingClientRect(); return [x0+(e.clientX-r.left)/r.width*(x1-x0), y1-(e.clientY-r.top)/r.height*(y1-y0)]; };
+  P.axes = () => {
+    const ink=css("--ink"), muted=css("--muted"), line=css("--line");
+    c.setLineDash([]); c.globalAlpha=1; c.clearRect(0,0,W,H);
+    const sx=(x1-x0)>14?2:1, sy=(y1-y0)>14?2:1, AX=ax(), AY=ay();
+    c.strokeStyle=line; c.lineWidth=1; c.font="14px system-ui"; c.fillStyle=muted; c.textAlign="left";
+    for(let i=Math.ceil(x0/sx)*sx;i<=x1;i+=sx){ c.beginPath(); c.moveTo(X(i),0); c.lineTo(X(i),H); c.stroke(); if(i!==0 && X(i)>6 && X(i)<W-22) c.fillText(i,X(i)+3,Math.min(AY+17,H-4)); }
+    for(let j=Math.ceil(y0/sy)*sy;j<=y1;j+=sy){ c.beginPath(); c.moveTo(0,Y(j)); c.lineTo(W,Y(j)); c.stroke(); if(j!==0 && Y(j)>22 && Y(j)<H-6) c.fillText(j,Math.min(AX+6,W-24),Y(j)-4); }
+    c.strokeStyle=ink; c.fillStyle=ink; c.lineWidth=2;
+    c.beginPath(); c.moveTo(0,AY); c.lineTo(W-2,AY); c.stroke();
+    c.beginPath(); c.moveTo(AX,H); c.lineTo(AX,2); c.stroke();
+    c.beginPath(); c.moveTo(W,AY); c.lineTo(W-12,AY-6); c.lineTo(W-12,AY+6); c.fill();
+    c.beginPath(); c.moveTo(AX,0); c.lineTo(AX-6,12); c.lineTo(AX+6,12); c.fill();
+    c.font="italic bold 17px Georgia,serif"; c.fillText("x",W-18,AY-10); c.fillText("y",AX+10,16);
+    if(X(0)>0&&X(0)<W&&Y(0)>0&&Y(0)<H) c.fillText("O",AX-16,AY+18);
+  };
+  P.fn = (f,col,lw=3) => {
+    c.strokeStyle=col; c.lineWidth=lw; c.setLineDash([]); c.beginPath(); let pen=false, prev=null;
+    for(let px=0;px<=W;px+=0.5){
+      const x=x0+px/W*(x1-x0), y=f(x);
+      if(!isFinite(y) || (prev!==null && Math.abs(y-prev)>(y1-y0))){ pen=false; prev=isFinite(y)?y:null; continue; }
+      const py=Math.max(-60,Math.min(H+60,Y(y)));
+      pen ? c.lineTo(px,py) : c.moveTo(px,py); pen=true; prev=y;
+    }
+    c.stroke();
+  };
+  P.param = (g,t0,t1,col,lw=3) => { c.strokeStyle=col; c.lineWidth=lw; c.setLineDash([]); c.beginPath();
+    for(let k=0;k<=600;k++){ const [px,py]=g(t0+(t1-t0)*k/600); k ? c.lineTo(X(px),Y(py)) : c.moveTo(X(px),Y(py)); } c.stroke(); };
+  P.dot = (x,y,col,r=7,mode) => {
+    c.setLineDash([]);
+    if(mode==="hole"){ c.fillStyle=css("--bg"); c.strokeStyle=col; c.lineWidth=2.5; c.beginPath(); c.arc(X(x),Y(y),r,0,2*Math.PI); c.fill(); c.stroke(); return; }
+    c.fillStyle=col; c.beginPath(); c.arc(X(x),Y(y),r,0,2*Math.PI); c.fill();
+    if(mode==="ring"){ c.fillStyle=css("--card"); c.beginPath(); c.arc(X(x),Y(y),r*0.4,0,2*Math.PI); c.fill(); }
+  };
+  P.dash = (xa,ya,xb,yb,col,lw=1.5) => { c.setLineDash([6,5]); c.strokeStyle=col; c.lineWidth=lw; c.beginPath(); c.moveTo(X(xa),Y(ya)); c.lineTo(X(xb),Y(yb)); c.stroke(); c.setLineDash([]); };
+  P.vline = (x,col) => { c.setLineDash([7,6]); c.strokeStyle=col; c.lineWidth=2; c.beginPath(); c.moveTo(X(x),0); c.lineTo(X(x),H); c.stroke(); c.setLineDash([]); };
+  P.hline = (y,col) => { c.setLineDash([7,6]); c.strokeStyle=col; c.lineWidth=2; c.beginPath(); c.moveTo(0,Y(y)); c.lineTo(W,Y(y)); c.stroke(); c.setLineDash([]); };
+  P.label = (t,x,y) => {
+    c.font="bold 15px system-ui"; c.textAlign="left"; const w=c.measureText(t).width;
+    let lx=X(x)+12; if(lx+w>W-4) lx=X(x)-12-w; let ly=Y(y)-12; if(ly<24) ly=Y(y)+28;
+    c.globalAlpha=.92; c.fillStyle=css("--card"); c.fillRect(lx-4,ly-16,w+8,22); c.globalAlpha=1;
+    c.fillStyle=css("--ink"); c.fillText(t,lx,ly);
+  };
+  P.xband = (a,b,col,alpha=.6) => { c.setLineDash([]); c.globalAlpha=alpha; c.strokeStyle=col; c.lineWidth=9; c.lineCap="butt"; c.beginPath(); c.moveTo(X(a),ay()); c.lineTo(X(b),ay()); c.stroke(); c.globalAlpha=1; };
+  P.yband = (a,b,col,alpha=.6) => { c.setLineDash([]); c.globalAlpha=alpha; c.strokeStyle=col; c.lineWidth=9; c.beginPath(); c.moveTo(ax(),Y(a)); c.lineTo(ax(),Y(b)); c.stroke(); c.globalAlpha=1; };
+  P.domBands = (f,col,alpha=.6) => { let start=null;
+    for(let px=0;px<=W;px++){ const x=x0+px/W*(x1-x0), ok=isFinite(f(x));
+      if(ok && start===null) start=x; if((!ok || px===W) && start!==null){ P.xband(start, ok?x:x0+(px-1)/W*(x1-x0), col, alpha); start=null; } } };
+  P.imgBands = (f,col,alpha=.6,lo=-60,hi=60) => {
+    const rows=new Uint8Array(H+1), N=40000; let py=null, prevY=null;
+    for(let k=0;k<=N;k++){ const x=lo+(hi-lo)*k/N, y=f(x);
+      if(!isFinite(y)){ prevY=null; continue; }
+      const a=prevY!==null && Math.abs(y-prevY)<(y1-y0)/4 ? prevY : y;
+      let r1=Math.round(Y(Math.max(Math.min(a,y),y0-1))), r2=Math.round(Y(Math.min(Math.max(a,y),y1+1)));
+      for(let r=Math.max(0,r2); r<=Math.min(H,r1); r++) if(Math.min(a,y)<=y1 && Math.max(a,y)>=y0) rows[r]=1;
+      prevY=y; }
+    c.globalAlpha=alpha; c.strokeStyle=col; c.lineWidth=9; let s=null;
+    for(let r=0;r<=H;r++){ if(rows[r]&&s===null) s=r; if((!rows[r]||r===H)&&s!==null){ c.beginPath(); c.moveTo(ax(),s); c.lineTo(ax(),r); c.stroke(); s=null; } }
+    c.globalAlpha=1; };
+  return P;
+}
+
+function makeQuiz(box, scoreEl, Q, resetBtn){
+  let right=0, done=0;
+  const upd = () => { scoreEl.textContent = `Punteggio: ${right} / ${done}` + (done===Q.length ? `  —  ${right>=Q.length*0.8?"Ottimo lavoro!":right>=Q.length/2?"Buon risultato, rivedi gli errori.":"Rileggi le pagine precedenti e riprova."}` : ""); };
+  const build = () => {
+    right=0; done=0; upd(); box.innerHTML="";
+    Q.forEach((q,i) => {
+      const d=document.createElement("div"); d.className="q";
+      d.innerHTML=`<div class="txt"><b>${i+1}.</b> ${q.t}</div><div class="opts"></div><div class="fb"></div>`;
+      const opts=d.querySelector(".opts"), fb=d.querySelector(".fb");
+      q.o.forEach((o,j) => {
+        const b=document.createElement("button"); b.innerHTML=o;
+        b.onclick=() => {
+          opts.querySelectorAll("button").forEach(x=>x.disabled=true);
+          opts.children[q.a].classList.add("right");
+          if(j===q.a){ right++; fb.className="fb box ok"; fb.innerHTML="<b>Esatto!</b> "+q.e; }
+          else { b.classList.add("wrong"); fb.className="fb box no"; fb.innerHTML="<b>Non proprio.</b> "+q.e; }
+          fb.style.display="block"; K(fb); done++; upd();
+        };
+        opts.appendChild(b);
+      });
+      box.appendChild(d);
+    });
+    K(box);
+  };
+  if(resetBtn) resetBtn.onclick=build;
+  build();
+}
+
+const QN = [
+  {t:String.raw`In $f:A\to B$, l'insieme $A$ si chiama…`, o:["Dominio","Codominio","Insieme immagine","Grafico"], a:0, e:"A è l'insieme di partenza: il dominio. B è l'insieme di arrivo: il codominio."},
+  {t:String.raw`Che cosa indica il simbolo $f(2)$?`, o:["La funzione f","Il numero che f associa a 2","Il prodotto di f per 2","Il dominio di f"], a:1, e:String.raw`$f(2)$ è un numero: l'immagine di 2, cioè l'altezza del grafico sopra $x=2$.`},
+  {t:String.raw`Se $f(x)=x^2-2x-1$, quanto vale $f(3)$?`, o:["$2$","$14$","$-4$","$5$"], a:0, e:String.raw`$f(3)=3^2-2\cdot3-1=9-6-1=2$.`},
+  {t:String.raw`Il punto $(1;\,-2)$ appartiene al grafico di $f(x)=x^2-2x-1$?`, o:["Sì","No"], a:0, e:String.raw`$f(1)=1-2-1=-2$: l'ordinata coincide, quindi il punto sta sul grafico.`},
+  {t:String.raw`Il punto $(2;\,4)$ appartiene al grafico di $f(x)=3x-1$?`, o:["Sì","No"], a:1, e:String.raw`$f(2)=6-1=5\neq4$. Il punto del grafico sopra $x=2$ è $(2;\,5)$.`},
+  {t:String.raw`L'insieme immagine di $f(x)=x^2$ è…`, o:[String.raw`$\mathbb{R}$`,String.raw`$[0;+\infty)$`,String.raw`$(0;+\infty)$`,String.raw`$\mathbb{R}\setminus\{0\}$`], a:1, e:String.raw`Un quadrato non è mai negativo e vale $0$ per $x=0$: $\operatorname{Im}f=[0;+\infty)$.`},
+  {t:"Una retta verticale incontra una curva in due punti. La curva può essere il grafico di una funzione?", o:["Sì","No"], a:1, e:"No: a quell'x corrisponderebbero due valori di y."},
+  {t:"Una retta orizzontale incontra il grafico di una curva in due punti. Può essere una funzione?", o:["Sì","No"], a:0, e:"Sì: due x diversi possono avere la stessa immagine (es. la parabola). Vietato è il contrario."},
+];
+const TIPI=["Razionale intera","Razionale fratta","Irrazionale intera","Irrazionale fratta","Trascendente"];
+const QC = [
+  {t:String.raw`Che tipo di funzione è $y=x^3-5x$?`, o:TIPI, a:0, e:"Non c'è x al denominatore né sotto radice: razionale intera."},
+  {t:String.raw`Che tipo di funzione è $y=\dfrac{x+2}{x-4}$?`, o:TIPI, a:1, e:"La x compare al denominatore, ma non sotto radice: razionale fratta."},
+  {t:String.raw`Che tipo di funzione è $y=\sqrt{x+3}$?`, o:TIPI, a:2, e:"La x è sotto radice, non al denominatore: irrazionale intera."},
+  {t:String.raw`Che tipo di funzione è $y=\dfrac{1}{\sqrt{x}}$?`, o:TIPI, a:3, e:"La x è sotto radice e al denominatore: irrazionale fratta."},
+  {t:String.raw`Che tipo di funzione è $y=e^x+1$?`, o:TIPI, a:4, e:"La x è all'esponente: funzione esponenziale, quindi trascendente."},
+];
+const QD = [
+  {t:String.raw`Qual è il dominio di $y=\dfrac{x+2}{x-4}$?`, o:[String.raw`$\mathbb{R}$`,String.raw`$x\neq-2$`,String.raw`$x\neq4$`,String.raw`$x>4$`], a:2, e:"Denominatore ≠ 0: x − 4 ≠ 0, cioè x ≠ 4. Il numeratore non conta!"},
+  {t:String.raw`Qual è il dominio di $y=\sqrt{x+3}$?`, o:[String.raw`$x\geq-3$`,String.raw`$x>-3$`,String.raw`$x\geq3$`,String.raw`$\mathbb{R}$`], a:0, e:"Radicando ≥ 0: x + 3 ≥ 0, cioè x ≥ −3 (lo zero sotto radice va bene)."},
+  {t:String.raw`Qual è il dominio di $y=\dfrac{5}{x^2-9}$?`, o:[String.raw`$x\neq9$`,String.raw`$x\neq3$`,String.raw`$x\neq\pm3$`,String.raw`$\mathbb{R}$`], a:2, e:"x² − 9 ≠ 0, cioè x² ≠ 9: x ≠ 3 e x ≠ −3."},
+  {t:String.raw`Qual è il dominio di $y=\ln(x-2)$?`, o:[String.raw`$x\geq2$`,String.raw`$x>2$`,String.raw`$x\neq2$`,String.raw`$x>0$`], a:1, e:"Argomento del logaritmo > 0 (strettamente!): x − 2 > 0, cioè x > 2."},
+  {t:String.raw`Qual è il dominio di $y=\dfrac{1}{\sqrt{x}}$?`, o:[String.raw`$x\geq0$`,String.raw`$x>0$`,String.raw`$x\neq0$`,String.raw`$\mathbb{R}$`], a:1, e:"Serve x ≥ 0 (radice) e √x ≠ 0 (denominatore): insieme danno x > 0."},
+  {t:String.raw`Qual è il dominio di $y=\dfrac{\sqrt{2x-6}}{x-5}$?`, o:[String.raw`$x\geq3$`,String.raw`$x\neq5$`,String.raw`$x\geq3,\ x\neq5$`,String.raw`$x>5$`], a:2, e:"2x − 6 ≥ 0 dà x ≥ 3; x − 5 ≠ 0 dà x ≠ 5. Valgono entrambe."},
+  {t:String.raw`Qual è il dominio di $y=\sqrt[3]{x-1}$?`, o:[String.raw`$x\geq1$`,String.raw`$x>1$`,String.raw`$\mathbb{R}$`,String.raw`$x\neq1$`], a:2, e:"La radice cubica (indice dispari) esiste anche per numeri negativi: nessuna condizione."},
+];
+
+
+/* A: sfida */
+(()=>{
+  const cv=document.getElementById("cvA"), P=plane(cv,[-6,6,-4,4]);
+  const tA=document.getElementById("tA"), fbA=document.getElementById("fbA"), sc=document.getElementById("scA");
+  let T=[9,9], pick=null, ok=0, tot=0, solved=false;
+  function draw(){ P.axes(); if(pick){ const m=css("--muted"); P.dash(pick[0],pick[1],pick[0],0,m); P.dash(pick[0],pick[1],0,pick[1],m); P.dot(pick[0],pick[1],solved?css("--green"):css("--amber"),8); P.label(`(${pick[0]}; ${pick[1]})`,pick[0],pick[1]); } }
+  function nuovo(){ let a,b; do{ a=Math.round(Math.random()*10-5); b=Math.round(Math.random()*6-3); } while(a===0||b===0||(a===T[0]&&b===T[1])); T=[a,b]; pick=null; solved=false;
+    tA.innerHTML=`Clicca sul punto $P(${a};\\,${b})$`; K(tA); fbA.style.display="none"; draw(); }
+  const dir=(v,p,n)=>`${Math.abs(v)} ${Math.abs(v)===1?"passo":"passi"} verso ${v>0?p:n}`;
+  cv.addEventListener("pointerdown",e=>{ if(solved) return; const [x,y]=P.inv(e); pick=[Math.round(x),Math.round(y)]; tot++;
+    if(pick[0]===T[0]&&pick[1]===T[1]){ ok++; solved=true; fbA.className="box ok"; fbA.innerHTML=`Esatto! Per arrivare a $P(${T[0]};\\,${T[1]})$ partendo da $O$ si fanno ${dir(T[0],"destra","sinistra")} e ${dir(T[1],"l'alto","il basso")}.`; }
+    else if(pick[0]===T[1]&&pick[1]===T[0]){ fbA.className="box no"; fbA.innerHTML=`Hai cliccato $(${pick[0]};\\,${pick[1]})$: hai <b>scambiato</b> $x$ e $y$! Prima l'ascissa (destra/sinistra), poi l'ordinata (alto/basso).`; }
+    else { fbA.className="box no"; fbA.innerHTML=`Hai cliccato $(${pick[0]};\\,${pick[1]})$. Riprova: parti da $O$, fai ${dir(T[0],"destra","sinistra")} e poi ${dir(T[1],"l'alto","il basso")}.`; }
+    fbA.style.display="block"; K(fbA); sc.textContent=`Punti trovati: ${ok} · tentativi: ${tot}`; draw(); });
+  document.getElementById("newA").onclick=nuovo; redraws.push(draw); nuovo();
+})();
+
+/* B: tabella -> punti */
+(()=>{
+  const cv=document.getElementById("cvB"), P=plane(cv,[-4,4,-3,8]);
+  const xs=[-3,-2,-1,0,1,2,3], f=x=>x*x-2; let n=0, joined=false;
+  const row=document.getElementById("yRow"), info=document.getElementById("bInfo"), add=document.getElementById("addB"), join=document.getElementById("joinB");
+  function table(){ row.innerHTML="<th>$y$</th>"+xs.map((x,i)=>`<td>${i<n?"$"+f(x)+"$":""}</td>`).join(""); K(row); }
+  function draw(){ P.axes(); if(joined) P.fn(f,css("--blue"),3);
+    for(let i=0;i<n;i++) P.dot(xs[i],f(xs[i]),css("--amber"),7);
+    if(n>0 && !joined){ const x=xs[n-1]; P.label(`(${x}; ${f(x)})`,x,f(x)); } }
+  add.onclick=()=>{ if(n>=xs.length) return; const x=xs[n]; n++;
+    const xx=x<0?`(${x})`:x;
+    info.innerHTML=`$x=${x}\\;\\longrightarrow\\; y=${xx}^2-2=${x*x}-2=${f(x)}$ &nbsp;&nbsp; quindi il punto $(${x};\\,${f(x)})$.`;
+    K(info); table(); draw(); if(n===xs.length){ add.disabled=true; join.disabled=false; } };
+  join.onclick=()=>{ joined=true; join.disabled=true; info.innerHTML=`Unendo i punti (e tutti quelli intermedi) otteniamo una curva, la <b>parabola</b>. È l'insieme di tutti i punti $(x;\\,x^2-2)$.`; K(info); draw(); };
+  document.getElementById("resB").onclick=()=>{ n=0; joined=false; add.disabled=false; join.disabled=true; info.innerHTML="La tabella è vuota: premi «Calcola il prossimo punto»."; table(); draw(); };
+  redraws.push(draw); table(); draw();
+})();
+
+/* C: retta verticale */
+(()=>{
+  const two=(d)=>{ if(d<-1e-9) return []; if(Math.abs(d)<1e-9) return [0]; const s=Math.sqrt(d); return [s,-s]; };
+  const C=[
+    {name:"y = x² − 2  (parabola)", fun:true, f:x=>x*x-2, ys:x=>[x*x-2]},
+    {name:"y = 0,5x + 1  (retta)", fun:true, f:x=>0.5*x+1, ys:x=>[0.5*x+1]},
+    {name:"y = √x  (radice)", fun:true, f:x=>x<0?NaN:Math.sqrt(x), ys:x=>x< -1e-9?[]:[Math.sqrt(Math.max(x,0))]},
+    {name:"x² + y² = 9  (circonferenza)", fun:false, param:t=>[3*Math.cos(t),3*Math.sin(t)], t:[0,2*Math.PI], ys:x=>two(9-x*x)},
+    {name:"x = y²  (parabola “sdraiata”)", fun:false, param:t=>[t*t,t], t:[-3,3], ys:x=>two(x)},
+  ];
+  const sel=document.getElementById("pSel"), R=document.getElementById("pR"), cv=document.getElementById("cv0"), P=plane(cv,[-6,6,-4,4]);
+  C.forEach((g,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=g.name; sel.appendChild(o); });
+  function draw(){
+    const g=C[+sel.value], teal=css("--blue"), acc=css("--amber"), m=css("--muted");
+    P.axes(); g.param ? P.param(g.param,g.t[0],g.t[1],teal) : P.fn(g.f,teal);
+    const x=Math.round(parseFloat(R.value)*10)/10, ys=g.ys(x);
+    document.getElementById("pVal").textContent=fmt(x);
+    P.vline(x,acc); ys.forEach(y=>P.dash(x,y,0,y,m)); P.dot(x,0,acc,5);
+    ys.forEach(y=>{ P.dot(x,y,acc,8,"ring"); P.label(`(${fmt(x)}; ${fmt(y)})`,x,y); });
+    const rd=document.getElementById("pRead");
+    if(ys.length===0){ rd.className="readout warn"; rd.innerHTML=`La retta $x=${fm(x)}$ <b>non tocca</b> la curva: a questo $x$ non corrisponde nessun $y$.`; }
+    else if(ys.length===1){ rd.className="readout ok"; rd.innerHTML=`Un solo punto: $(${fm(x)};\\,${fm(ys[0])})$. A $x=${fm(x)}$ corrisponde un solo valore, $y=${fm(ys[0])}$.`; }
+    else { rd.className="readout no"; rd.innerHTML=`<b>Due punti</b>: $(${fm(x)};\\,${fm(ys[0])})$ e $(${fm(x)};\\,${fm(ys[1])})$. Allo stesso $x$ corrispondono due valori di $y$!`; }
+    K(rd);
+  }
+  function setC(){ const g=C[+sel.value], v=document.getElementById("pVerdict"); v.className="box verdict "+(g.fun?"ok":"no");
+    v.textContent=g.fun?"✓ È il grafico di una funzione: ogni retta verticale la incontra al massimo in un punto.":"✗ NON è il grafico di una funzione: ci sono rette verticali che la incontrano in due punti."; draw(); }
+  let drag=false; const toX=e=>{ const [x]=P.inv(e); R.value=Math.max(-6,Math.min(6,Math.round(x*10)/10)); draw(); };
+  cv.addEventListener("pointerdown",e=>{drag=true; toX(e);}); cv.addEventListener("pointermove",e=>{ if(drag) toX(e); }); window.addEventListener("pointerup",()=>drag=false);
+  sel.addEventListener("change",setC); R.addEventListener("input",draw); redraws.push(draw); setC();
+})();
+
+/* D: leggi dal grafico */
+(()=>{
+  const cv=document.getElementById("cvD"), P=plane(cv,[-3,5,-3,5]), f=x=>x*x-2*x-1; let help=null;
+  const Qs=[{x:3},{x:0},{x:1},{y:2,xs:[-1,3]}];
+  function draw(){ P.axes(); P.fn(f,css("--blue"),3); if(help===null) return;
+    const q=Qs[help], m=css("--muted"), acc=css("--amber");
+    if(q.x!==undefined){ const y=f(q.x); P.dot(q.x,0,acc,5); P.dash(q.x,0,q.x,y,acc,2); P.dash(q.x,y,0,y,acc,2); P.dot(q.x,y,acc,7); }
+    else { P.hline(q.y,acc); q.xs.forEach(x=>{ P.dot(x,q.y,acc,7); P.dash(x,q.y,x,0,acc,2); P.dot(x,0,acc,5); }); } }
+  document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{ help=+b.dataset.h; draw(); });
+  document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.c, q=Qs[i], mk=document.getElementById("m"+i); let ok;
+    if(q.x!==undefined) ok=Math.abs(parse(document.getElementById("d"+i).value)-f(q.x))<1e-9;
+    else { const a=parse(document.getElementById("d3a").value), c=parse(document.getElementById("d3b").value); ok=[a,c].sort((u,v)=>u-v).join()===q.xs.join(); }
+    if(ok){ mk.className="mark y"; mk.textContent = q.x!==undefined ? `✓ Giusto: il punto è (${q.x}; ${f(q.x)})` : "✓ Giusto: due x diversi, stesso y!"; }
+    else { mk.className="mark n"; mk.textContent="✗ Riprova o premi Aiuto"; } });
+  redraws.push(draw); draw();
+})();
+
+/* frecce e punti */
+(()=>{
+  const EX=[
+    {b:"Funzione", A:[-1,0,1,2], B:[0,1,2,3,4], pairs:[[-1,1],[0,0],[1,1],[2,4]], ok:true,
+     t:"Ogni elemento di A ha <b>una e una sola</b> freccia: è una funzione. Nota che −1 e 1 vanno nello stesso elemento: è permesso! Sul piano, su ogni retta verticale c'è al massimo un punto. È la regola $x\\mapsto x^2$."},
+    {b:"Troppe frecce", A:[-1,0,1,2], B:[0,1,2,3,4], pairs:[[-1,1],[0,0],[1,1],[1,3],[2,4]], bad:[1], ok:false,
+     t:"L'elemento 1 ha <b>due frecce</b> (verso 1 e verso 3): <b>non</b> è una funzione. Sul piano i punti $(1;\\,1)$ e $(1;\\,3)$ stanno sulla stessa retta verticale."},
+    {b:"Freccia mancante", A:[-1,0,1,2], B:[0,1,2,3,4], pairs:[[-1,1],[0,0],[1,1]], ok:false,
+     t:"L'elemento 2 <b>non ha frecce</b>: <b>non</b> è una funzione da A in B. Sul piano, sopra $x=2$ non c'è nessun punto. Se togliamo 2 dall'insieme di partenza torna a essere una funzione: per questo è importante scegliere bene il <b>dominio</b>."},
+    {b:"Funzione costante", A:[-1,0,1,2], B:[0,1,2,3,4], pairs:[[-1,2],[0,2],[1,2],[2,2]], ok:true,
+     t:"Tutti gli elementi vanno in 2: è una funzione (si dice <b>costante</b>). Sul piano i punti stanno su una retta orizzontale, ma su ogni verticale ce n'è uno solo."},
+  ];
+  const cvV=document.getElementById("cvV"), P=plane(document.getElementById("cvP"),[-2.5,3.5,-1.5,4.5]), info=document.getElementById("exInfo"), bt=document.getElementById("exBtns");
+  let cur=0;
+  const lab=v=>String(v).replace("-","−");
+  function arrow(c,x1,y1,x2,y2,col){ c.strokeStyle=col; c.fillStyle=col; c.lineWidth=2.4; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+    const a=Math.atan2(y2-y1,x2-x1); c.beginPath(); c.moveTo(x2,y2); c.lineTo(x2-12*Math.cos(a-0.4),y2-12*Math.sin(a-0.4)); c.lineTo(x2-12*Math.cos(a+0.4),y2-12*Math.sin(a+0.4)); c.fill(); }
+  function draw(){
+    const ex=EX[cur], c=cvV.getContext("2d"), W=cvV.width, H=cvV.height;
+    const ink=css("--ink"), teal=css("--blue"), soft=css("--blue-soft"), acc=css("--amber"), red=css("--red"), card=css("--card");
+    c.clearRect(0,0,W,H); c.textAlign="center";
+    [[95,"A"],[305,"B"]].forEach(([cx,l])=>{ c.fillStyle=soft; c.strokeStyle=teal; c.lineWidth=2; c.beginPath(); c.ellipse(cx,215,64,150,0,0,2*Math.PI); c.fill(); c.stroke(); c.fillStyle=teal; c.font="bold 22px Georgia,serif"; c.fillText(l,cx,44); });
+    const pos=(arr,i,cx)=>[cx,215+(i-(arr.length-1)/2)*Math.min(62,250/arr.length)];
+    const bad=new Set(ex.bad||[]), has=new Set(ex.pairs.map(p=>p[0]));
+    ex.pairs.forEach(([a,b])=>{ const [xa,ya]=pos(ex.A,ex.A.indexOf(a),95), [xb,yb]=pos(ex.B,ex.B.indexOf(b),305), g=Math.atan2(yb-ya,xb-xa);
+      arrow(c,xa+19*Math.cos(g),ya+19*Math.sin(g),xb-19*Math.cos(g),yb-19*Math.sin(g),bad.has(a)?red:acc); });
+    const el=(v,x,y,w)=>{ c.fillStyle=card; c.strokeStyle=w?red:ink; c.lineWidth=w?3.5:1.5; c.beginPath(); c.arc(x,y,17,0,2*Math.PI); c.fill(); c.stroke();
+      c.fillStyle=ink; c.font="bold 15px system-ui"; c.textBaseline="middle"; c.fillText(lab(v),x,y); c.textBaseline="alphabetic"; };
+    ex.A.forEach((v,i)=>{ const [x,y]=pos(ex.A,i,95); el(v,x,y,bad.has(v)||!has.has(v)); });
+    ex.B.forEach((v,i)=>{ const [x,y]=pos(ex.B,i,305); el(v,x,y,false); });
+    c.textAlign="left";
+    P.axes(); ex.A.forEach(a=>{ if(bad.has(a)||!has.has(a)) P.vline(a,red); });
+    ex.pairs.forEach(([a,b])=>P.dot(a,b,bad.has(a)?red:acc,7));
+    info.className="box "+(ex.ok?"ok":"no"); info.innerHTML=`<b>${ex.ok?"✓":"✗"} ${ex.b}.</b> ${ex.t}`; K(info);
+    [...bt.children].forEach((b,i)=>b.className="btn"+(i===cur?"":" alt"));
+  }
+  EX.forEach((ex,i)=>{ const b=document.createElement("button"); b.textContent=ex.b; b.onclick=()=>{cur=i; draw();}; bt.appendChild(b); });
+  redraws.push(draw); draw();
+})();
+
+/* calcolo f(a) */
+(()=>{
+  const cv=document.getElementById("cvC"), P=plane(cv,[-3,5,-3,6]), f=x=>x*x-2*x-1;
+  const aIn=document.getElementById("aIn"), bIn=document.getElementById("bIn"), out=document.getElementById("cOut");
+  function draw(){
+    const a=parse(aIn.value), b=parse(bIn.value), teal=css("--blue"), m=css("--muted");
+    P.axes(); P.fn(f,teal,3);
+    if(isNaN(a)){ out.className="calc box warn"; out.textContent="Scrivi un numero in a."; return; }
+    const fa=f(a), A=a<0?`(${fm(a)})`:fm(a), t1=a*a, t2=-2*a;
+    let s=`f(${fm(a)})=${A}^2-2\\cdot ${A}-1=${fm(t1)}${t2<0?"-":"+"}${fm(Math.abs(t2))}-1=${fm(fa)}`;
+    let html=`$${s}$`;
+    P.dash(a,0,a,fa,m); P.dash(a,fa,0,fa,m); P.dot(a,fa,teal,7,"ring");
+    if(isNaN(b)){ out.className="calc box idea"; html+=`<br>Il punto del grafico con ascissa $${fm(a)}$ è $(${fm(a)};\\,${fm(fa)})$.`; P.label(`(${fmt(a)}; ${fmt(fa)})`,a,fa); }
+    else if(Math.abs(b-fa)<1e-9){ out.className="calc box ok"; html+=`<br>Il punto $(${fm(a)};\\,${fm(b)})$ <b>appartiene</b> al grafico, perché $f(${fm(a)})=${fm(b)}$.`; P.dot(a,b,css("--green"),8); P.label(`(${fmt(a)}; ${fmt(b)})`,a,b); }
+    else { out.className="calc box no"; html+=`<br>Il punto $(${fm(a)};\\,${fm(b)})$ <b>non appartiene</b> al grafico, perché $f(${fm(a)})=${fm(fa)}\\neq ${fm(b)}$. Il punto del grafico con ascissa $${fm(a)}$ è $(${fm(a)};\\,${fm(fa)})$.`;
+      P.dot(a,b,css("--red"),8); P.label(`(${fmt(a)}; ${fmt(b)})`,a,b); }
+    out.innerHTML=html; K(out);
+  }
+  cv.addEventListener("pointerdown",e=>{ const [x,y]=P.inv(e); aIn.value=fmt(Math.round(x)); bIn.value=fmt(Math.round(y*2)/2); draw(); });
+  aIn.addEventListener("input",draw); bIn.addEventListener("input",draw); redraws.push(draw); draw();
+})();
+
+/* ombre */
+(()=>{
+  const S=[
+    {n:"f(x) = x² − 2", f:x=>x*x-2, sig:String.raw`f:\mathbb{R}\to\mathbb{R},\ \ x\mapsto x^2-2`, D:String.raw`D=\mathbb{R}`, I:String.raw`\operatorname{Im}f=[-2;\,+\infty)`, why:"Il grafico si estende a destra e a sinistra senza interruzioni; il punto più basso è il vertice (0; −2)."},
+    {n:"f(x) = √(x + 3)", f:x=>x>=-3?Math.sqrt(x+3):NaN, sig:String.raw`f:[-3;\,+\infty)\to\mathbb{R},\ \ x\mapsto\sqrt{x+3}`, D:String.raw`D=[-3;\,+\infty)`, I:String.raw`\operatorname{Im}f=[0;\,+\infty)`, why:"Il grafico parte dal punto (−3; 0) e va solo verso destra e verso l'alto.", ends:[[-3,0]]},
+    {n:"f(x) = 1/x", f:x=>Math.abs(x)<1e-12?NaN:1/x, sig:String.raw`f:\mathbb{R}\setminus\{0\}\to\mathbb{R},\ \ x\mapsto\dfrac1x`, D:String.raw`D=\mathbb{R}\setminus\{0\}`, I:String.raw`\operatorname{Im}f=\mathbb{R}\setminus\{0\}`, why:"Il grafico non tocca mai l'asse y (x = 0 escluso) né l'asse x (y = 0 non è mai raggiunto).", holes:true},
+    {n:"f(x) = 2ˣ", f:x=>Math.pow(2,x), sig:String.raw`f:\mathbb{R}\to\mathbb{R},\ \ x\mapsto 2^x`, D:String.raw`D=\mathbb{R}`, I:String.raw`\operatorname{Im}f=(0;\,+\infty)`, why:"Il grafico c'è per ogni x, ma sta sempre sopra l'asse x: si avvicina a 0 senza mai arrivarci."},
+    {n:"f(x) = x + 1  con x ∈ [−2; 3]", f:x=>(x>=-2-1e-9&&x<=3+1e-9)?x+1:NaN, sig:String.raw`f:[-2;\,3]\to\mathbb{R},\ \ x\mapsto x+1`, D:String.raw`D=[-2;\,3]`, I:String.raw`\operatorname{Im}f=[-1;\,4]`, why:"Qui il dominio è scelto da noi: il grafico è solo un segmento, dal punto (−2; −1) al punto (3; 4).", ends:[[-2,-1],[3,4]]},
+  ];
+  const sel=document.getElementById("sSel"), P=plane(document.getElementById("cvS"),[-6,6,-4,5]), shD=document.getElementById("shD"), shI=document.getElementById("shI"), info=document.getElementById("sInfo");
+  S.forEach((s,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=s.n; sel.appendChild(o); });
+  function draw(){ const s=S[+sel.value]; P.axes();
+    if(shD.checked) P.domBands(s.f,css("--green"));
+    if(shI.checked) P.imgBands(s.f,css("--amber"));
+    P.fn(s.f,css("--blue"),3);
+    (s.ends||[]).forEach(([x,y])=>P.dot(x,y,css("--blue"),6));
+    if(s.holes){ P.dot(0,0,css("--red"),7,"hole"); }
+  }
+  function setS(){ const s=S[+sel.value]; info.innerHTML=`$${s.sig}$<br><span style="color:var(--green);font-weight:700">Dominio:</span> $${s.D}$ &nbsp;&nbsp; <span style="color:var(--amber);font-weight:700">Immagine:</span> $${s.I}$<br>${s.why}`; K(info); draw(); }
+  sel.addEventListener("change",setS); shD.addEventListener("change",draw); shI.addEventListener("change",draw); redraws.push(draw); setS();
+})();
+
+/* macchina */
+(()=>{
+  const M=[
+    {tex:"f(x)=2x+1", f:x=>({ok:true,y:2*x+1})},
+    {tex:"f(x)=x^2", f:x=>({ok:true,y:x*x})},
+    {tex:"f(x)=\\dfrac1x", f:x=>x===0?{ok:false,why:"Non si può dividere per zero: $0\\notin D$."}:{ok:true,y:1/x}},
+    {tex:"f(x)=\\sqrt x", f:x=>x<0?{ok:false,why:"La radice quadrata di un numero negativo non esiste nei reali: i numeri negativi non stanno nel dominio."}:{ok:true,y:Math.sqrt(x)}},
+  ];
+  const sel=document.getElementById("mSel"), inp=document.getElementById("mIn"), box=document.getElementById("mBox"), out=document.getElementById("mOut"), msg=document.getElementById("mMsg");
+  function run(){ const m=M[+sel.value], x=parse(inp.value); box.innerHTML=`$${m.tex}$`; K(box);
+    if(isNaN(x)){ out.textContent="?"; msg.className="box warn"; msg.textContent="Inserisci un numero."; return; }
+    const r=m.f(x);
+    if(r.ok){ out.textContent=fmt(r.y); msg.className="box ok"; msg.innerHTML=`$f(${fm(x)})=${fm(r.y)}$: l'immagine di $${fm(x)}$ è $${fm(r.y)}$, cioè il punto $(${fm(x)};\\,${fm(r.y)})$ sta sul grafico.`; }
+    else { out.textContent="⚠"; msg.className="box no"; msg.innerHTML="La macchina si inceppa. "+r.why; }
+    K(msg); }
+  sel.addEventListener("change",run); inp.addEventListener("input",run); run();
+})();
+
+makeQuiz(document.getElementById("quizBox2"), document.getElementById("score2"), QN.slice(0,6), document.getElementById("reset2"));
+makeQuiz(document.getElementById("quizBox3"), document.getElementById("score3"), QC, document.getElementById("reset3"));
+(()=>{
+  const F=[
+    {name:"y = 3x² − x + 2", tex:String.raw`f(x)=3x^2-x+2`, cls:"Algebrica razionale intera", dom:String.raw`D=\mathbb{R}`, why:"Nessuna frazione con x, nessuna radice: ogni numero va bene.", f:x=>3*x*x-x+2, ok:x=>[true], win:[-3,3,-2,14]},
+    {name:"y = 2x / (x + 1)", tex:String.raw`f(x)=\dfrac{2x}{x+1}`, cls:"Algebrica razionale fratta", dom:String.raw`D=\mathbb{R}\setminus\{-1\}`, why:"Denominatore ≠ 0: x + 1 ≠ 0, cioè x ≠ −1.", f:x=>2*x/(x+1), ok:x=>Math.abs(x+1)<1e-9?[false,"Con $x=-1$ il denominatore vale $0$: divisione impossibile."]:[true], win:[-6,5,-8,10], holes:[-1]},
+    {name:"y = √(x − 1)", tex:String.raw`f(x)=\sqrt{x-1}`, cls:"Algebrica irrazionale intera", dom:String.raw`D=\{x\in\mathbb{R}: x\geq1\}`, why:"Radicando ≥ 0: x − 1 ≥ 0, cioè x ≥ 1.", f:x=>Math.sqrt(x-1), ok:x=>x-1< -1e-9?[false,"Con $x<1$ sotto radice c'è un numero negativo."]:[true], win:[-3,9,-1,4]},
+    {name:"y = √x / (x − 3)", tex:String.raw`f(x)=\dfrac{\sqrt{x}}{x-3}`, cls:"Algebrica irrazionale fratta", dom:String.raw`D=\{x\in\mathbb{R}: x\geq0,\ x\neq3\}`, why:"Due condizioni insieme: x ≥ 0 (radice) e x ≠ 3 (denominatore).", f:x=>Math.sqrt(x)/(x-3), ok:x=>x< -1e-9?[false,"Con $x<0$ sotto radice c'è un numero negativo."]:(Math.abs(x-3)<1e-9?[false,"Con $x=3$ il denominatore vale $0$."]:[true]), win:[-3,9,-6,6], holes:[3]},
+    {name:"y = 2ˣ", tex:String.raw`f(x)=2^x`, cls:"Trascendente esponenziale", dom:String.raw`D=\mathbb{R}`, why:"Si può elevare 2 a qualunque esponente.", f:x=>Math.pow(2,x), ok:x=>[true], win:[-4,4,-1,12]},
+    {name:"y = ln x", tex:String.raw`f(x)=\ln x`, cls:"Trascendente logaritmica", dom:String.raw`D=\{x\in\mathbb{R}: x>0\}`, why:"Argomento del logaritmo > 0: x > 0 (lo zero è escluso!).", f:x=>Math.log(x), ok:x=>x<=1e-9?[false,"Il logaritmo esiste solo per argomenti strettamente positivi."]:[true], win:[-3,8,-4,3], holes:[0]},
+    {name:"y = sin x", tex:String.raw`f(x)=\sin x`, cls:"Trascendente goniometrica", dom:String.raw`D=\mathbb{R}`, why:"Il seno è definito per ogni angolo x (in radianti).", f:x=>Math.sin(x), ok:x=>[true], win:[-7,7,-2,2]},
+  ];
+  const sel=document.getElementById("fSel"), xR=document.getElementById("xR"), cv=document.getElementById("cv"); let P;
+  F.forEach((g,i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=g.name; sel.appendChild(o); });
+  function setF(){ const g=F[+sel.value]; P=plane(cv,g.win);
+    const fi=document.getElementById("fInfo"); fi.innerHTML=`$${g.tex}$ &nbsp;—&nbsp; <b>${g.cls}</b><br>${g.why}<br>$${g.dom}$`; K(fi);
+    xR.min=g.win[0]; xR.max=g.win[1]; xR.step=0.1; xR.value=Math.round(((g.win[0]+g.win[1])/2)*10)/10; draw(); }
+  function draw(){
+    const g=F[+sel.value], f=x=>g.ok(x)[0]?g.f(x):NaN, red=css("--red"), m=css("--muted");
+    P.axes(); P.xband(g.win[0],g.win[1],red,1); P.domBands(f,css("--green"),1);
+    (g.holes||[]).forEach(h=>P.dot(h,0,red,7,"hole"));
+    P.fn(f,css("--blue"),2.5);
+    const x=Math.round(parseFloat(xR.value)*10)/10, r=g.ok(x), rd=document.getElementById("read");
+    document.getElementById("xVal").textContent=fmt(x);
+    if(r[0] && isFinite(g.f(x))){ const y=g.f(x); P.dash(x,0,x,y,m); P.dash(x,y,0,y,m); P.dot(x,y,css("--amber"),7);
+      rd.className="readout ok"; rd.innerHTML=`$x=${fm(x)}$ appartiene al dominio: &nbsp; $f(${fm(x)})=${fm(y)}$`; }
+    else { P.vline(x,red); rd.className="readout no"; rd.innerHTML=`$x=${fm(x)}$ <b>non</b> appartiene al dominio. ${r[1]}`; }
+    K(rd); }
+  sel.addEventListener("change",setF); xR.addEventListener("input",draw);
+  let drag=false; const toX=e=>{ const [x]=P.inv(e); xR.value=Math.round(x*10)/10; draw(); };
+  cv.addEventListener("pointerdown",e=>{drag=true; toX(e);}); cv.addEventListener("pointermove",e=>{ if(drag) toX(e); }); window.addEventListener("pointerup",()=>drag=false);
+  redraws.push(()=>draw()); setF();
+})();
+makeQuiz(document.getElementById("quizBox4"), document.getElementById("score4"), QD.slice(0,4), document.getElementById("reset4"));
+makeQuiz(document.getElementById("quizBox5"), document.getElementById("score5"), QN.concat(QC, QD), document.getElementById("reset5"));
+K(document.body);
+
+const pagesEl=[...document.querySelectorAll(".page")], navA=[...document.querySelectorAll("nav a")];
+function show(){
+  let k=parseInt((location.hash||"#p0").replace("#p",""),10); if(isNaN(k)||k<0||k>5) k=0;
+  pagesEl.forEach((p,i)=>p.style.display=i===k?"block":"none");
+  navA.forEach((a,i)=>a.classList.toggle("on",i===k));
+  document.getElementById("hTitle").textContent=pagesEl[k].dataset.title;
+  document.getElementById("hSub").textContent=pagesEl[k].dataset.sub;
+  redraws.forEach(f=>f());
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",show);
+show();
+
+});
+</script>
+</body>
+</html>
